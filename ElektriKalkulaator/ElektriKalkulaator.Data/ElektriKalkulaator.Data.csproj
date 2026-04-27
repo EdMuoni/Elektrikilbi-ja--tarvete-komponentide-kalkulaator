@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
+		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
+		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
+	</ItemGroup>
 </Project>

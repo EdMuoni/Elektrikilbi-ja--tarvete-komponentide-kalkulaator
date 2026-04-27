@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Dto\" />
+    <Folder Include="Domain\" />
+    <Folder Include="ServiceInterface\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
+		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
+		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
+	</ItemGroup>
+	
 </Project>

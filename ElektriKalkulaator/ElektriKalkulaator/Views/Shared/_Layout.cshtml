@@ -1,50 +1,102 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="et">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ElektriKalkulaator</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] – ElektrikilbiKalkulaator</title>
+    <!-- Bootstrap 5 — grid ja komponendid -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Meie kohandatud tume teema -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ElektriKalkulaator.styles.css" asp-append-version="true" />
+    <!-- Google Fonts — Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- ================================================================
+         NAVIGATSIOONIBAAR
+         asp-controller / asp-action = Razor Tag Helper
+         Razor genereerib automaatselt õige URL-i kontrolleri ja actioni järgi
+         ================================================================ -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ElektriKalkulaator</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark-nav shadow-sm">
+            <div class="container">
+                <!-- Logo / brändimärk — klõps viib avalehele -->
+                <a class="navbar-brand fw-bold fs-5" asp-controller="Home" asp-action="Index">
+                    ⚡ ElektrikilbiKalkulaator
+                </a>
+
+                <!-- Mobiil: hamburger nupp -->
+                <button class="navbar-toggler border-0" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navMenu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <!-- Navigatsiooni lingid -->
+                <div class="collapse navbar-collapse" id="navMenu">
+                    <ul class="navbar-nav ms-auto gap-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link px-3" asp-controller="Home" asp-action="Index">
+                                🏠 Avaleht
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link px-3" asp-controller="Calculator" asp-action="Index">
+                                🔧 Kalkulaator
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3" asp-controller="Products" asp-action="Index">
+                                📦 Tooted
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 cart-link" asp-controller="Cart" asp-action="Index">
+                                🛒 Ostukorv
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ElektriKalkulaator - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Põhisisu ala — @RenderBody() = siin renderdatakse iga lehe sisu -->
+    <main class="container py-4">
+        <!-- Teadeteplokk (TempData["Success"] ja TempData["Error"]) -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ✅ @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ❌ @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <!-- Jalus -->
+    <footer class="footer mt-auto py-4">
+        <div class="container text-center">
+            <span class="text-muted small">
+                ⚡ ElektrikilbiKalkulaator &copy; 2025 — EVS-HD 60364 standardil põhinev kalkulaator
+            </span>
         </div>
     </footer>
+
+    <!-- JavaScript teegid — laaditakse lehe lõpus (kiirem laadimine) -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Lehekülje spetsiifilised skriptid (vorm, validatsioon jne) -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

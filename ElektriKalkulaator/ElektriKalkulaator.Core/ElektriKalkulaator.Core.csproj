@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -6,16 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Dto\" />
-    <Folder Include="Domain\" />
-    <Folder Include="ServiceInterface\" />
-  </ItemGroup>
+  <!-- Core projekt EI viita ühelegi teisele projektile -->
+  <!-- Core on "alus" — kõik teised sõltuvad sellest, mitte vastupidi -->
+  <!-- Sõltuvushierarhia: Core ← Data ← ApplicationServices ← Web -->
 
-	<ItemGroup>
-		<ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-	</ItemGroup>
-	
 </Project>

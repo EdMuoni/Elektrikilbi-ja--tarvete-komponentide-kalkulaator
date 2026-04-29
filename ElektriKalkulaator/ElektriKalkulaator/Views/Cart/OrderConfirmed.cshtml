@@ -1,0 +1,23 @@
+@* Tellimuse kinnituse leht *@
+@{
+    ViewData["Title"] = "Tellimus kinnitatud";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-lg-6 text-center">
+        <div style="font-size: 5rem; margin-bottom: 1.5rem;">✅</div>
+        <h2 class="text-white fw-bold mb-3">Tellimus kinnitatud!</h2>
+        <p class="text-muted-custom mb-4">
+            Aitäh! Sinu tellimus on vastu võetud.
+            Päris rakenduses saaksid siit e-posti kinnituse.
+        </p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber">
+                🔧 Uus arvutus
+            </a>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">
+                📦 Tooted
+            </a>
+        </div>
+    </div>
+</div>

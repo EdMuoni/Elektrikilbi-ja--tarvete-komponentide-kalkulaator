@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -6,9 +6,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-	</ItemGroup>
+  <!-- EF Core SQL Server — andmebaasiga suhtlemiseks -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Data vajab ainult Core projekti (Domain mudelid, interface-id) -->
+  <!-- Data EI viita ApplicationServices ega Web projektile -->
+  <ItemGroup>
+    <ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
+  </ItemGroup>
+
 </Project>

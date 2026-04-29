@@ -1,0 +1,79 @@
+@* Category management page *@
+@model IEnumerable<ElektriKalkulaator.Core.Domain.ProductCategory>
+
+@{
+    ViewData["Title"] = "Kategooriad";
+}
+
+<div class="mb-4">
+    <h1 class="page-title">⚙️ Kategooriate haldus</h1>
+    <p class="page-subtitle">Lisa ja kustuta tootekategooriad</p>
+</div>
+
+<div class="row g-4">
+    <!-- Lisa uus kategooria -->
+    <div class="col-lg-4">
+        <div class="card p-4">
+            <h5 class="text-white fw-bold mb-3">➕ Lisa uus kategooria</h5>
+            <form asp-action="CreateCategory" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label">Kategooria nimi *</label>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="nt Automaatikaseadmed" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kirjeldus</label>
+                    <input type="text" name="description" class="form-control"
+                           placeholder="Lühike kirjeldus (valikuline)" />
+                </div>
+                <button type="submit" class="btn btn-amber w-100">💾 Salvesta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Olemasolevad kategooriad -->
+    <div class="col-lg-8">
+        <div class="card p-4">
+            <h5 class="text-white fw-bold mb-3">📋 Kategooriad (@Model.Count())</h5>
+
+            @if (!Model.Any())
+            {
+                <p class="text-muted-custom small">Kategooriaid pole veel lisatud.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nimi</th>
+                                <th>Kirjeldus</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in Model)
+                            {
+                                <tr>
+                                    <td class="text-white fw-semibold">@cat.Name</td>
+                                    <td class="text-muted-custom small">@cat.Description</td>
+                                    <td>
+                                        <a asp-action="Index" asp-route-categoryId="@cat.Id"
+                                           class="btn btn-sm btn-secondary">
+                                            📦 Vaata tooteid
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary btn-sm">← Tagasi toodetele</a>
+</div>

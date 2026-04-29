@@ -1,0 +1,114 @@
+@* Ostukorvi leht *@
+@model List<ElektriKalkulaator.Controllers.CartItemViewModel>
+
+@{
+    ViewData["Title"] = "Ostukorv";
+}
+
+<div class="mb-4">
+    <h1 class="page-title">🛒 Ostukorv</h1>
+    <p class="page-subtitle">Sinu valitud tooted</p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card p-5 text-center">
+        <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">🛒</div>
+        <h5 class="text-white">Ostukorv on tühi</h5>
+        <p class="text-muted-custom small mb-4">
+            Lisa tooteid kataloogist või kasuta kalkulaatorit.
+        </p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber">
+                🔧 Kalkulaator
+            </a>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">
+                📦 Tooted
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        <!-- Ostukorvi nimekiri -->
+        <div class="col-lg-8">
+            <div class="card p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Toode</th>
+                                <th class="text-center">Kogus</th>
+                                <th class="text-end">Ühikuhind</th>
+                                <th class="text-end">Kokku</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-white">@item.ProductName</div>
+                                        <div class="text-muted-custom small">@item.Brand</div>
+                                    </td>
+                                    <td class="text-center">@item.Quantity tk</td>
+                                    <td class="text-end text-muted-custom">@item.UnitPrice.ToString("F2") €</td>
+                                    <td class="text-end price-tag-small">@item.TotalPrice.ToString("F2") €</td>
+                                    <td>
+                                        <!-- Eemalda toode korvist -->
+                                        <form asp-action="Remove" method="post">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                    title="Eemalda">✕</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="bom-total-row">
+                                <td colspan="3" class="text-end pe-3">💰 Kokku:</td>
+                                <td class="text-end price-tag">@ViewBag.TotalCost?.ToString("F2") €</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kassa sektsioon -->
+        <div class="col-lg-4">
+            <div class="card p-4">
+                <h5 class="text-white fw-bold mb-3">💳 Tellimuse kokkuvõte</h5>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted-custom">Tooteid kokku:</span>
+                    <span class="text-white">@Model.Sum(i => i.Quantity) tk</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 pt-2 border-top border-secondary">
+                    <span class="text-white fw-bold">Kogusumma:</span>
+                    <span class="price-tag">@ViewBag.TotalCost?.ToString("F2") €</span>
+                </div>
+
+                <!-- Kinnita tellimus -->
+                <form asp-action="Checkout" method="post" class="mb-2">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-amber w-100 btn-lg">
+                        ✅ Kinnita tellimus
+                    </button>
+                </form>
+
+                <!-- Tühjenda korv -->
+                <form asp-action="Clear" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-secondary w-100 btn-sm">
+                        🗑️ Tühjenda korv
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+}

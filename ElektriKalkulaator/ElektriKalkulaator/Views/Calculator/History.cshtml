@@ -1,0 +1,108 @@
+@* Calculation history page *@
+@model IEnumerable<ElektriKalkulaator.Core.Domain.PowerboxCalculation>
+
+@{
+    ViewData["Title"] = "Arvutuste ajalugu";
+}
+
+<div class="mb-4">
+    <h1 class="page-title">📋 Arvutuste ajalugu</h1>
+    <p class="page-subtitle">Kõik varasemad arvutused koos komponentide nimekirjaga</p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card p-5 text-center">
+        <div style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;">📋</div>
+        <h5 class="text-white">Ajalugu on tühi</h5>
+        <p class="text-muted-custom small">
+            Kasuta kalkulaatorit ja arvutused salvestatakse siia automaatselt.
+        </p>
+        <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber mx-auto" style="width:fit-content">
+            Ava kalkulaator
+        </a>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-4">
+        @foreach (var calc in Model)
+        {
+            <div class="card p-4">
+                <!-- Arvutuse päis -->
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge bg-success me-2">@calc.Status</span>
+                        <span class="text-muted-custom small">@calc.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                    </div>
+                    <div class="price-tag">@calc.TotalCost.ToString("F2") €</div>
+                </div>
+
+                @* Show input summary if available *@
+                @if (calc.Requirements != null)
+                {
+                    <div class="row g-3 mb-3 small">
+                        <div class="col-auto">
+                            <span class="text-muted-custom">Hoone:</span>
+                            <span class="text-white ms-1 fw-semibold">@calc.Requirements.BuildingType</span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="text-muted-custom">Toad:</span>
+                            <span class="text-white ms-1">@calc.Requirements.RoomCount</span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="text-muted-custom">Pistikud:</span>
+                            <span class="text-white ms-1">@calc.Requirements.SocketCount</span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="text-muted-custom">Lambid:</span>
+                            <span class="text-white ms-1">@calc.Requirements.LightCount</span>
+                        </div>
+                        @if (calc.Requirements.HasElectricStove)
+                        {
+                            <div class="col-auto">
+                                <span class="badge badge-ampere">♨️ Elektripliit</span>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @* BOM rows for this calculation *@
+                @if (calc.Components != null && calc.Components.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle small">
+                            <thead>
+                                <tr>
+                                    <th>Komponent</th>
+                                    <th class="text-center">Kogus</th>
+                                    <th class="text-end">Kokku</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var comp in calc.Components)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (comp.Product != null)
+                                            {
+                                                <span class="text-white">@comp.Product.Name</span>
+                                                <span class="text-muted-custom ms-1">@comp.Product.Brand</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted-custom">@comp.ProductId</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">@comp.Quantity tk</td>
+                                        <td class="text-end text-amber">@comp.TotalPrice.ToString("F2") €</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}

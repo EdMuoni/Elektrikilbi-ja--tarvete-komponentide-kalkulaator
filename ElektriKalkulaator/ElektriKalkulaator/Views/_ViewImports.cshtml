@@ -1,3 +1,12 @@
-﻿@using ElektriKalkulaator
+@* _ViewImports.cshtml — GLOBAALSED IMPORDID KÕIGILE VAADETELE *@
+@* Siin lisame namespace-id mida kasutame kõigis .cshtml failides *@
+@* Tänu sellele ei pea iga faili alguses kirjutama pikki using lauseid *@
+
+@using ElektriKalkulaator
 @using ElektriKalkulaator.Models
+@using ElektriKalkulaator.Core.Domain
+@using ElektriKalkulaator.Core.Dto
+@using ElektriKalkulaator.Controllers
+
+@* TagHelpers — lubab asp-controller, asp-action, asp-for jne atribuute HTML-is *@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

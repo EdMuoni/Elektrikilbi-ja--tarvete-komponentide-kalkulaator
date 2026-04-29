@@ -1,0 +1,219 @@
+@* Calculator page — shows the input form and, after POST, the BOM results side by side. *@
+
+@model ElektriKalkulaator.Core.Dto.CalculatorInputDto
+@using ElektriKalkulaator.Core.Dto
+
+@{
+    ViewData["Title"] = "Kalkulaator";
+    // Kas arvutuse tulemused on olemas? (POST pärast vormi saatmist)
+    var bom = ViewBag.BOM as List<BOMItemDto>;
+    var hasBom = bom != null && bom.Any();
+}
+
+<!-- Pealkiri -->
+<div class="mb-4">
+    <h1 class="page-title">🔧 ElektrikilbiKalkulaator</h1>
+    <p class="page-subtitle">
+        Täida hoone andmed — arvutame EVS-HD 60364 standardil põhineva komponentide nimekirja
+    </p>
+</div>
+
+<div class="row g-4">
+    <!-- VASAK: Sisendvorm -->
+    <div class="col-lg-5">
+        <div class="card p-4">
+            <h5 class="fw-bold text-white mb-4">📋 Hoone andmed</h5>
+
+            @* POST /Calculator — triggers EVS-HD 60364 calculation *@
+            <form asp-action="Index" asp-controller="Calculator" method="post">
+                @* CSRF protection *@
+                @Html.AntiForgeryToken()
+
+                <!-- Hoone tüüp -->
+                <div class="mb-3">
+                    <label asp-for="BuildingType" class="form-label">Hoone tüüp</label>
+                    <select asp-for="BuildingType" class="form-select">
+                        <option value="">-- Vali hoone tüüp --</option>
+                        <option value="korterelamu">🏢 Korterelamu</option>
+                        <option value="eramu">🏡 Eramu</option>
+                        <option value="ärihoone">🏪 Ärihoone</option>
+                    </select>
+                    @* Shows the [Required] validation message *@
+                    <span asp-validation-for="BuildingType" class="text-danger small"></span>
+                </div>
+
+                <!-- Tubade arv -->
+                <div class="mb-3">
+                    <label asp-for="RoomCount" class="form-label">Tubade arv</label>
+                    <input asp-for="RoomCount" type="number" min="1" max="100"
+                           class="form-control" placeholder="nt 4" />
+                    <span asp-validation-for="RoomCount" class="text-danger small"></span>
+                </div>
+
+                <!-- Pistikute arv -->
+                <div class="mb-3">
+                    <label asp-for="SocketCount" class="form-label">
+                        Pistikute arv
+                        <small class="text-muted-custom">(kokku kõigis tubades)</small>
+                    </label>
+                    <input asp-for="SocketCount" type="number" min="0" max="200"
+                           class="form-control" placeholder="nt 20" />
+                    <span asp-validation-for="SocketCount" class="text-danger small"></span>
+                </div>
+
+                <!-- Lampide arv -->
+                <div class="mb-3">
+                    <label asp-for="LightCount" class="form-label">
+                        Lampide arv
+                        <small class="text-muted-custom">(valgustitega kohad)</small>
+                    </label>
+                    <input asp-for="LightCount" type="number" min="0" max="200"
+                           class="form-control" placeholder="nt 15" />
+                    <span asp-validation-for="LightCount" class="text-danger small"></span>
+                </div>
+
+                <!-- Lülitite arv -->
+                <div class="mb-3">
+                    <label asp-for="SwitchCount" class="form-label">Lülitite arv</label>
+                    <input asp-for="SwitchCount" type="number" min="0" max="100"
+                           class="form-control" placeholder="nt 10" />
+                </div>
+
+                <!-- Elektripliit — checkbox -->
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input asp-for="HasElectricStove" type="checkbox" class="form-check-input" />
+                        <label asp-for="HasElectricStove" class="form-check-label text-white">
+                            ♨️ Elektripliit (6 mm² / 32A eraldatud ahel)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Arvuta nupp -->
+                <button type="submit" class="btn btn-amber w-100 btn-lg">
+                    ⚡ Arvuta komponendid
+                </button>
+            </form>
+        </div>
+
+        <!-- Selgituse kaart -->
+        <div class="card p-3 mt-3">
+            <h6 class="text-amber fw-bold mb-2">ℹ️ Arvutamise reeglid</h6>
+            <div class="small text-muted-custom">
+                <div class="mb-1">💡 <strong class="text-white">Valgustus:</strong> 1 ahel iga 8 lambi kohta · 1.5 mm² · 10A</div>
+                <div class="mb-1">🔌 <strong class="text-white">Pistikud:</strong> 1 ahel iga 6 pistiku kohta · 2.5 mm² · 16A</div>
+                <div class="mb-1">♨️ <strong class="text-white">Pliit:</strong> 1 eraldatud ahel · 6.0 mm² · 32A</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAREM: Tulemused -->
+    <div class="col-lg-7">
+        @if (hasBom)
+        {
+            <!-- BOM tabel — materjalide nimekiri -->
+            <div class="card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold text-white mb-0">📊 Komponentide nimekiri</h5>
+                    <span class="badge bg-success">✅ Arvutus valmis</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Komponent</th>
+                                <th class="text-center">Kogus</th>
+                                <th class="text-end">Ühikuhind</th>
+                                <th class="text-end">Kokku</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in bom!)
+                            {
+                                <!-- Iga BOM rida -->
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-white">@item.ProductName</div>
+                                        <div class="small text-muted-custom">@item.Brand</div>
+                                        @* Circuit type badge with colour coding *@
+                                        @if (!string.IsNullOrEmpty(item.CircuitType))
+                                        {
+                                            <span class="small bom-circuit-@item.CircuitType">
+                                                @switch (item.CircuitType)
+                                                {
+                                                    case "lighting": @("💡 Valgustus"); break;
+                                                    case "socket":   @("🔌 Pistikud"); break;
+                                                    case "stove":    @("♨️ Pliit"); break;
+                                                    case "rcd":      @("🛡️ RCD"); break;
+                                                    case "panel":    @("📦 Kilp"); break;
+                                                    default:         @item.CircuitType; break;
+                                                }
+                                            </span>
+                                        }
+                                        @if (item.WireCrossSectionMm2.HasValue)
+                                        {
+                                            <span class="badge-wire ms-1">@item.WireCrossSectionMm2 mm²</span>
+                                        }
+                                    </td>
+                                    <td class="text-center fw-bold">@item.Quantity tk</td>
+                                    <td class="text-end price-tag-small">@item.UnitPrice.ToString("F2") €</td>
+                                    <td class="text-end price-tag-small">@item.TotalPrice.ToString("F2") €</td>
+                                    <td>
+                                        @* Add to cart — POST form *@
+                                        <form asp-controller="Cart" asp-action="Add" method="post">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="hidden" name="quantity" value="@item.Quantity" />
+                                            <input type="hidden" name="returnUrl" value="/Calculator" />
+                                            <button type="submit" class="btn btn-sm btn-outline-amber" title="Lisa ostukorvi">
+                                                🛒
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <!-- KOKKU RIDA -->
+                        <tfoot>
+                            <tr class="bom-total-row">
+                                <td colspan="3" class="text-end pe-3">💰 Kokku:</td>
+                                <td class="text-end price-tag">
+                                    @ViewBag.TotalCost?.ToString("F2") €
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Lisa kõik ostukorvi -->
+                <div class="mt-3 pt-3 border-top border-secondary d-flex gap-2 flex-wrap">
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-amber">
+                        🛒 Vaata ostukorvi
+                    </a>
+                    <a asp-controller="Calculator" asp-action="History" class="btn btn-secondary">
+                        📋 Arvutuste ajalugu
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Tühi olek — enne arvutust -->
+            <div class="card p-5 text-center h-100 d-flex flex-column align-items-center justify-content-center">
+                <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1.5rem;">⚡</div>
+                <h5 class="text-white mb-2">Täida vorm ja vajuta "Arvuta"</h5>
+                <p class="text-muted-custom small">
+                    Sisesta hoone andmed vasakul — tulemused ilmuvad siia.<br>
+                    Arvutus põhineb EVS-HD 60364 Eesti elektristandardil.
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @* Client-side validation — shows errors immediately without a round-trip *@
+    <partial name="_ValidationScriptsPartial" />
+}

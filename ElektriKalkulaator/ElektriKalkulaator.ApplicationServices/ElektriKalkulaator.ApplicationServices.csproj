@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,13 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
   </ItemGroup>
 
+  <!-- ApplicationServices vajab ainult Core (interface'id) ja Data (DbContext) -->
+  <!-- EI viita veebiprojektile — see tekitaks ringviite! -->
   <ItemGroup>
     <ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
     <ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-    <ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.csproj" />
   </ItemGroup>
 
 </Project>

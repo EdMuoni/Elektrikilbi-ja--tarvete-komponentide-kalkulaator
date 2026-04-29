@@ -6,24 +6,26 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="9.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	</ItemGroup>
+  <ItemGroup>
+    <!-- Entity Framework Core SQL Server — andmebaas -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <!-- JSON töötlemiseks (ostukorv Sessions) -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
 
+  <!-- Viited teistele projektidele meie lahenduses -->
+  <!-- Veebiprojekt vajab kõiki kolme projekti -->
+  <ItemGroup>
+    <!-- Domain mudelid, DTOd, interface'id -->
+    <ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
+    <!-- DbContext ja andmebaasi loogika -->
+    <ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
+    <!-- Teenuste implementatsioonid (CalculatorServices jne) -->
+    <ProjectReference Include="..\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
-		<ProjectReference Include="..\ElektriKalkulaator\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-	</ItemGroup>
 </Project>

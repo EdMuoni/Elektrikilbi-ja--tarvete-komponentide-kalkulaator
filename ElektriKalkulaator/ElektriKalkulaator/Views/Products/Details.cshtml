@@ -1,0 +1,107 @@
+@* Toote detailvaade *@
+@model ElektriKalkulaator.Core.Domain.Product
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-secondary btn-sm">← Tagasi</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <div class="mb-3">
+                <span class="badge bg-secondary me-2">@Model.Category?.Name</span>
+                <span class="text-muted-custom small">@Model.Brand</span>
+            </div>
+
+            <h2 class="text-white fw-bold mb-3">@Model.Name</h2>
+
+            <!-- Tehnilised andmed -->
+            <div class="row g-3 mb-4">
+                @if (Model.RatedCurrent > 0)
+                {
+                    <div class="col-6">
+                        <div class="card bg-card p-3">
+                            <div class="text-muted-custom small">Nimivool</div>
+                            <div class="text-amber fw-bold fs-5">@Model.RatedCurrent A</div>
+                        </div>
+                    </div>
+                }
+                @if (Model.Voltage > 0)
+                {
+                    <div class="col-6">
+                        <div class="card bg-card p-3">
+                            <div class="text-muted-custom small">Nimipinge</div>
+                            <div class="text-white fw-bold fs-5">@Model.Voltage V</div>
+                        </div>
+                    </div>
+                }
+                @if (Model.WireCrossSectionMm2.HasValue)
+                {
+                    <div class="col-6">
+                        <div class="card bg-card p-3">
+                            <div class="text-muted-custom small">Juhtme ristlõige</div>
+                            <div class="text-white fw-bold fs-5">@Model.WireCrossSectionMm2 mm²</div>
+                        </div>
+                    </div>
+                }
+                <div class="col-6">
+                    <div class="card bg-card p-3">
+                        <div class="text-muted-custom small">Laoseis</div>
+                        <div class="fw-bold fs-5">
+                            @if (Model.StockQuantity > 0)
+                            {
+                                <span class="text-success">@Model.StockQuantity tk</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger">Otsas</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p class="text-muted-custom">@Model.Description</p>
+            }
+
+            <!-- Hind ja ostmine -->
+            <div class="d-flex align-items-center gap-3 mt-3">
+                <div class="price-tag">@Model.Price.ToString("F2") €</div>
+                @if (Model.StockQuantity > 0)
+                {
+                    <form asp-controller="Cart" asp-action="Add" method="post">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="quantity" value="1" />
+                        <button type="submit" class="btn btn-amber">
+                            🛒 Lisa ostukorvi
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin tegevused -->
+    <div class="col-lg-5">
+        <div class="card p-4">
+            <h6 class="text-muted-custom mb-3">⚙️ Admin tegevused</h6>
+            <div class="d-flex flex-column gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id"
+                   class="btn btn-secondary btn-sm">✏️ Muuda</a>
+                <a asp-action="Delete" asp-route-id="@Model.Id"
+                   class="btn btn-danger btn-sm">🗑️ Kustuta</a>
+            </div>
+            <hr class="section-divider" />
+            <div class="small text-muted-custom">
+                <div>Lisatud: @Model.CreatedAt.ToString("dd.MM.yyyy")</div>
+                <div>Muudetud: @Model.ModifiedAt.ToString("dd.MM.yyyy")</div>
+            </div>
+        </div>
+    </div>
+</div>

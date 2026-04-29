@@ -1,8 +1,90 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@* Avaleht — kangelasesektsioon + omaduste kaardid *@
+@{
+    ViewData["Title"] = "Avaleht";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- KANGELASESEKTSIOON -->
+<section class="hero-section mb-5">
+    <div class="row align-items-center w-100">
+        <div class="col-lg-7">
+            <h1 class="hero-title mb-3">
+                ⚡ <span class="hero-accent">ElektrikilbiKalkulaator</span>
+            </h1>
+            <p class="hero-subtitle mb-4">
+                Automaatne elektrikilbi komponentide kalkulaator
+                <strong class="text-amber">EVS-HD 60364</strong> standardil põhinev.<br>
+                Sisesta hoone andmed — saad täpse komponentide nimekirja koos hindadega.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber btn-lg">
+                    🔧 Kalkulaator
+                </a>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-amber btn-lg">
+                    📦 Tooted
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5 text-center d-none d-lg-block">
+            <div style="font-size: 8rem; opacity: 0.1;">⚡</div>
+        </div>
+    </div>
+</section>
+
+<!-- OMADUSTE KAARDID -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
+            <h5 class="fw-bold text-white mb-2">Kalkulaator</h5>
+            <p class="text-muted-custom small mb-3">
+                Sisesta hoone tüüp, tubade ja pistikute arv —
+                saad täpse komponentide nimekirja koos hindadega EVS-HD 60364 standardil.
+            </p>
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-primary btn-sm mt-auto">
+                Ava kalkulaator →
+            </a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📦</div>
+            <h5 class="fw-bold text-white mb-2">Toodete kataloog</h5>
+            <p class="text-muted-custom small mb-3">
+                ABB, Schneider ja Hager kaitselülitid, NYM juhtmed,
+                rikkevoolukaitsmeid ja kilbi korpused — kõik ühes kohas.
+            </p>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-sm mt-auto">
+                Vaata tooteid →
+            </a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📋</div>
+            <h5 class="fw-bold text-white mb-2">Arvutuste ajalugu</h5>
+            <p class="text-muted-custom small mb-3">
+                Vaata kõiki varasemaid arvutusi koos komponentide nimekirja
+                ja koguhinnadega.
+            </p>
+            <a asp-controller="Calculator" asp-action="History" class="btn btn-primary btn-sm mt-auto">
+                Vaata ajalugu →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- STANDARDI INFO -->
+<div class="card p-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h6 class="fw-bold text-white mb-1">🏛️ EVS-HD 60364 standard</h6>
+            <p class="text-muted-custom small mb-0">
+                Kõik arvutused põhinevad Eesti elektripaigaldiste standardil EVS-HD 60364.
+                Valgustusahelad: 1.5 mm² / 10A · Pistikuahelad: 2.5 mm² / 16A · Elektripliit: 6.0 mm² / 32A
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-2 mt-md-0">
+            <span class="badge bg-success px-3 py-2">✅ Standardi järgi</span>
+        </div>
+    </div>
 </div>

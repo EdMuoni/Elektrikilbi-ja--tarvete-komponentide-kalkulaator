@@ -1,0 +1,32 @@
+@* Kustutamise kinnitusvorm *@
+@model ElektriKalkulaator.Core.Domain.Product
+
+@{
+    ViewData["Title"] = "Kustuta toode";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card p-4 border border-danger" style="border-color: #ef4444 !important;">
+            <h4 class="text-danger fw-bold mb-3">🗑️ Kustuta toode</h4>
+            <p class="text-white">Kas oled kindel et soovid kustutada:</p>
+
+            <div class="card p-3 mb-4">
+                <div class="fw-bold text-white">@Model.Name</div>
+                <div class="text-muted-custom small">@Model.Brand · @Model.Category?.Name</div>
+                <div class="price-tag-small mt-1">@Model.Price.ToString("F2") €</div>
+            </div>
+
+            <p class="text-danger small">⚠️ Seda tegevust ei saa tagasi võtta!</p>
+
+            <div class="d-flex gap-2">
+                @* POST → DeleteConfirmed *@
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">🗑️ Jah, kustuta</button>
+                </form>
+                <a asp-action="Index" class="btn btn-secondary">← Tagasi</a>
+            </div>
+        </div>
+    </div>
+</div>

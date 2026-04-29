@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using ElektriKalkulaator.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElektriKalkulaator.Controllers
@@ -13,20 +11,14 @@ namespace ElektriKalkulaator.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        // GET / — landing page with hero section
+        public IActionResult Index() => View();
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        // GET /Home/Privacy
+        public IActionResult Privacy() => View();
 
+        // GET /Home/Error — shown when an unhandled exception occurs
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        public IActionResult Error() => View();
     }
 }

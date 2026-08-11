@@ -1,0 +1,58 @@
+@* New customer account *@
+@model ElektriKalkulaator.Core.Dto.RegisterDto
+
+@{
+    ViewData["Title"] = "Loo konto";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card p-4">
+            <h4 class="text-white fw-bold mb-1">👤 Loo konto</h4>
+            <p class="text-muted-custom small mb-4">Konto võimaldab salvestada arvutusi ja tellimusi.</p>
+
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label">Nimi</label>
+                    <input asp-for="FullName" class="form-control" autocomplete="name" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">E-post *</label>
+                    <input asp-for="Email" class="form-control" autocomplete="username" placeholder="nimi@näide.ee" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Parool *</label>
+                    <input asp-for="Password" type="password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                    <div class="form-text text-muted-custom">
+                        Vähemalt 8 tähemärki, sisaldab suur- ja väiketähte ning numbrit.
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ConfirmPassword" class="form-label">Korda parooli *</label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-amber w-100">Loo konto</button>
+            </form>
+
+            <hr class="section-divider" />
+            <p class="text-muted-custom small mb-0">
+                Konto juba olemas? <a asp-action="Login" class="text-amber">Logi sisse</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

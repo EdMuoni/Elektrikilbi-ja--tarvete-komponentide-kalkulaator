@@ -312,7 +312,7 @@ unaware. Being able to explain why a layer is absent is a stronger position than
 | 1 | **Frontend** | 🟢 Good | Razor + Bootstrap 5, custom dark theme, responsive card grid. Server-rendered, no SPA. |
 | 2 | **APIs & Backend Logic** | 🟡 Half | Backend logic is the project's strength (clean layering, tested service). But there's **no API surface** — controllers return HTML, not JSON. Blocks a React frontend and any mobile client. → Phase 2. |
 | 3 | **Database & Storage** | 🟢 Good | EF Core 9 + SQL Server, migrations, seeded reference data, decimal precision configured. File storage = local disk. |
-| 4 | **Auth & Permissions** | 🔴 **None** | **The most significant gap.** `/Products/Create`, `/Edit`, `/Delete` and the upload endpoint are open to anyone who knows the URL. `PowerboxCalculation.UserId` exists but is unused and there's no user table. Fine for a local demo; blocking for anything public. |
+| 4 | **Auth & Permissions** | 🟢 Good | **Closed 2026-08-11.** ASP.NET Core Identity with `Admin` and `Customer` roles; product/category management requires an admin, catalogue and calculator stay public. Passwords hashed, lockout after 5 failed attempts, admin seeded from User Secrets. Remaining: `PowerboxCalculation.UserId` is still not populated on save. |
 | 5 | **Hosting & Deployment** | 🔴 None | Runs on `localhost` only. Connection string hard-codes one machine name. Never deployed anywhere. |
 | 6 | **Cloud & Compute** | 🔴 None | No cloud resources. Not needed yet. |
 | 7 | **CI/CD & Version Control** | 🟡 Half | Git yes — but 4 commits, one branch, and ~a full session of work currently uncommitted. No CI pipeline, though `dotnet test` now makes one genuinely worthwhile, and ShopTARge24 has a `.github/workflows` folder to copy from. |

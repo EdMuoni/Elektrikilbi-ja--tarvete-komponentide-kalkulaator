@@ -44,6 +44,75 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Authentication and roles (ASP.NET Core Identity)
+
+**Type:** security / feature
+**Author:** Claude (Sonnet 5) + Edgar
+
+Closes the **critical** finding from the security review: the application had no authentication at
+all, so anyone who knew a URL could create, edit and delete products.
+
+**What changed**
+- `ApplicationUser` (extends `IdentityUser`) with `FullName`, `Language` and `CreatedAt`.
+  `UserRoles` holds the two role names as constants, so a typo becomes a compile error rather than
+  a silent hole.
+- `ElektriKalkulaatorContext` now inherits `IdentityDbContext<ApplicationUser>`, with
+  `base.OnModelCreating` called first. Migration `AddIdentityTables` creates the seven `AspNet*`
+  tables in the same database.
+- `Program.cs`: `AddIdentity` + `AddRoles`, password rules (8+ chars, upper, lower, digit),
+  lockout after 5 failed attempts for 5 minutes, unique email, and cookie paths for login and
+  access-denied. **`app.UseAuthentication()` added before `app.UseAuthorization()`** — its absence
+  was the root cause, since authorization has nothing to check without it.
+- `AccountController` with Login, Register, Logout and AccessDenied. Logout is POST-only so
+  another site cannot sign users out.
+- `IdentitySeeder` creates both roles and the first admin at startup. Credentials come from
+  configuration (User Secrets), never from constants — no password is committed.
+- `ProductsController` carries `[Authorize(Roles = Admin)]` at class level, with `[AllowAnonymous]`
+  on `Index` and `Details` only. Secure-by-default: a new action is protected unless explicitly
+  opened.
+- Login/Register/AccessDenied views styled to match the existing dark theme; `_Layout` shows the
+  signed-in user, an admin-only link, and login/register or logout.
+
+**Why this design**
+- **Identity rather than a hand-written login.** Password hashing, lockout and token handling are
+  exactly the things not to write yourself.
+- **Same database and DbContext** — one connection string, one migration chain, and it finally
+  gives the orphaned `PowerboxCalculation.UserId` a real table to reference, as the ERD spec
+  intended.
+- **Hand-written MVC views rather than scaffolded Identity Razor Pages** — the project is MVC with
+  a custom theme; scaffolding would add dozens of inconsistent files.
+- **Admins are seeded, never self-registered.** Everyone registering through the form gets
+  `Customer`; otherwise anyone could grant themselves catalogue deletion rights.
+
+**How it was verified**
+
+Build clean, `dotnet test` **16/16 passing**, plus the full flow exercised over real HTTP:
+
+| Check | Result |
+|---|---|
+| Anonymous → `/Products/Create`, `/Edit`, `/Delete`, `/Categories` | all `302` → `/Account/Login` (were `200`) |
+| Anonymous → `/`, `/Products`, `/Calculator`, `/Cart`, `/Products/Details` | all `200` — public pages unaffected |
+| Admin login | `302`, then admin pages return `200`, nav shows the account |
+| Wrong password | rejected, *"Vale e-post või parool."*, still blocked |
+| Customer registration | `302`, auto-signed-in |
+| **Logged-in customer → admin pages** | `302` → `/Account/AccessDenied` (authenticated but wrong role — correct behaviour) |
+| Customer → calculator / products / cart | all `200` |
+| Weak password `abc` | refused, no account created |
+| Logout | `302`, admin pages blocked again |
+
+Database confirmed directly: two users with correct roles, and `PasswordHash` stored as a hash,
+not plain text. Test customer account deleted afterwards; only the seeded admin remains.
+
+**Follow-ups or known limitations**
+- `PowerboxCalculation.UserId` still is not populated when a signed-in user runs a calculation —
+  the table now exists to point at, but the wiring is not done.
+- No email confirmation, password reset or "remember me" hardening. Fine for a thesis demo.
+- Cart is still session-based, so it is lost on logout and not tied to the account.
+- Admin credentials for this machine are in User Secrets. Anyone else cloning the repo must set
+  `AdminUser:Email` and `AdminUser:Password` themselves or no admin is created (a warning is logged).
+
+---
+
 ## 2026-08-11 — Security hardening: CSRF, open redirect, input validation, config
 
 **Type:** security

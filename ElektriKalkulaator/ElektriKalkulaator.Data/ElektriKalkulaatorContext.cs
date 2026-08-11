@@ -1,9 +1,16 @@
 using ElektriKalkulaator.Core.Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ElektriKalkulaator.Data
 {
-    public class ElektriKalkulaatorContext : DbContext
+    // Inherits IdentityDbContext rather than plain DbContext, which adds the tables ASP.NET Core
+    // Identity needs (users, roles, role assignments, login tokens) to this same database.
+    //
+    // Keeping users alongside the product data means one database, one connection string and one
+    // migration history — and it lets PowerboxCalculation.UserId finally point at a real table
+    // instead of being an orphaned column.
+    public class ElektriKalkulaatorContext : IdentityDbContext<ApplicationUser>
     {
         public ElektriKalkulaatorContext(DbContextOptions<ElektriKalkulaatorContext> options)
             : base(options) { }
@@ -17,6 +24,11 @@ namespace ElektriKalkulaator.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // MUST run first. IdentityDbContext configures its own tables (users, roles, claims,
+            // tokens) inside this base call. Skipping it leaves Identity half-configured and the
+            // login system silently broken.
+            base.OnModelCreating(modelBuilder);
+
             // Relationships
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)

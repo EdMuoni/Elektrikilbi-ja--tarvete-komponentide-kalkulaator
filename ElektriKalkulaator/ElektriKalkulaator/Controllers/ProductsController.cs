@@ -1,5 +1,7 @@
+using ElektriKalkulaator.Core.Domain;
 using ElektriKalkulaator.Core.Dto;
 using ElektriKalkulaator.Core.ServiceInterface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -7,6 +9,15 @@ namespace ElektriKalkulaator.Controllers
 {
     // Full CRUD for products plus category management.
     // Routes: /Products, /Products/Details, /Products/Create, /Products/Edit, /Products/Delete, /Products/Categories
+    //
+    // [Authorize(Roles = Admin)] on the CLASS means every action here requires an administrator
+    // by default. The two pages the public genuinely needs - the catalogue listing and a product's
+    // details - opt back out with [AllowAnonymous] individually.
+    //
+    // Securing by default and opening up deliberately is safer than the reverse: forgetting to add
+    // [Authorize] to a new action would leave it open, whereas forgetting [AllowAnonymous] only
+    // makes a page stricter than intended, which is obvious immediately.
+    [Authorize(Roles = UserRoles.Admin)]
     public class ProductsController : Controller
     {
         private readonly IProductServices _productServices;
@@ -24,6 +35,7 @@ namespace ElektriKalkulaator.Controllers
         }
 
         // GET /Products — catalogue with optional category filter and name search
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index(Guid? categoryId, string? searchTerm)
         {
@@ -41,6 +53,7 @@ namespace ElektriKalkulaator.Controllers
         }
 
         // GET /Products/Details/{id}
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {

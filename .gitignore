@@ -418,7 +418,8 @@ FodyWeavers.xsd
 *.msp
 /ShopTARge24/ShopTARge24.ApplicationServices/Services/WeatherForecastServices.cs
 
-# Uploaded product images are user-generated content, not source — keep the folder via .gitkeep
-# but don't commit what gets uploaded into it.
+# Uploaded product images are user-generated content, not source — don't commit them.
+# The in-house SVG illustrations shipped with the seed data ARE source, so they stay tracked.
 ElektriKalkulaator/ElektriKalkulaator/wwwroot/images/products/*
 !ElektriKalkulaator/ElektriKalkulaator/wwwroot/images/products/.gitkeep
+!ElektriKalkulaator/ElektriKalkulaator/wwwroot/images/products/*.svg

@@ -1,538 +1,442 @@
-# ElektriKalkulaator — Project Roadmap & AI Context Document
+# ElektriKalkulaator — Project Roadmap & Context Document
 
-> **Purpose of this file.** This is a self-contained briefing for any AI model (or human) picking
-> up this project without prior conversation history. It covers what the project is, how it got
-> here, what's built, what's missing, what's deliberately deferred (and why), and what to do next.
-> It is a **living document** — append to it, don't just read it. See "How to keep this document
-> updated" at the end before you finish a work session on this project.
->
-> Last updated: **2026-08-10 (rev. 2)**, by Claude (Sonnet 5), in collaboration with Edgar. Rev. 2
-> incorporates the official thesis proposal form and the author's own written ERD specification
-> (both previously unread `.docx` files), plus a targeted scan of five other coursework projects
-> for reusable patterns.
+**Revision 3** · last updated **2026-08-11** · maintained by Edgar Muoni with Claude
 
 ---
 
-## 1. Project identity
+## §0 — Read this first
+
+### What this document is
+A self-contained briefing on the ElektriKalkulaator project, written so that **someone who has
+never seen this codebase** — a new AI model with no chat history, a classmate, a reviewer, or
+Edgar himself in six months — can understand what it is, why it's built this way, and what to do
+next, without guessing.
+
+### Its two companion files
+| File | Purpose |
+|---|---|
+| `PROJECT_ROADMAP.md` (this file) | **Where things stand and where they're going.** Living document — sections get rewritten as reality changes. |
+| `CHANGELOG.md` | **What actually happened to the code, and why.** Append-only log, newest first. Never rewritten. |
+| `RESEARCH_LOG.md` | **Facts gathered from outside the project** — market prices, competitor design analysis, UX research, image sourcing. Separate from the changelog because external facts go stale on their own schedule. |
+| `IMAGE_CREDITS.md` | Attribution and licences for every shipped image. Legally required for the CC BY-SA one. |
+| `README.md` | Currently just the repo title. Low priority. |
+
+### House rules for code
+- **All code comments must be written in English.** Some older files still contain Estonian
+  comments (`*.csproj`, `site.css`, several views) — convert them when you next touch those files.
+- Comments should explain code so that a **beginner programmer** can follow the reasoning, not
+  just restate what the line does.
+- **Images: one format only — `.jpg`.** Applies to seeded catalogue images and uploads alike.
+
+### If you are an AI model picking this up cold
+1. Read this file top to bottom — it's designed to be your whole context.
+2. Read `CHANGELOG.md` for recent history and the reasoning behind current code.
+3. **After any code change**, add a `CHANGELOG.md` entry (template is in that file) and tick the
+   relevant checkbox in §D2 below. This is not optional bookkeeping — it's the mechanism that
+   keeps the next model from having to re-derive everything from scratch.
+4. Don't trust this document blindly on details — verify a file still exists before recommending
+   changes to it. Documents drift; code is the truth.
+
+### If you are a beginner programmer
+The project is an **ASP.NET Core MVC web application** in C#. Terms you'll meet below:
+- **MVC** — Model (data), View (HTML pages), Controller (handles requests). ASP.NET's standard way
+  of organising a website.
+- **EF Core (Entity Framework Core)** — translates C# classes into database tables so you rarely
+  write SQL by hand.
+- **Migration** — a versioned, generated script that updates the database schema when you change
+  a C# model class.
+- **DTO (Data Transfer Object)** — a simple class for moving data between layers (e.g. from a web
+  form into a service) without exposing the database entities directly.
+- **DI (Dependency Injection)** — instead of a class creating its own dependencies, they're handed
+  to it in its constructor. Configured in `Program.cs`. It's what makes the code testable.
+- **xUnit** — the testing framework. Methods marked `[Fact]` are run automatically by
+  `dotnet test`.
+
+Start by reading `§B2` (domain model) and `§B3` (the calculator algorithm). Those two sections are
+the heart of the project; everything else is scaffolding around them.
+
+---
+
+# PART A — Identity and purpose
+
+## §A1 — Project identity
 
 | | |
 |---|---|
-| **Project name** | ElektriKalkulaator (Estonian repo name: `Elektrikilbi-ja--tarvete-komponentide-kalkulaator`) |
-| **Official thesis title** | "Elektrikilbi ja -tarvete komponentide kalkulaator" — confirmed verbatim in the signed-off proposal form |
+| **Thesis title** | "Elektrikilbi ja -tarvete komponentide kalkulaator" (Electrical panel and supplies component calculator) |
+| **Type** | LÕPUTÖÖ — diploma thesis |
 | **Author** | Edgar Muoni |
-| **Type** | LÕPUTÖÖ — diploma/graduation thesis project |
-| **Institution** | Tallinna Tööstushariduskeskus, Infotehnoloogia osakond (IT department) — confirmed independently in both the ERD spec doc and the proposal form |
-| **Supervisor (juhendaja)** | Kalle Olumets — same, confirmed in both documents |
-| **Study group (õpperühm)** | TARge24 |
-| **Thesis plan submission** | The proposal form has two dates that don't agree: the form's own printed instruction says thesis plans ("lõputöö kava") are due **9. veebruar 2026**, but the field Edgar filled in under "Lõputöö plaani esitamise kuupäev" says **31.05.2026**. Not resolved — see §13 Open Questions. |
-| **Defense date** | Not stated in any document read so far. Unknown — see §13. |
-| **Repo root (this file's location)** | `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\Elektrikilbi-ja--tarvete-komponentide-kalkulaator\` |
-| **Git status as of writing** | Single branch `main`, 4 commits, solo author (Edgar), Apr 26 – May 7 2026 |
+| **Institution** | Tallinna Tööstushariduskeskus (TTHK), Infotehnoloogia osakond |
+| **Study group** | TARge24 |
+| **Supervisor (juhendaja)** | Kalle Olumets |
+| **Repo root** | `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\Elektrikilbi-ja--tarvete-komponentide-kalkulaator\` |
+| **Git** | branch `main`, 4 commits (Apr 26 – May 7 2026), solo author. Work from 2026-08-10 onward is **uncommitted** as of this revision. |
 
-**Important scope note for any AI reading this:** the repo map in §3 below includes paths *outside*
-this git repository, on Edgar's local machine (a much larger personal school-work repo at
-`C:\Users\Jazztime\Desktop\TARge24\`). If you are only given a clone of *this* repo, those paths
-won't exist for you — treat that material as background you're being told about, not files you can
-open. If you do have access to the full `TARge24` tree, it's genuinely useful reference material
-(see §7–§9).
+**Administrative record** (from the TTHK student portal, screenshot reviewed 2026-08-11 — recorded
+because it's the only dated administrative trail available, and dates matter for thesis planning):
 
----
+| Application (avaldus) | Submitted | Approved |
+|---|---|---|
+| Akadeemiline puhkus (academic leave) | 16.01.2024 | 05.02.2024 |
+| Rakenduskava muutmine (curriculum plan change) | 09.07.2024 | 09.07.2024 |
+| Välisõpilaseks vormistamine (registration as an exchange/foreign student) | 02.04.2026 | 10.04.2026 |
 
-## 2. Elevator pitch & vision
+Two things worth noting from that record: an academic leave in 2024 explains the gap between
+course enrolment (TARge24) and thesis work in 2026, and exchange-student status was approved on
+10.04.2026 — about two weeks before the implementation commits began. **Neither the portal nor any
+document read so far states a thesis defence date.** See §D4.
 
-**The official pitch**, quoted from the submitted proposal form (translated from Estonian):
+## §A2 — What it does (and what it will do)
+
+**The official pitch**, from the submitted proposal form `Lõputöö kavand_VORM.docx`, translated:
 
 > "Build a calculator that helps clients assemble electrical supplies and panel components for
-> apartment buildings [korterelamud] and commercial buildings [ärihooned]. The calculator would
-> show different components, their prices, and help clients make suitable choices."
+> apartment buildings and commercial buildings. The calculator would show different components,
+> their prices, and help clients make suitable choices."
 >
 > Goal: "A web-based application whose core component is the calculator algorithm."
 >
-> Practical value: "The innovation is that the automatic calculator uses Estonia's most common
-> electrical supply components, and assembles a panel and electrical system according to the
-> client's construction site's parameters. It produces a list with an estimated cost, removing the
-> need to use a cost-estimator's [eelarvestaja] service."
+> Value: "…the automatic calculator uses Estonia's most common electrical supply components and
+> assembles a panel and electrical system according to the client's construction site parameters.
+> It produces a list with an estimated cost, removing the need to use a cost-estimator's
+> (*eelarvestaja*) service."
 
-**Scope note**: the official proposal names only *korterelamu* (apartment building) and *ärihoone*
-(commercial building) as target building types. The actual seeded `CalculationRule` data and the
-`eramu` (private house) option in the UI go beyond that — a reasonable, low-risk extension, but
-worth having a one-sentence answer ready ("I extended coverage to private houses since the same
-EVS-HD 60364 rules apply, it cost nothing extra to include") rather than being caught off guard.
+**In plain terms:** the user says what kind of building they have and how many rooms, sockets and
+lights it needs. The app returns a **priced shopping list** (Bill of Materials) of breakers, cable,
+an RCD and an enclosure — calculated from the Estonian electrical standard **EVS-HD 60364**, using
+real products with real prices from its own catalogue.
 
-**Now (thesis deliverable):** a working ASP.NET Core web app where the user enters a building type
-+ room/socket/light counts, and gets back a priced Bill of Materials (BOM) — computed
-deterministically from **EVS-HD 60364** (the Estonian electrical installation standard), matched
-against a real seeded product catalogue with real prices and stock levels.
+**Scope note:** the proposal names only *korterelamu* (apartment building) and *ärihoone*
+(commercial building). The built app also supports *eramu* (private house). That's a small,
+defensible expansion — keep it, and mention it in one sentence rather than being caught out by it.
 
-**Officially documented future work** (from the author's own ERD specification, §7 of that
-document — see §12 below for the full list): CAD floor-plan import, user accounts, live supplier
-price feeds, PDF export.
-
-**Additionally discussed with Claude, not yet in any written thesis document (2026-07-27):**
-grow this into a real client-facing e-commerce/dropshipping site post-thesis, where the calculator's
-BOM becomes an actual customer order relayed to suppliers rather than fulfilled from owned stock.
-This is a broader commercial vision than the officially documented future work above — the two
-overlap (both want a `Supplier`-integration layer) but aren't identical, and only the
-CAD/accounts/pricing/PDF list has been formally written down by Edgar himself. Treat the
-dropshipping vision as Edgar's stated intent, not yet a committed academic scope item.
+**Future direction (post-thesis, not an academic commitment):** grow into a real client-facing
+shop where the calculator's BOM becomes an actual order, and the site acts as a middleman relaying
+orders to suppliers rather than holding stock (dropshipping). The calculator stays the core
+feature. See §D3.
 
 ---
 
-## 3. Repository & file map
+# PART B — The system as it is today
 
-### 3.1 The actual buildable solution (this repo)
+## §B1 — Architecture and file map
+
+Four projects, each depending only on the ones "below" it. This is the same layered structure as
+Edgar's earlier coursework (`ShopTARge24`), deliberately.
 
 ```
-Elektrikilbi-ja--tarvete-komponentide-kalkulaator/          ← git root, this file lives here
+Core  ←  Data  ←  ApplicationServices  ←  Web
+ ↑                                        ↑
+ └────────── Tests references these ──────┘
+```
+
+```
+Elektrikilbi-ja--tarvete-komponentide-kalkulaator/     ← git root
+├── PROJECT_ROADMAP.md                                  ← this file
+├── CHANGELOG.md                                        ← what changed and why
 └── ElektriKalkulaator/
-    ├── ElektriKalkulaator.slnx                              ← solution file
-    ├── ElektriKalkulaator.Core/                              ← Domain, DTO, ServiceInterface (no deps)
-    │   ├── Domain/        Product.cs, ProductCategory.cs, CalculationRule.cs,
-    │   │                  PowerboxCalculation.cs, PowerboxRequirements.cs, PowerboxComponents.cs
-    │   ├── Dto/           CalculatorInputDto.cs, BOMItemDto.cs, ProductDto.cs
-    │   └── ServiceInterface/  ICalculatorServices.cs, IProductServices.cs, ICategoryServices.cs
-    ├── ElektriKalkulaator.Data/                              ← EF Core DbContext + migrations
-    │   ├── ElektriKalkulaatorContext.cs                       (seed data lives here too)
-    │   └── Migrations/    20260429200202_InitialCreate.cs (+ Designer + Snapshot)
-    ├── ElektriKalkulaator.ApplicationServices/               ← service implementations
-    │   └── Services/      CalculatorServices.cs, ProductServices.cs, CategoryServices.cs
-    └── ElektriKalkulaator/                                   ← the ASP.NET Core web project
-        ├── Program.cs
-        ├── Controllers/   CalculatorController.cs, CartController.cs, ProductsController.cs, HomeController.cs
-        ├── Views/          Calculator/, Cart/, Products/, Home/, Shared/
-        ├── wwwroot/        css/site.css (custom dark-navy/amber theme over Bootstrap 5), lib/ (bootstrap, jquery)
-        └── appsettings.json  (SQL Server connection string, local `DESKTOP-KMVSVQK` server)
+    ├── ElektriKalkulaator.slnx                          ← solution file (lists all 5 projects)
+    ├── ElektriKalkulaator.Core/                         ← no dependencies on anything
+    │   ├── Domain/       Product, ProductCategory, CalculationRule,
+    │   │                 PowerboxCalculation, PowerboxRequirements, PowerboxComponents
+    │   ├── Dto/          CalculatorInputDto, BOMItemDto, ProductDto
+    │   └── ServiceInterface/  ICalculatorServices, IProductServices, ICategoryServices
+    ├── ElektriKalkulaator.Data/                         ← depends on Core
+    │   ├── ElektriKalkulaatorContext.cs                  (DbContext + all seed data)
+    │   └── Migrations/                                   (InitialCreate, AddEvsReference…)
+    ├── ElektriKalkulaator.ApplicationServices/          ← depends on Core + Data
+    │   └── Services/     CalculatorServices, ProductServices, CategoryServices
+    ├── ElektriKalkulaator.Tests/                        ← depends on Core + Data + AppServices
+    │   ├── TestBase.cs, CalculatorServicesTests.cs, ProductServicesTests.cs
+    └── ElektriKalkulaator/                              ← the website; depends on all three
+        ├── Program.cs                                    (DI wiring, middleware, auto-migrate)
+        ├── Controllers/  Calculator, Cart, Products, Home
+        ├── Views/        Calculator/, Cart/, Products/, Home/, Shared/
+        └── wwwroot/      css/site.css (custom dark theme), images/products/ (uploads), lib/
 ```
 
-Stack: **ASP.NET Core 9 MVC + EF Core 9 (SQL Server)**, Razor views + Bootstrap 5 with custom CSS
-variables for a dark theme, session-based cart (`Newtonsoft.Json`-serialised `Dictionary<Guid,int>`
-in ASP.NET session, 30-min idle timeout), no authentication anywhere. There is currently **no test
-project** in the solution.
+**Stack:** ASP.NET Core 9 MVC · EF Core 9 · SQL Server · Razor views · Bootstrap 5 with a custom
+dark-navy/amber theme · session-based cart · **no authentication**.
 
-### 3.2 Planning / reference material (outside this repo, same machine)
+## §B2 — Domain model
 
-All under `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\Elektrikilbi ja -tarvete kalk draft\` unless
-noted. All of these have now been read (as of rev. 2 of this document).
+All entities use `Guid` primary keys and `CreatedAt`/`ModifiedAt` timestamps set by the service layer.
 
-| File/folder | What it is | Key takeaway |
+- **`ProductCategory`** — `Name`, `Description`. Seeded (Estonian): Kaitselülitid (breakers),
+  Juhtmed (cables), RCD / Rikkevoolukaitsmeid, Klemmid (terminals), Kilbi korpused (enclosures).
+- **`Product`** — `CategoryId`, `Name`, `Brand`, `RatedCurrent` (used to match 10A/16A/32A
+  breakers), `Voltage`, `Price`, `StockQuantity`, `ImagePath`, `WireCrossSectionMm2` (cables only:
+  1.5 / 2.5 / 6.0 mm²), `Description`. 10 seeded ABB/Schneider/Draka products.
+- **`CalculationRule`** — the standard, encoded as data: `BuildingType`
+  (`korterelamu`/`eramu`/`ärihoone`), `CircuitType` (`lighting`/`socket`/`stove`),
+  `WireCrossSectionMm2`, `BreakerAmperes`, `RoomsFrom`/`RoomsTo`, `EvsReference` *(added
+  2026-08-10, currently unpopulated — see §D2)*. 8 seeded rules.
+- **`PowerboxCalculation`** — one row per "Calculate" click. `UserId` (nullable, **unused** — no
+  user table exists), `Status`, `RulesApplied`, `TotalCost`.
+- **`PowerboxRequirements`** — 1:1 with a calculation; stores exactly what the user typed.
+- **`PowerboxComponents`** — 1:N with a calculation; one row per BOM line
+  (`ProductId`, `Quantity`, `UnitPrice`, `TotalPrice`, `CircuitType`, `WireCrossSectionMm2`).
+
+**Important design note:** `CalculationRule` has **no foreign key** to anything. C# code joins it
+at runtime by matching `BuildingType` strings. This is deliberate and is stated explicitly in
+Edgar's own ERD document: rules are a general lookup table, not data belonging to one calculation.
+
+### Documented design vs. built code — known gaps
+Edgar's written spec (`ERD_Loogiline_Seletus.docx`) defines a 7-table schema. The built code
+differs in these ways. A reviewer who read that appendix may ask about them:
+
+| Spec says | Code actually has | Verdict |
 |---|---|---|
-| `elecpro-components-&-calculator/` (React+TS+Vite) | Earliest artifact (2026-01-29): AI-estimator-based UI/UX prototype (dark slate/yellow theme, `en`/`et`/`ru` i18n, calls Gemini for the BOM, no pricing). | Visual/UX north star, calculation approach explicitly rejected. See §8. |
-| `whole-building-calculator-erd.mermaid`, `powerbox-calculator-erd.mermaid`, `Whole_Building_Electrical_ERD.png` | ERD explorations (2026-02-02), still AI-service-oriented and US-centric (NEC, AWG, 120V/240V). | Superseded by the Estonia-localized ERD below. |
-| `powerbox-no-ai-visual-explanation.html` | Written AI-vs-rule-based pivot decision (2026-02-03). | Decision record for the project's most defensible architecture choice. |
-| `Elektrikilbi ja -tarvete komponentide kalkulaator .drawio/.png/.svg`, `elektrikomponentide-kalkulaator-erd.html`, `tabelite-seosed-seletus.html` | Final Estonia-localized ERD diagrams/explanations (2026-03-08/09). | Matches `ERD_Loogiline_Seletus.docx` below almost exactly; the `.docx` is the authoritative prose version, cite that one. |
-| **`ERD_Loogiline_Seletus.docx`** | The author's own formal, written database design specification — meant as an appendix to the thesis's theoretical section. **Read in full for rev. 2 — see §4.1, §9, and §12.** | This is the single most authoritative planning document for the data model. Where the real C# code disagrees with it, that's a documented gap, not a guess. |
-| **`Lõputöö kavand_VORM.docx`** | The official submitted thesis proposal form. **Read in full for rev. 2.** | Source of §1's identity facts, §2's official pitch, and the tech-stack reconciliation in §6. |
+| `USER` table (id, language, location) | No user entity at all; `PowerboxCalculation.UserId` is an orphan nullable field | Not built. Guest-only behaviour matches intent, but the table doesn't exist. |
+| `name_et` / `name_en` / `name_rus` on products & categories; `USER.language` | Single Estonian `Name` field | **Not built — and the spec calls multilinguality a *main design principle*, not an extra.** Explain as a time constraint; don't dress it up as deliberate scoping. |
+| `CALCULATION_RULES.room_type` (üldine/köök/vannituba/esik) | No room-type granularity | Simplified during implementation. Worth one honest sentence in the thesis. |
+| `CALCULATION_RULES.evs_reference` | ✅ Added 2026-08-10 — but values still empty | Needs real clause numbers from the standard. |
+| `POWERBOX_COMPONENTS.calculation_source` | Not present | Only matters once CAD import exists. Low priority. |
+| `PRODUCT.in_stock` (boolean) | `StockQuantity` (integer) | **Code is better than the spec here.** Positive deviation. |
+| "Only two required inputs: building type + room count" | Form also requires socket count, light count, stove checkbox | Honest answer: explicit counts proved more accurate than deriving them from room count. |
 
-### 3.3 Reference codebases from Edgar's broader coursework (same machine, `C:\Users\Jazztime\Desktop\TARge24\`)
+## §B3 — The core algorithm
 
-| Project | Path | Relevance |
-|---|---|---|
-| **ShopTARge24** (Edgar's own prior coursework) | `Veebiarendus/ShopTARge24/ShopTARge24/` | The architectural template this thesis's 4-project layering was explicitly modeled on. Full comparison in §7. |
-| **ShopTARge24_opetaja** | `Veebiarendus/ShopTARge24_opetaja/ShopTARge24/` | Teacher's reference solution for the same project. |
-| **ReactCRUD** | `Veebiarendus/ReactCRUD/` | Working React+TypeScript-over-C# solution (VS "ASP.NET Core with React" template). Directly answers "how do I wire the future frontend to this backend." See §9.1. |
-| **AdvancedAjax** | `Veebiarendus/AdvancedAjax/` | jQuery/AJAX cascading-dropdown and live-image-preview patterns. See §9.3. |
-| **Car_TARge24** | `Veebiarendus/Car_TARge24/` | Ships a ready-to-clone xUnit + EF-InMemory test project. See §9.4. |
-| **JustShop2** | `Agiilsed tarkvaraarenduse metoodikad/JustShop/JustShop2/` | Same layered architecture; has two working image-upload/render implementations. See §9.5. |
-| **Bitcoin-kalkulaator** | `Bitcoin-kalkulaator/` | Edgar's earlier, simpler calculator (WinForms). Checked, not useful beyond a "past mistake already fixed" contrast — see §9.2. |
-| **SeleniumShopUITestSampleTARge24** | `Tarkvarasüsteemide_Testimine/SeleniumShopUITestSampleTARge24-main/` | UI-level Selenium testing template for ShopTARge24, applicable to Calculator/Cart flows. |
+`ElektriKalkulaator.ApplicationServices/Services/CalculatorServices.cs` → `Calculate()`
+
+1. Load all `CalculationRule` rows matching the chosen `BuildingType`. **If none match, return an
+   empty list immediately.**
+2. Work out how many circuits are needed:
+   - lighting: `ceiling(LightCount / 8)` — one circuit per 8 lights
+   - sockets: `ceiling(SocketCount / 6)` — one circuit per 6 sockets
+   - stove: `1` if the box is ticked, otherwise `0`
+3. Estimate cable: `RoomCount × 8` metres per circuit.
+4. For each matching rule, pick the **cheapest in-stock** product that matches — a breaker whose
+   `RatedCurrent` equals the rule's amperage, and a cable whose cross-section matches.
+5. Always add one enclosure and one RCD (fault protection is mandatory under the standard).
+6. `SaveCalculation()` writes three tables: the calculation header, the user's inputs, and one row
+   per BOM line.
+7. `GetHistory()` returns the 50 most recent calculations for `/Calculator/History`.
+
+**Why this matters:** this is pure, deterministic arithmetic over data. Same inputs always give the
+same outputs, it's auditable, and it's testable — which is exactly the argument for choosing it
+over the AI-based approach in the original prototype. See §C3.
+
+## §B4 — What works right now
+
+✅ **Working:** product & category CRUD · the calculator (form → BOM → saved history) ·
+session-based cart (add/remove/clear) · product image upload and display · automatic database
+migration on startup · custom dark theme · **16 automated tests, all passing**
+
+⚠️ **Cosmetic only:** `CartController.Checkout()` clears the session and shows a confirmation
+page. **It saves nothing to the database.** There is no order.
+
+❌ **Absent:** authentication · i18n · orders/payment · deployment · everything in §D1 marked
+"Not started"
+
+🐞 **Known rough edges:** image-upload validation failures throw an exception (raw 500 page)
+instead of showing a friendly form error · one EF Core nullability warning (CS8620) in
+`CalculatorServices.GetHistory()` · connection string is hard-coded to a specific machine name
+(`DESKTOP-KMVSVQK`) in `appsettings.json`
 
 ---
 
-## 4. Domain model (full detail)
+# PART C — How it got here
 
-All entities in `ElektriKalkulaator.Core/Domain/`, `Guid` primary keys, `CreatedAt`/`ModifiedAt`
-timestamps set by the service layer via `DateTime.Now`.
+## §C1 — Timeline (reconstructed from file timestamps and git history)
 
-- **`ProductCategory`** — `Id`, `Name`, `Description`. 1→N `Products`. Seeded categories (Estonian):
-  Kaitselülitid (breakers), Juhtmed (cables), RCD / Rikkevoolukaitsmeid, Klemmid, Kilbi korpused
-  (enclosures).
-- **`Product`** — `Id`, `CategoryId` (FK), `Name`, `Brand`, `RatedCurrent`, `Voltage`, `Price`
-  (decimal 10,2), `StockQuantity` (int), `ImagePath` (nullable — **exists but is never rendered in
-  any view**, see §4.1/§9.5), `WireCrossSectionMm2` (nullable, only for cables), `Description`.
-- **`CalculationRule`** — `Id`, `RuleName`, `BuildingType` (string exact-match join key:
-  `korterelamu`/`eramu`/`ärihoone`), `WireCrossSectionMm2`, `BreakerAmperes`, `CircuitType`
-  (`lighting`/`socket`/`stove`), `RoomsFrom`/`RoomsTo`. 8 seeded rules encoding EVS-HD 60364.
-- **`PowerboxCalculation`** — `Id`, `UserId` (nullable Guid, unused, no `User` table exists),
-  `Status`, `RulesApplied`, `TotalCost`. 1↔1 `Requirements`, 1→N `Components`.
-- **`PowerboxRequirements`** — `Id`, `CalculationId`, `BuildingType`, `RoomCount`, `SocketCount`,
-  `LightCount`, `SwitchCount` (informational only), `HasElectricStove`, `FloorCount`/`TotalAreaM2`
-  (nullable, currently unused by the calculation itself).
-- **`PowerboxComponents`** — `Id`, `CalculationId`, `ProductId`, `Quantity`, `UnitPrice`,
-  `TotalPrice`, `CircuitType`, `WireCrossSectionMm2`.
-
-### DTOs (`ElektriKalkulaator.Core/Dto/`)
-- `CalculatorInputDto` — validated form model for `/Calculator`.
-- `BOMItemDto` — one BOM output row.
-- `ProductDto` — form model for Create/Edit product pages.
-
-### 4.1 Actual implementation vs. the officially documented ERD — known gaps
-
-`ERD_Loogiline_Seletus.docx` specifies a 7-table schema (`USER`, `POWERBOX_CALCULATION`,
-`POWERBOX_REQUIREMENTS`, `CALCULATION_RULES`, `POWERBOX_COMPONENTS`, `PRODUCT`,
-`PRODUCT_CATEGORY`) that maps closely onto the real EF Core model above — but not perfectly. These
-are genuine, citable differences between the *approved design* and the *built implementation*,
-useful to know before a committee member who has read the same appendix asks about them:
-
-| Documented in the ERD spec | Actually implemented | Note |
-|---|---|---|
-| `USER` table with `UserID` (PK), `language` (et/en/ru), `location`, `created_at` | No `User` entity exists at all. `PowerboxCalculation.UserId` is a bare nullable `Guid` with no backing table or FK. | Documented as supporting guest sessions either way — the "no login required" behavior matches intent, but the table itself was never built. |
-| `PRODUCT.name_et`/`name_en`/`name_rus`, `PRODUCT_CATEGORY.name_et`/`name_en`/`name_rus`, `USER.language` | `Product.Name`, `ProductCategory.Name` are single strings, Estonian only. | **This is more than a deferred nice-to-have** — multilingual text fields are listed explicitly as one of the database's stated "peamised disainipõhimõtted" (main design principles) in §8 of the spec doc: *"Mitmekeelsus: kõik kasutajale nähtavad tekstiväljad on saadaval eesti, inglise ja vene keeles."* The real schema doesn't have the columns for it yet. Be ready to say this plainly (time constraints during the build phase) rather than reframe it as intentional scoping — the design doc itself treats it as core, not optional. |
-| `CALCULATION_RULES.room_type` (`üldine`/`köök`/`vannituba`/`esik` — general/kitchen/bathroom/hallway) | `CalculationRule` has no room-type granularity — only `BuildingType` + `CircuitType`. | The real rule set is coarser than documented. Simplification made during implementation, not previously justified in writing — worth a one-line rationale in the thesis ("per-room-type rules were designed but simplified to per-circuit-type for the initial release; the schema's `RuleName`/`CircuitType` fields leave room to reintroduce room-level granularity later"). |
-| `CALCULATION_RULES.evs_reference` (e.g. `"EVS-HD 60364-4-41"`) | No such field on `CalculationRule`. | **Cheap, high-value fix**: this is a single nullable string column plus seed-data values. It would let the BOM output cite the exact standard clause per component — directly strengthens the "auditable, standards-traceable" argument that's already the project's best defense talking point (§8). Worth doing even outside the formal roadmap phases below, it's nearly free. |
-| `POWERBOX_COMPONENTS.calculation_source` (`"rule_based"`, future `"cad_import"`) | No such field on `PowerboxComponents`. | Low priority — only matters once CAD import (§12) is real. |
-| `PRODUCT.in_stock` (BIT) | `Product.StockQuantity` (INT) | The real implementation is **better** than the documented design here — quantity instead of a boolean. No action needed, just note it as a positive deviation if asked. |
-| Design principle: *"only two required inputs — building type and room count, everything else derived"* (ERD spec §8) | `CalculatorInputDto` requires `BuildingType`, `RoomCount`, **and** `SocketCount`, `LightCount` (both `[Range(0,500)]`, not optional), plus `HasElectricStove` | The built form asks for more explicit input than the approved design says it should. Defensible (more accurate than guessing sockets/lights per room), but if asked "your own design doc says two inputs, why does the form have five fields," the honest answer is that requiring the extra counts turned out to give better real-world accuracy than deriving them from room count alone — say that, don't pretend the doc said something else. |
-
----
-
-## 5. Core algorithm — `CalculatorServices.Calculate()`
-
-File: `ElektriKalkulaator.ApplicationServices/Services/CalculatorServices.cs`
-
-1. Load all `CalculationRule` rows where `BuildingType == input.BuildingType`. Empty BOM if none
-   match.
-2. Compute circuit counts: `lightingCircuits = ⌈LightCount / 8⌉`, `socketCircuits = ⌈SocketCount /
-   6⌉`, `stoveCircuits = HasElectricStove ? 1 : 0`.
-3. Rough wire estimate: `wireLengthPerCircuit = RoomCount × 8` metres.
-4. Per matching rule: cheapest in-stock breaker matching `RatedCurrent == rule.BreakerAmperes` in
-   "Kaitselülitid" → one BOM line. Cheapest in-stock cable matching `WireCrossSectionMm2` in
-   "Juhtmed" → one BOM line, quantity = `circuitCount × wireLengthPerCircuit` metres.
-5. Always append one enclosure ("Kilbi korpused") and one RCD ("RCD / Rikkevoolukaitsmeid"),
-   quantity 1 each.
-6. `SaveCalculation()` persists across `PowerboxCalculation`/`PowerboxRequirements`/
-   `PowerboxComponents`.
-7. `GetHistory()` returns the last 50 calculations, eager-loaded, for `/Calculator/History`.
-
-Pure, deterministic, side-effect-light logic (excluding DB reads) — see §11 (decision ledger) for
-why this matters, and §9.4 for the cheapest path to actually testing it.
-
----
-
-## 6. Design & planning history (chronological, dated from real file timestamps)
-
-1. **2026-01-29** — React/TypeScript/Vite UI prototype, calculator powered by a live Gemini call,
-   no pricing, "consult a licensed electrician" disclaimer.
-2. **2026-02-02** — Two ERD explorations, still `AI_ESTIMATOR`/`AI_SERVICE`-centered and
-   **US-centric** (NEC, 120V/240V/600V, AWG wire gauge, 100A/200A/400A service ratings).
-3. **2026-02-03** — `powerbox-no-ai-visual-explanation.html`: explicit written AI-vs-rule-based
-   comparison, concludes rule-based is correct, notes "can customize for Estonian regulations."
-4. **2026-03-08/09** — Final, Estonia-localized ERD diagrams **and** `ERD_Loogiline_Seletus.docx`
-   (the formal written spec — see §4.1): building types switch to Estonian terms, standard
-   reference switches to `evs_reference` (EVS-HD 60364), 7-table schema with multilingual product
-   fields and per-room-type rules specified.
-5. **2026-04-24** — `Lõputöö kavand_VORM.docx` (official thesis proposal) touched/finalized.
-6. **2026-04-26 to 2026-05-07** — Actual implementation, 4 git commits, culminating in a single
-   ~4300-line commit that built out most of the app. Some design-doc details (i18n columns,
-   room-level rules, `evs_reference`, the `User` table) didn't make it into this implementation
-   pass — see §4.1.
-
-**Tech stack reconciliation.** The official proposal's technology list is: *"MSQL, C#, .NET, HTML,
-javascript, Python, Typescript."* Checked against what actually exists:
-
-| Listed | Status |
+| Date | Event |
 |---|---|
-| MSQL (MSSQL) | ✅ SQL Server, as built |
-| C#, .NET | ✅ as built |
-| HTML | ✅ Razor views |
-| JavaScript | ✅ jQuery/Bootstrap JS already present (`site.js`, jquery-validation) |
-| TypeScript | Used in the `elecpro-components-&-calculator` prototype only; not yet in the production app — matches this document's Phase 2 (React frontend) plan, see §12. |
-| **Python** | **Not used anywhere yet**, prototype or production. Best-fit explanation: `ERD_Loogiline_Seletus.docx` §7 (future work) describes CAD floor-plan import (parsing DXF/DWG files to auto-detect outlet/light/switch positions) — a natural Python task (geometry/CAD file-format libraries are Python's strength, e.g. `ezdxf`), much more so than a general C# or TypeScript job. Treat Python as reserved for that one specific future feature, not a general-purpose addition to the current stack — this doesn't change the Phase 2 backend/frontend recommendation in §12. |
+| 2026-01-29 | React/TypeScript/Vite UI prototype (`elecpro-components-&-calculator`). Calculator powered by a live **Google Gemini** call. No pricing. Dark slate/yellow theme, 3-language UI. |
+| 2026-02-02 | Two ERD drafts — still AI-service-centred, and **US-centric** (NEC code, 120V/240V, AWG wire gauges). |
+| 2026-02-03 | `powerbox-no-ai-visual-explanation.html` — a written AI-vs-rules comparison concluding **rule-based is correct**, citing predictability, zero running cost, offline capability and code compliance. |
+| 2026-03-08/09 | Final **Estonia-localised** ERD set + `ERD_Loogiline_Seletus.docx`. NEC → EVS-HD 60364, US building types → korterelamu/eramu/ärihoone. |
+| 2026-04-10 | Exchange-student status approved (see §A1). |
+| 2026-04-24 | Thesis proposal form finalised. |
+| 2026-04-26 → 05-07 | Implementation. 4 commits; one ~4,300-line commit contains most of the app. |
+| 2026-08-10 | Nullable/error-handling bugfix · `EvsReference` field · product images + upload hardening · **test project added**. All logged in `CHANGELOG.md`. |
 
-**Net effect**: ~5 weeks of design/planning (including a real pivot away from an AI API call, a
-real US→Estonia localization pass, and a formally written 7-table spec), followed by a
-concentrated ~2-week implementation that built the core system but left several documented details
-(i18n columns, room-level rule granularity, the `User` table, `evs_reference`) for later.
+**The story this tells** — and it's a genuinely good one for a thesis methodology chapter — is
+five weeks of design that included **two real pivots** (AI → deterministic rules, then US standard
+→ Estonian standard), followed by a concentrated two-week build.
 
----
+## §C2 — Reference projects (Edgar's own earlier coursework)
 
-## 7. Relationship to ShopTARge24 (condensed — see the standalone comparison report for detail)
+All under `C:\Users\Jazztime\Desktop\TARge24\`. These are on Edgar's machine, not in this repo.
 
-A full file-by-file comparison report exists as a previously-published Claude artifact ("ElektriKalkulaator —
-Thesis Comparison Report"); if unavailable, regenerate by diffing conventions against
-`Veebiarendus/ShopTARge24/ShopTARge24/`.
+| Project | Path | What it's good for |
+|---|---|---|
+| **ShopTARge24** | `Veebiarendus/ShopTARge24/` | The architectural template this project copies. Matching it = safe; deviating = needs a reason. |
+| ShopTARge24_opetaja | `Veebiarendus/ShopTARge24_opetaja/` | Teacher's reference version of the same. |
+| **Car_TARge24** | `Veebiarendus/Car_TARge24/` | Source of the `TestBase` pattern now used in `ElektriKalkulaator.Tests`. |
+| **ReactCRUD** | `Veebiarendus/ReactCRUD/` | Working React+TS frontend over a C# backend — the exact recipe for §D3 Phase 2. Single solution, `.esproj` client, `SpaProxy` package, Vite dev-proxy, **no CORS code needed**. |
+| **AdvancedAjax** | `Veebiarendus/AdvancedAjax/` | jQuery `$.getJSON` cascading dropdowns; live image preview via `createObjectURL`. Source of the simple `wwwroot` upload pattern. |
+| JustShop2 | `Agiilsed tarkvaraarenduse metoodikad/JustShop/` | Two image-upload strategies (disk path vs DB blob). |
+| SeleniumShopUITest… | `Tarkvarasüsteemide_Testimine/SeleniumShopUITestSampleTARge24-main/` | Template if browser-level end-to-end tests are ever wanted. |
+| Bitcoin-kalkulaator | `Bitcoin-kalkulaator/` | Checked; not useful. WinForms, dead API, unfinished validation. |
 
-**Matches**: 4-project layering, manual DI registration style, domain model shape, naming
-conventions, async patterns.
+**The design draft** — `LÕPUTÖÖ/Elektrikilbi ja -tarvete kalk draft/elecpro-components-&-calculator/`
+— is a visual reference only. Its calculator calls Gemini and its output type has **no price
+field at all**. The real app's dark-navy/amber theme is already a deliberate adaptation of its
+slate/yellow palette.
 
-**Deliberate, defensible deviations**: two DTO layers instead of three; separate
-`Create.cshtml`/`Edit.cshtml` instead of combined `CreateUpdate.cshtml`; `ProductsController.Index()`
-correctly uses the service layer where ShopTARge24's `RealEstateController.Index()` bypasses its
-own.
+## §C3 — Decision ledger
 
-**Real inconsistency** (fix in Phase 1, §12): `ProductServices.GetById`/`CategoryServices.GetById`
-are typed non-nullable but can return `null` via a suppressed `!` warning; `Update`/`Delete` throw
-raw `Exception` on not-found instead of following ShopTARge24's null-return convention.
+When someone asks "why is it like this?", the answer is here. **Add a row whenever you make a
+non-obvious decision.**
 
-**Missing entirely**: automated tests — see §9.4 for the concrete fix (a better template than
-ShopTARge24's own test projects, found in Car_TARge24).
-
----
-
-## 8. Relationship to the TypeScript/React design draft (condensed)
-
-`elecpro-components-&-calculator` is a visual/UX reference only, calculator calls Gemini instead of
-computing anything deterministically, `CalculatedComponent` has no price field. **Already
-implemented in the real app**: `wwwroot/css/site.css` has a bespoke dark-navy/amber theme layered
-over Bootstrap that closely mirrors the draft's palette — this was a deliberate, successful
-adaptation. **Still missing**: product images, full i18n (now known to be a documented design
-principle, not just a draft aspiration — see §4.1), broader filtering.
-
-**The single most important finding**: the draft's AI-estimator has no price and an explicit
-"consult a licensed electrician" disclaimer. The real app's value proposition is the opposite — a
-priced, auditable, testable BOM. Lead talking point for the defense.
-
----
-
-## 9. Ideas mined from other sibling coursework projects
-
-Scope: read-only scan of five other projects under `C:\Users\Jazztime\Desktop\TARge24\`
-(ShopTARge24 excluded, covered separately in §7). Goal was concrete, transferable patterns, not
-another architecture audit.
-
-### 9.1 ReactCRUD — the exact wiring recipe for Phase 2
-
-`Veebiarendus/ReactCRUD/` is the Visual Studio "ASP.NET Core with React" template: a `.esproj`
-client project referenced from the C# server project with `ReferenceOutputAssembly=false`, plus
-the `Microsoft.AspNetCore.SpaProxy` package. In dev, Vite proxies `/api` calls straight to the
-ASP.NET Core HTTPS port; in prod, `Program.cs` just does
-`app.UseDefaultFiles(); app.MapStaticAssets(); app.MapFallbackToFile("/index.html");` and serves
-the built SPA as static files from the same origin as the API. **Result: no CORS configuration
-anywhere.** React side is plain — `fetch()`, `useState`/`useEffect`, react-router-dom, hand-typed
-TS interfaces mirroring C# view models (PascalCase → camelCase via
-`JsonSerializerOptions.PropertyNamingPolicy`), no AutoMapper, no shared-type codegen.
-
-**Action**: when Phase 2 starts, clone this structure directly instead of researching SPA-hosting
-options from scratch.
-
-### 9.2 Bitcoin-kalkulaator — checked, not useful
-
-Edgar's earlier calculator (WinForms, not web). Input validation is an empty-string check only; a
-numeric-format check was attempted and abandoned (commented out); unguarded `float.Parse` throws
-on bad input. No history/persistence. Nothing to adopt — noted only because ElektriKalkulaator's
-own `CalculatorInputDto` (model binding + `[Required]`/`[Range]` + `ModelState.IsValid` +
-persisted `History()`) is already more mature than this earlier attempt.
-
-### 9.3 AdvancedAjax — cascading dropdowns and live previews, zero new dependencies
-
-`Veebiarendus/AdvancedAjax/` demonstrates two jQuery-AJAX patterns (jQuery is already loaded in
-`_Layout.cshtml` for unobtrusive validation, so these cost nothing new):
-
-- **Cascading dropdown**: an `onchange` handler calls `$.getJSON('/Controller/Action', {...},
-  callback)` against a `[HttpGet] JsonResult` action that returns a filtered `SelectListItem` list;
-  the callback repopulates a second `<select>`.
-- **Live image preview**: `imgElement.src = window.URL.createObjectURL(fileInput.files[0])` on a
-  file input's `change` event, no upload required to preview.
-
-**Action**: `Views/Calculator/Index.cshtml` currently full-page POSTs and reloads to show the BOM
-table. A `Recalculate` JSON action + this same `$.getJSON` pattern could swap in a `_BomResults`
-partial without a reload — nice UX polish, not required for the defense, low effort. The
-live-preview snippet is also a direct drop-in for the product image upload work below.
-
-### 9.4 Car_TARge24 — the test-project template to actually copy
-
-`Veebiarendus/Car_TARge24/TARge24_Car_Test/` ships a working xUnit + EF Core InMemory test
-project:
-
-```csharp
-// TestBase.cs
-public abstract class TestBase {
-    protected IServiceProvider serviceProvider { get; set; }
-    protected TestBase() {
-        var services = new ServiceCollection();
-        services.AddScoped<ICarServices, CarServices>();
-        services.AddDbContext<Car_TARge24Context>(x => x.UseInMemoryDatabase("TEST"));
-        serviceProvider = services.BuildServiceProvider();
-    }
-    protected T Svc<T>() => serviceProvider.GetService<T>();
-}
-```
-Tests call the real `ApplicationServices` layer through its interface (`Svc<ICarServices>().Create(dto)`
-etc.) against the in-memory DB — integration-style, not mocked. (Its own assertions are a bit thin
-in places, but the harness itself is solid and directly copyable.)
-
-**Action** (Phase 1, highest priority): add `ElektriKalkulaator.Tests`, same package set
-(`Microsoft.EntityFrameworkCore.InMemory`, `xunit`, `xunit.runner.visualstudio`,
-`Microsoft.NET.Test.Sdk`), same `TestBase`/`Svc<T>()` shape, pointed at `ElektriKalkulaatorContext`.
-Cover `CalculatorServices.Calculate()` first.
-
-### 9.5 JustShop2 — two working image upload/render implementations
-
-`Agiilsed tarkvaraarenduse metoodikad/JustShop/JustShop2/` solves the exact
-`Product.ImagePath`-never-rendered gap two ways: (a) save to a disk folder with a GUID-prefixed
-filename, store the relative path, render with `<img src="~/path/@Model.FilePath">`; (b) store
-`byte[]` directly in the DB, render as a base64 data URI. Option (a) matches `Product.ImagePath`'s
-existing `string?` shape.
-
-**Action** (Phase 1): the *cheapest* real working version of option (a) is actually in
-`AdvancedAjax/CustomerController` — saving straight into `wwwroot/images` needs no extra
-`StaticFileOptions`/`PhysicalFileProvider` registration (unlike JustShop2's approach, which saves
-outside `wwwroot` and needs one). Add `<input asp-for="ImageFile" type="file">` to
-`Views/Products/Create.cshtml`/`Edit.cshtml` (currently has no file input at all — confirmed), save
-into `wwwroot/images/products/` with a GUID-prefixed filename, store the relative path in
-`Product.ImagePath`, add one `<img>` to `Views/Products/Index.cshtml`'s product card.
-
-### Prioritized shortlist across all five projects
-
-1. **xUnit test project from Car_TARge24's pattern** (§9.4) — highest value, low effort, closes
-   the most visible thesis gap.
-2. **Product image upload/render via AdvancedAjax's simple disk-save pattern** (§9.5) — closes the
-   other explicitly-flagged gap, no new middleware needed.
-3. **ReactCRUD's SPA-proxy wiring, bookmarked for Phase 2** (§9.1) — not needed pre-defense, but
-   removes all the guesswork later.
-4. **AJAX-ify the calculator submit** (§9.3) — medium value UX polish, low effort.
-5. **Cascading dropdowns on the Products form** (§9.3) — lower priority, essentially free once #4
-   is done.
-
----
-
-## 10. Current implementation status (as of 2026-08-10)
-
-**Built and working**: full `Product`/`ProductCategory` CRUD, calculator form → BOM → persisted
-history, session-based cart (checkout is cosmetic — clears session, writes nothing to DB),
-automatic EF Core migration on startup, custom dark-navy/amber theme.
-
-**Not built / deferred**: automated tests (§9.4), auth (`PowerboxCalculation.UserId` unused, no
-`User` table despite being in the ERD spec), real order persistence/payment, i18n (§4.1 — this is
-now known to be a documented design principle that wasn't implemented, not a deferred nice-to-have),
-product images in the catalogue view, `evs_reference` traceability field, room-level rule
-granularity, CAD import, PDF export, supplier price feeds.
-
-**Known bugs/inconsistencies**: the `GetById` nullable-annotation lie and mixed
-throw/null-return convention (§7).
-
----
-
-## 11. Explicit design decisions & rationale ledger
-
-| Decision | Rationale |
+| Decision | Reasoning |
 |---|---|
-| Rule-based (`CalculationRule` table + arithmetic) instead of an LLM call | Explicitly reasoned through in `powerbox-no-ai-visual-explanation.html` (2026-02-03): auditability, zero ongoing cost, 100% predictability, offline capability, guaranteed standard compliance. |
-| Two DTO layers, not three like ShopTARge24 | ShopTARge24's third layer existed for multi-entity forms with file uploads; this project's single CRUD entity doesn't need it. |
-| `CalculationRule` joined to `PowerboxRequirements` by string equality, no formal FK | Deliberate — stated explicitly in both `tabelite-seosed-seletus.html` and `ERD_Loogiline_Seletus.docx` §4.6: rules are a general lookup table read by business logic, not a relational entity tied to one specific requirements row. |
-| Estonian-only strings, no i18n yet | **Correction from rev. 1 of this document**: this was originally framed as a smart scoping decision. It's more accurate to say i18n was a *stated core design principle* in the approved ERD spec (§4.1) that wasn't implemented during the compressed build phase — still explainable (time constraints), but don't claim it was intentionally deferred as good scoping when the design doc itself calls it a main principle. |
-| Separate `Create.cshtml`/`Edit.cshtml` instead of ShopTARge24's combined view | Legitimate alternative convention — no runtime branching, and the two forms genuinely diverge slightly. |
-| Session-only cart, cosmetic checkout | Matches the thesis's scope: demonstrating the calculator and catalogue, not a production checkout flow. First real build target in a post-thesis commercial phase. |
-| Rules keyed on `BuildingType` + `CircuitType` only, not per-room-type as documented | Simplification made during implementation, not previously written down anywhere — now recorded here (§4.1) so it reads as a known, explainable scope reduction rather than an oversight if raised in the defense. |
+| **Rule table + arithmetic, not an LLM call** | Written out in full on 2026-02-03: auditable, reproducible, free to run, works offline, and guarantees standard compliance. An LLM can hallucinate an amperage; for electrical work that's unacceptable. **This is the project's strongest defence point — lead with it.** |
+| Two DTO layers, not three like ShopTARge24 | ShopTARge24's third (ViewModel) layer served multi-entity forms with uploads. With one CRUD entity here, it would be pure boilerplate. |
+| `CalculationRule` joined by string, no FK | Stated in the ERD spec: rules are a general lookup table, not rows owned by one calculation. |
+| Estonian-only, no i18n | **Honest framing:** the spec calls multilinguality a main design principle; it wasn't built in the compressed build phase. Also genuinely harder than it looks — `BuildingType` and `Category.Name` are *business-logic join keys*, not just labels, so i18n needs stable codes + a translation table, i.e. a schema change. |
+| Separate `Create`/`Edit` views, not one combined | Valid alternative convention; the two forms genuinely differ (Edit carries hidden `Id` and `ImagePath`). |
+| Session-only cart, cosmetic checkout | Matches thesis scope: demonstrate the calculator and catalogue, not a payment flow. |
+| Not-found → return `null`, not throw | Matches ShopTARge24, and the controllers already assumed it. Fixed 2026-08-10. |
+| Uploads into `wwwroot/images/products/` | `wwwroot` is already served by default — no extra middleware needed, unlike storing outside it. |
+| `EvsReference` left empty | Inventing standard clause numbers in a thesis about standards compliance would be worse than leaving them blank. Needs Edgar's verification against the real text. |
 
 ---
 
-## 12. Roadmap
+# PART D — Where it's going
 
-Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
+## §D1 — Full-stack maturity map
 
-### Phase 0 — Workflow setup
-- [x] Cross-session memory of project context established.
-- [x] This document created and revised (rev. 2, 2026-08-10) with the official thesis proposal,
-      the formal ERD spec, and sibling-project research folded in.
-- [ ] `CLAUDE.md` at repo root — optional, not yet requested.
-- [ ] `.claude/agents/{architect,coder,tester}.md` — discussed, not yet built.
+This is the honest answer to "how far is this from a real production system?", mapped against the
+thirteen layers of a production web stack.
 
-### Phase 1 — Pre-defense fixes, ranked by usefulness × cheapness
-- [ ] **Add `ElektriKalkulaator.Tests`** — xUnit + EF InMemory, cloned from
-      `Car_TARge24/TARge24_Car_Test`'s `TestBase`/`Svc<T>()` pattern (§9.4). Cover
-      `CalculatorServices.Calculate()` first: circuit-count math, stove conditional, RCD+enclosure
-      always present, empty result for unmatched `BuildingType`.
-- [ ] **Render product images** — file-upload input on `Products/Create.cshtml`/`Edit.cshtml`,
-      save to `wwwroot/images/products/` (AdvancedAjax-style, no extra middleware, §9.5), display
-      in `Products/Index.cshtml`.
-- [ ] Fix `ProductServices.GetById`/`CategoryServices.GetById` nullable-annotation lie; make
-      `Update`/`Delete` not-found handling consistent (§7).
-- [ ] **Nearly-free bonus**: add `EvsReference` (nullable string) to `CalculationRule`, seed real
-      EVS-HD 60364 clause citations (§4.1) — directly strengthens the project's best defense
-      talking point ("auditable, standards-traceable calculation") for one column and some seed
-      data.
-- [ ] *Optional, time permitting*: AJAX-ify the calculator submit (§9.3); broaden `/Products`
-      filtering (price range, brand).
-- [ ] Write the thesis's "future work" / limitations section using §4.1 (documented-vs-built gaps),
-      §8 (i18n structural cost), and §12 Phase 3/4 below.
+**Read this the right way.** It is an *orientation map*, not a to-do list. A diploma thesis is
+graded on whether it solves its stated problem correctly and is well-engineered — **not** on
+whether it has load balancing. Most rows below are correctly absent. The map's value is that you
+can now *name* what's missing and say deliberately "out of scope for v1" instead of being caught
+unaware. Being able to explain why a layer is absent is a stronger position than having built it.
 
-### Phase 2 — Post-defense: TypeScript/React frontend
-- [ ] Add a Web API surface (`[ApiController]`) alongside/replacing the MVC controllers —
-      `Core`/`Data`/`ApplicationServices` untouched.
-- [ ] Clone ReactCRUD's SPA-proxy wiring (§9.1) — `.esproj` client project, `SpaProxy` package,
-      Vite dev-proxy, same-origin static serving in prod, no CORS code.
-- [ ] Turn `elecpro-components-&-calculator` into a real app wired to the new API instead of
-      Gemini.
-- [ ] Do real i18n here — add the `name_et`/`name_en`/`name_rus` columns and `User.language` that
-      the ERD spec already calls for (§4.1), replace Estonian string join-keys
-      (`CalculationRule.BuildingType`, `Product.Category.Name`) with stable codes + a translation
-      table, since the API contract is already being touched.
+| # | Layer | Status | Where it stands |
+|---|---|---|---|
+| 1 | **Frontend** | 🟢 Good | Razor + Bootstrap 5, custom dark theme, responsive card grid. Server-rendered, no SPA. |
+| 2 | **APIs & Backend Logic** | 🟡 Half | Backend logic is the project's strength (clean layering, tested service). But there's **no API surface** — controllers return HTML, not JSON. Blocks a React frontend and any mobile client. → Phase 2. |
+| 3 | **Database & Storage** | 🟢 Good | EF Core 9 + SQL Server, migrations, seeded reference data, decimal precision configured. File storage = local disk. |
+| 4 | **Auth & Permissions** | 🔴 **None** | **The most significant gap.** `/Products/Create`, `/Edit`, `/Delete` and the upload endpoint are open to anyone who knows the URL. `PowerboxCalculation.UserId` exists but is unused and there's no user table. Fine for a local demo; blocking for anything public. |
+| 5 | **Hosting & Deployment** | 🔴 None | Runs on `localhost` only. Connection string hard-codes one machine name. Never deployed anywhere. |
+| 6 | **Cloud & Compute** | 🔴 None | No cloud resources. Not needed yet. |
+| 7 | **CI/CD & Version Control** | 🟡 Half | Git yes — but 4 commits, one branch, and ~a full session of work currently uncommitted. No CI pipeline, though `dotnet test` now makes one genuinely worthwhile, and ShopTARge24 has a `.github/workflows` folder to copy from. |
+| 8 | **Security** | 🟡 Half | Present: antiforgery tokens on POSTs, EF Core parameterised queries (no SQL injection), HTTPS redirection, upload allow-list + size cap + GUID filenames. Missing: auth (row 4), content-type verification on uploads, secret management. |
+| 9 | **Rate Limiting** | 🔴 None | .NET 9 has `AddRateLimiter` built in — a few lines whenever it's actually needed. |
+| 10 | **Caching & CDN** | 🔴 None | Note: `AddDistributedMemoryCache()` in `Program.cs` looks like caching but only backs session state. |
+| 11 | **Load Balancing & Scaling** | 🔴 None | Worth knowing: the cart lives in **in-memory** session state, so running two instances would randomly lose carts. A real blocker for the dropshipping vision, not for the thesis. |
+| 12 | **Error Tracking & Logs** | 🟡 Half | Default `ILogger`, migration failures logged, `UseExceptionHandler` in production. No structured logging, no aggregation. |
+| 13 | **Availability & Recovery** | 🔴 None | No backups, health checks or recovery plan. |
 
-### Phase 3 — Officially documented future work (from `ERD_Loogiline_Seletus.docx` §7)
-- [ ] **CAD floor-plan import**: parse uploaded DXF/DWG files to auto-detect outlet/light/switch
-      counts, populating `POWERBOX_REQUIREMENTS` automatically instead of manual entry. Extends
-      `PowerboxRequirements` with `OutletsCount`/`LightsCount`/`SwitchesCount` and
-      `PowerboxComponents` with a `CalculationSource` flag (`"rule_based"` vs `"cad_import"`).
-      **This is the most plausible home for Python** in the stack (§6) — CAD/geometry parsing
-      libraries are a Python strength; likely shape is a small dedicated parsing service the C#
-      backend calls, not a rewrite of anything existing.
-- [ ] **User accounts**: build the `User` table the ERD spec already defines (email, password
-      hash, roles), wire it to the existing (currently unused) `PowerboxCalculation.UserId`, so
-      calculation history can be tied to a real account instead of only session-scoped guests.
-- [ ] **Live supplier price feeds**: extend `Product` with a `SupplierId` FK to a new `Supplier`
-      table; real-time price queries against ABB/Schneider/Hager wholesaler feeds.
-- [ ] **PDF export**: export a calculation's BOM as a PDF (component list, quantities, prices,
-      EVS-HD 60364 references) — usable as a cost-estimation document for building-permit
-      applications.
+**For the defence:** rows 1–3 are solid, row 4 is the one you should proactively acknowledge, and
+rows 5–6 and 9–13 are legitimately beyond a diploma project's scope. Say so plainly.
 
-### Phase 4 — Dropshipping/marketplace vision (discussed with Claude, not yet a written thesis commitment)
-- [ ] `Order`/`OrderLine` entities + real checkout persistence (replaces the cosmetic
-      `CartController.Checkout()`).
-- [ ] `Supplier` entity — overlaps with Phase 3's supplier-price-feed item; if both get built,
-      design them as one entity, not two.
-- [ ] Payment processing (Stripe.net).
-- [ ] Supplier order relay — start manual/semi-automated, add per-supplier API integration only
-      where volume justifies it.
+**For the dropshipping future:** rows 4, 5, 8 and 11 become mandatory the moment real customers and
+real money are involved.
 
-**Stack recommendation** (unchanged from 2026-08-10, now reconciled against the official proposal
-in §6): C#/.NET backend, TypeScript/React frontend once past the defense. Python is officially
-declared but has no clear role yet except the CAD-import feature above — don't add it anywhere
-else without a specific reason.
+## §D2 — Phase 1: before the defence
+
+- [x] **Automated test project** — `ElektriKalkulaator.Tests`, 16 tests passing, mutation-verified. *(2026-08-10)*
+- [x] **Fix nullable-annotation lie + inconsistent not-found handling** *(2026-08-10)*
+- [x] **Product images** — upload, storage, display, plus security hardening *(2026-08-10)*
+- [x] **Add `EvsReference` column** to `CalculationRule` *(2026-08-10)*
+- [x] **Real product photography** for all ten seeded products, licensed and attributed *(2026-08-11)*
+- [ ] **Decide and display the VAT basis of prices** — `Product.Price` doesn't say whether it
+      includes VAT, a >20 % ambiguity in a tool whose purpose is cost estimation. Estonian
+      retailers always state it. See `RESEARCH_LOG.md` *(2026-08-11)*
+- [ ] Consider re-basing seeded prices on observed market rates — the seeded 9.20 € for an
+      ABB S201-B16 is above the ~5.78 € a real customer pays, so the calculator over-estimates
+- [ ] Label catalogue photos as illustrative ("pilt on illustratiivne"), as Estonian shops do
+- [ ] **Populate `EvsReference`** with real EVS-HD 60364 clause numbers — *needs Edgar; must not be guessed*
+- [ ] **Commit the current work** — a session's worth of changes is uncommitted (see §A1)
+- [ ] Turn image-upload validation errors into form messages instead of 500 pages
+- [ ] Write the thesis's own "limitations / future work" section using §B2's gap table, §D1 and §D3
+- [ ] *Optional:* more test coverage (`CategoryServices`, controllers)
+- [ ] *Optional:* AJAX-ify the calculator submit (pattern in `AdvancedAjax`, jQuery already loaded)
+- [ ] *Optional:* broaden `/Products` filtering (price range, brand)
+
+## §D3 — Later phases (post-defence)
+
+**Phase 2 — API + React frontend**
+- [ ] Add `[ApiController]` JSON endpoints alongside the MVC controllers (Core/Data/Services untouched)
+- [ ] Clone ReactCRUD's SPA wiring: `.esproj` client project, `SpaProxy`, Vite dev-proxy, same-origin in production
+- [ ] Rebuild the `elecpro-components-&-calculator` draft against the real API instead of Gemini
+- [ ] **Do i18n here** — while the API contract is being designed anyway. Replace Estonian string join-keys with stable codes plus a translation table; add the multilingual columns the ERD spec already defines.
+
+**Phase 3 — Edgar's own documented future work** (from `ERD_Loogiline_Seletus.docx` §7)
+- [ ] **CAD import** — parse uploaded DXF/DWG floor plans to count outlets/lights/switches automatically. **This is the one place Python genuinely fits** (see §D4), likely as a small separate parsing service the C# backend calls.
+- [ ] **User accounts** — build the `USER` table the spec defines; connect it to the already-present `PowerboxCalculation.UserId`. Also closes §D1 row 4.
+- [ ] **Live supplier price feeds** — `Supplier` table + `Product.SupplierId`; real-time prices from ABB/Schneider/Hager wholesalers.
+- [ ] **PDF export** — BOM as a PDF with quantities, prices and EVS-HD 60364 references; usable for building-permit applications.
+
+**Phase 4 — Dropshipping/marketplace** *(Edgar's stated ambition; not an academic commitment)*
+
+The model, as specified by Edgar on 2026-08-11: list products sourced from other retailers' sites;
+when a customer buys here, the system **automatically places the order with the original seller**,
+and the customer is charged the **source price + 25 % markup + shipping**. The calculator remains
+the reason customers arrive; the shop is how the site earns.
+
+- [ ] `Order`/`OrderLine` entities + real checkout persistence (replaces the cosmetic `Checkout()`)
+- [ ] `Supplier` entity — merge with Phase 3's supplier work; build it once, not twice
+- [ ] **Pricing engine** — store the supplier's cost separately from the customer-facing price,
+      with the markup as *configurable data, not a hard-coded 1.25*. Margins change; shipping is
+      not always a flat add-on; and some suppliers forbid resale above a set price.
+- [ ] **Automated order relay** to the source retailer. Be aware this is the hardest and riskiest
+      part: most retailers have **no public ordering API**, their terms of service often prohibit
+      automated purchasing or resale, and scraping a checkout flow is brittle and may be a
+      contract breach. Realistic sequencing: start with a **manual/assisted** relay (an email or
+      dashboard task per order), then negotiate a proper reseller/affiliate agreement with one or
+      two suppliers, and only then automate against a real API.
+- [ ] Payment processing (Stripe.net is the standard .NET choice)
+- [ ] **Legal/consumer-protection groundwork before taking real money** — as the seller of record
+      in the EU, this site would owe the customer a 14-day withdrawal right, a 2-year conformity
+      guarantee, and clear delivery-time disclosure, regardless of what the upstream retailer
+      offers. Stock and price sync failures become *your* liability, not the supplier's.
+- [ ] Revisit §D1 rows 4, 5, 8, 11 — they stop being optional here
+
+**Stack recommendation:** keep **C#/.NET** for the backend; add **TypeScript + React** for the
+frontend after the defence. This isn't a new bet — it finishes the prototype Edgar already built.
+
+## §D4 — Open questions
+
+These need Edgar's answer. Don't guess at them.
+
+1. **When is the defence?** No document or portal screenshot read so far states one. The proposal
+   form contains two conflicting dates: a printed deadline of 9 February 2026, and Edgar's own
+   entry of 31.05.2026 for "Lõputöö plaani esitamise kuupäev". Neither is obviously a defence date.
+2. **Does exchange-student status (approved 10.04.2026) affect the thesis timeline** — supervision,
+   deadlines, or where the defence takes place?
+3. **Python's role.** The proposal lists MSQL, C#, .NET, HTML, JavaScript, **Python** and
+   TypeScript. Everything but Python is either used or planned. Best inference is the CAD-import
+   feature (§D3 Phase 3) — geometry/DXF parsing is a genuine Python strength. Confirm, since a
+   listed technology that never appears may attract a question.
+4. **Framing for the eramu scope expansion** and **the "two required inputs" principle vs. the
+   five-field form** — both need a chosen sentence before the defence, not new code.
 
 ---
 
-## 13. Open questions — don't assume, ask Edgar
+# PART E — Working agreements
 
-- **Conflicting thesis-plan dates**: the proposal form's printed deadline says 9 February 2026;
-  Edgar's own filled-in field says 31 May 2026. Which is real? Is there a separate, later *defense*
-  date that isn't recorded in either document?
-- **Python's actual intended role**: this document's best guess is CAD-import parsing (§6, §12
-  Phase 3). Confirm, since it's currently inferred, not stated outright anywhere read so far.
-- **Scope beyond the official pitch**: the proposal names only korterelamu + ärihoone; the built
-  app and seed data also cover eramu. Intentional expansion — worth a one-line note in the thesis,
-  or worth trimming back to match the proposal exactly? (This document's recommendation: keep it
-  and mention it, don't trim.)
-- **The "two required inputs" design principle vs. the five-ish-field form** (§4.1): explain as an
-  accuracy-driven refinement in the thesis text, or treat as a gap? No action needed either way,
-  just needs a chosen framing before the defense.
-- Whether Edgar wants the Phase 0 items (`.claude/agents/*`, standalone `CLAUDE.md`) built is still
-  open.
+## §E1 — After every code change
 
----
+1. **Add a `CHANGELOG.md` entry** using the template at the top of that file. The *why* matters
+   more than the *what*.
+2. **Tick the checkbox** in §D2 or §D3 if the change completes a planned item.
+3. **Add a row to §C3** if you made a decision whose reasoning isn't obvious from the code.
+4. **Update §B4** if the "what works / what's broken" picture changed.
+5. **Fix any section that has drifted** out of line with reality — don't leave a stale claim
+   standing next to a new one.
+6. Add a line to §E2 below.
 
-## 14. How to keep this document updated
+## §E2 — Revision history of this document
 
-Whoever (human or AI) does work on this project next:
-1. Update the checkboxes in §12 as items move from not-started → in-progress → done.
-2. If you make an architectural decision with a non-obvious rationale, add a row to §11.
-3. Add a dated bullet to the Change Log below — specific, not just "updated code."
-4. If you discover the repo has drifted from what this document claims, fix that section in place.
-5. **Don't cite ephemeral file paths** (temp/scratchpad directories from a particular AI session)
-   inside this document — inline the actual facts instead, since those paths won't exist for
-   whoever reads this next.
-
-## 15. Change log
-
-- **2026-08-10 (rev. 1)** — Initial version. Synthesized from direct code reading, a background-agent
-  diff against ShopTARge24/ShopTARge24_opetaja, the `elecpro-components-&-calculator` TS draft, and
-  the `.mermaid`/`.html` ERD planning docs. `Lõputöö kavand_VORM.docx` and
-  `ERD_Loogiline_Seletus.docx` explicitly flagged as unread.
-- **2026-08-10 (rev. 2)** — Read both previously-flagged `.docx` files in full; corrected §1
-  (institution/supervisor now doubly-confirmed, added proposal-date discrepancy), §2 (added the
-  official pitch, quoted), added §4.1 (documented-ERD-vs-built-implementation gap table — most
-  significantly, reframed i18n from "smart scoping" to "documented principle not yet built"),
-  reconciled the official tech-stack list against reality in §6 (Python's likely role identified as
-  CAD-import), added §9 (five sibling projects mined for concrete reusable patterns — test-project
-  template, image upload pattern, React/C# wiring recipe, AJAX patterns), reworked §12's roadmap
-  into four phases with sibling-sourced concrete action items and the officially-documented future
-  work separated from the Claude-discussed dropshipping vision, expanded §13's open questions.
+- **rev. 1** (2026-08-10) — Created. Built from a full read of the C# solution, a comparison
+  against ShopTARge24, the TypeScript design draft, and the `.mermaid`/`.html` ERD planning
+  documents. `Lõputöö kavand_VORM.docx` and `ERD_Loogiline_Seletus.docx` flagged as unread.
+- **rev. 2** (2026-08-10) — Read both `.docx` files in full. Added the official pitch, the
+  documented-vs-built gap table, the tech-stack reconciliation, and findings from five sibling
+  coursework projects. **Corrected the i18n framing** from "smart scoping" to "documented
+  principle not yet built".
+- **rev. 3** (2026-08-11) — Restructured into Parts A–E for readability by newcomers. Added §0
+  orientation and beginner glossary; added §D1 full-stack maturity map (thirteen layers, honestly
+  scored); recorded TTHK portal administrative dates in §A1; **introduced `CHANGELOG.md`** and the
+  §E1 update protocol; ticked the four Phase 1 items completed on 2026-08-10.
+- **rev. 4** (2026-08-11) — Added `RESEARCH_LOG.md` and `IMAGE_CREDITS.md` to §0 and house rules
+  (English-only comments, single `.jpg` image format). Recorded the real-product-photography work
+  and three new price/VAT follow-ups in §D2. Expanded Phase 4 with the **25 % markup dropshipping
+  specification**, plus the supplier-API, pricing-engine and EU consumer-law realities it implies.

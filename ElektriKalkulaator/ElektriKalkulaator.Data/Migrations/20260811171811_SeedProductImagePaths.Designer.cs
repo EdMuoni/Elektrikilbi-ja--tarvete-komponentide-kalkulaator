@@ -4,6 +4,7 @@ using ElektriKalkulaator.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ElektriKalkulaator.Data.Migrations
 {
     [DbContext(typeof(ElektriKalkulaatorContext))]
-    partial class ElektriKalkulaatorContextModelSnapshot : ModelSnapshot
+    [Migration("20260811171811_SeedProductImagePaths")]
+    partial class SeedProductImagePaths
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -359,7 +362,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "1-pooluseline kaitselüliti B10A, 6kA",
-                            ImagePath = "/images/products/breaker.jpg",
+                            ImagePath = "/images/products/breaker-10a.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "ABB S201-B10 Kaitselüliti 10A",
                             Price = 8.50m,
@@ -375,7 +378,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "1-pooluseline kaitselüliti B16A, 6kA",
-                            ImagePath = "/images/products/breaker.jpg",
+                            ImagePath = "/images/products/breaker-16a.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "ABB S201-B16 Kaitselüliti 16A",
                             Price = 9.20m,
@@ -391,7 +394,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "1-pooluseline kaitselüliti B32A, 6kA",
-                            ImagePath = "/images/products/breaker.jpg",
+                            ImagePath = "/images/products/breaker-32a.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "ABB S201-B32 Kaitselüliti 32A",
                             Price = 12.80m,
@@ -407,7 +410,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "1-pooluseline kaitselüliti B10A",
-                            ImagePath = "/images/products/breaker.jpg",
+                            ImagePath = "/images/products/breaker-10a.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Schneider Easy9 B10A",
                             Price = 7.90m,
@@ -423,7 +426,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "1-pooluseline kaitselüliti B16A",
-                            ImagePath = "/images/products/breaker.jpg",
+                            ImagePath = "/images/products/breaker-16a.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Schneider Easy9 B16A",
                             Price = 8.50m,
@@ -439,7 +442,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Valgustuse juhe, müüakse meetrites",
-                            ImagePath = "/images/products/cable.jpg",
+                            ImagePath = "/images/products/cable-1-5.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "NYM-J 3x1.5mm² kaabel (1m)",
                             Price = 1.20m,
@@ -455,7 +458,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Pistikute juhe, müüakse meetrites",
-                            ImagePath = "/images/products/cable.jpg",
+                            ImagePath = "/images/products/cable-2-5.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "NYM-J 3x2.5mm² kaabel (1m)",
                             Price = 1.85m,
@@ -471,7 +474,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Pliidi juhe, müüakse meetrites",
-                            ImagePath = "/images/products/cable.jpg",
+                            ImagePath = "/images/products/cable-6.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "NYM-J 3x6mm² kaabel (1m)",
                             Price = 3.60m,
@@ -487,7 +490,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000003"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "2-pooluseline rikkevoolukaitsme 40A 30mA",
-                            ImagePath = "/images/products/rcd.jpg",
+                            ImagePath = "/images/products/rcd.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "ABB F202 AC-40/0.03 RCD 40A",
                             Price = 42.00m,
@@ -502,7 +505,7 @@ namespace ElektriKalkulaator.Data.Migrations
                             CategoryId = new Guid("11111111-0000-0000-0000-000000000005"),
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Pinna-paigaldusega kilbi korpus 12 moodulile",
-                            ImagePath = "/images/products/enclosure.jpg",
+                            ImagePath = "/images/products/enclosure.svg",
                             ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "ABB Mistral41F 12 mooduli kilp",
                             Price = 28.50m,

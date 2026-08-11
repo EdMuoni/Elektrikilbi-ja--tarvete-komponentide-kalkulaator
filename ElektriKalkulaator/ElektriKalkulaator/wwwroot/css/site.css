@@ -291,7 +291,10 @@ main {
 .product-card-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* "contain", not "cover": the seeded product images are SVG illustrations whose rating
+       label sits at the bottom of the drawing. "cover" crops it off. Uploaded photos simply
+       letterbox against the matching dark background instead, which is acceptable. */
+    object-fit: contain;
 }
 
 .product-card-img-placeholder {

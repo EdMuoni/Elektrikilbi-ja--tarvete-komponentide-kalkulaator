@@ -205,6 +205,21 @@ namespace ElektriKalkulaator.Controllers
             ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedId);
         }
 
+        // Product images live in two separate folders, and the distinction matters:
+        //
+        //   wwwroot/images/products/  — the photos that ship WITH the app for the seeded demo
+        //                               catalogue. These are source files, committed to git, and
+        //                               several products share the same file (all five breakers
+        //                               point at breaker.jpg).
+        //   wwwroot/images/uploads/   — photos an admin uploads through the Create/Edit form.
+        //                               These are user content, excluded from git, and each one
+        //                               belongs to exactly one product.
+        //
+        // Keeping them apart is what lets the app safely delete an upload without ever touching
+        // a shipped file that other products still rely on. See DeleteProductImageFile below.
+        private const string UploadsFolderName = "uploads";
+        private const string UploadsWebPath = "/images/uploads/";
+
         // There is no login/authorization on this controller (by design, for the thesis scope —
         // see PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
         // reach this upload path too. An extension allow-list and a size cap are the minimum
@@ -214,9 +229,9 @@ namespace ElektriKalkulaator.Controllers
 
         private const long MaxImageSizeBytes = 5 * 1024 * 1024; // 5 MB
 
-        // Saves an uploaded image straight into wwwroot/images/products (no extra static-file
-        // middleware needed, unlike storing outside wwwroot). Returns the web-relative path to
-        // store in Product.ImagePath, or null if no file was submitted.
+        // Saves an uploaded image into wwwroot/images/uploads. Anything under wwwroot is served
+        // by the default static-file middleware, so no extra configuration is needed.
+        // Returns the web-relative path to store in Product.ImagePath, or null if no file was sent.
         private async Task<string?> SaveProductImage(IFormFile? imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
@@ -230,7 +245,7 @@ namespace ElektriKalkulaator.Controllers
             if (imageFile.Length > MaxImageSizeBytes)
                 throw new InvalidOperationException("Image is too large (max 5 MB).");
 
-            var uploadsFolder = Path.Combine(_env.WebRootPath, "images", "products");
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "images", UploadsFolderName);
             Directory.CreateDirectory(uploadsFolder);
 
             // A fresh GUID filename means an upload can never collide with or overwrite another
@@ -244,19 +259,37 @@ namespace ElektriKalkulaator.Controllers
                 await imageFile.CopyToAsync(stream);
             }
 
-            return $"/images/products/{fileName}";
+            return $"{UploadsWebPath}{fileName}";
         }
 
-        // Removes a previously-saved product image from disk — called when a product is deleted,
-        // and when Edit replaces an existing image with a new upload. Safe to call with null/empty
-        // (e.g. a product that never had an image) or a path that's already gone.
+        // Removes a previously-uploaded product image from disk — called when a product is
+        // deleted, and when Edit replaces an existing image with a new upload.
+        //
+        // It deliberately deletes ONLY files under wwwroot/images/uploads. Two reasons:
+        //   1. The seeded demo photos in wwwroot/images/products are shared — all five breakers
+        //      point at the same breaker.jpg — so deleting one product must not remove an image
+        //      four other products still display.
+        //   2. The path comes from the database. Restricting deletion to one known folder means
+        //      that even a malformed or hand-edited value (e.g. "../../appsettings.json") cannot
+        //      make this method delete something outside the uploads directory.
+        //
+        // Safe to call with null/empty (a product that never had an image) or a path that's
+        // already gone.
         private void DeleteProductImageFile(string? imagePath)
         {
             if (string.IsNullOrEmpty(imagePath))
                 return;
 
-            var relativePath = imagePath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
-            var fullPath = Path.Combine(_env.WebRootPath, relativePath);
+            // Ignore anything that isn't an uploaded file — seeded images are shipped assets.
+            if (!imagePath.StartsWith(UploadsWebPath, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var fileName = Path.GetFileName(imagePath);
+            if (string.IsNullOrEmpty(fileName))
+                return;
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "images", UploadsFolderName);
+            var fullPath = Path.Combine(uploadsFolder, fileName);
 
             // Fully qualified: Controller.File(...) shadows System.IO.File within this class.
             if (System.IO.File.Exists(fullPath))

@@ -12,6 +12,11 @@
 <div class="row g-4">
     <div class="col-lg-7">
         <div class="card p-4">
+            @if (!string.IsNullOrEmpty(Model.ImagePath))
+            {
+                <img src="@Model.ImagePath" alt="@Model.Name" class="mb-3" style="max-height:220px;border-radius:12px;object-fit:cover" />
+            }
+
             <div class="mb-3">
                 <span class="badge bg-secondary me-2">@Model.Category?.Name</span>
                 <span class="text-muted-custom small">@Model.Brand</span>

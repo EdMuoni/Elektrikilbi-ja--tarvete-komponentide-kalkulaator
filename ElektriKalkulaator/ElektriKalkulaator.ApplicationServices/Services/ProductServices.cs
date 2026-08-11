@@ -37,12 +37,11 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         }
 
         // Returns null if not found — the controller checks and returns NotFound().
-        // The ! tells the compiler we're intentionally handling null in the caller.
-        public async Task<Product> GetById(Guid id)
+        public async Task<Product?> GetById(Guid id)
         {
-            return (await _context.Products
+            return await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id))!;
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         // Maps the form DTO to a domain object and saves it.
@@ -76,13 +75,16 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         }
 
         // EF Core tracks changes automatically — just update fields and save.
-        public async Task<Product> Update(ProductDto dto)
+        // Returns null if the product doesn't exist — the controller checks and returns NotFound(),
+        // same convention as GetById (a missing ID is an expected outcome, not an exceptional one).
+        public async Task<Product?> Update(ProductDto dto)
         {
             if (!dto.Id.HasValue)
                 throw new Exception("Product ID is missing.");
 
-            var product = await _context.Products.FindAsync(dto.Id.Value)
-                ?? throw new Exception($"Product with ID {dto.Id} was not found.");
+            var product = await _context.Products.FindAsync(dto.Id.Value);
+            if (product == null)
+                return null;
 
             product.CategoryId          = dto.CategoryId;
             product.Name                = dto.Name;
@@ -101,10 +103,12 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         }
 
         // Returns the deleted product so the controller can show "X was deleted" message.
-        public async Task<Product> Delete(Guid id)
+        // Returns null if the product doesn't exist — same not-found convention as GetById/Update.
+        public async Task<Product?> Delete(Guid id)
         {
-            var product = await _context.Products.FindAsync(id)
-                ?? throw new Exception($"Product with ID {id} was not found.");
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return null;
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();

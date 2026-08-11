@@ -7,9 +7,9 @@ namespace ElektriKalkulaator.Core.ServiceInterface
     {
         Task<IEnumerable<Product>> GetAll();
         Task<IEnumerable<Product>> GetByCategory(Guid categoryId);
-        Task<Product> GetById(Guid id);
+        Task<Product?> GetById(Guid id);
         Task<Product> Create(ProductDto dto);
-        Task<Product> Update(ProductDto dto);
-        Task<Product> Delete(Guid id);
+        Task<Product?> Update(ProductDto dto);
+        Task<Product?> Delete(Guid id);
     }
 }

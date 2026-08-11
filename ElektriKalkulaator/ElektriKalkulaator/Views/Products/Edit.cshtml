@@ -14,12 +14,25 @@
         <div class="card p-4">
             <h4 class="text-white fw-bold mb-4">✏️ Muuda toodet</h4>
 
-            <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 @* Hidden ID — required so the POST action knows which product to update *@
                 <input type="hidden" asp-for="Id" />
+                @* Hidden ImagePath — round-trips the existing image if no new file is chosen below *@
+                <input type="hidden" asp-for="ImagePath" />
 
                 <div class="row g-3">
+                    <div class="col-12">
+                        <label for="imageFile" class="form-label">Toote pilt</label>
+                        @if (!string.IsNullOrEmpty(Model.ImagePath))
+                        {
+                            <div class="mb-2">
+                                <img src="@Model.ImagePath" alt="@Model.Name" style="max-height:80px;border-radius:8px" />
+                            </div>
+                        }
+                        <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" />
+                        <div class="form-text text-muted-custom">Jäta tühjaks, kui soovid praegust pilti alles jätta.</div>
+                    </div>
                     <div class="col-md-6">
                         <label asp-for="Name" class="form-label">Toote nimi *</label>
                         <input asp-for="Name" class="form-control" />

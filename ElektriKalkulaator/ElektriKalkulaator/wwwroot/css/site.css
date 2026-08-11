@@ -278,6 +278,27 @@ main {
     box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
+.product-card-image {
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--bg-input);
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-card-img-placeholder {
+    font-size: 2.5rem;
+    opacity: 0.3;
+}
+
 .product-badge {
     display: inline-block;
     padding: 2px 8px;

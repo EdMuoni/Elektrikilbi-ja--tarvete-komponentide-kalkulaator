@@ -25,10 +25,10 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         }
 
         // Returns null if not found — caller is responsible for checking.
-        public async Task<ProductCategory> GetById(Guid id)
+        public async Task<ProductCategory?> GetById(Guid id)
         {
-            return (await _context.ProductCategories
-                .FirstOrDefaultAsync(c => c.Id == id))!;
+            return await _context.ProductCategories
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         // Auto-generates an ID if none was set before calling.

@@ -20,6 +20,11 @@ namespace ElektriKalkulaator.Core.Domain
         // "lighting" | "socket" | "stove"
         public string CircuitType { get; set; } = "";
 
+        // Exact EVS-HD 60364 clause this rule implements, e.g. "EVS-HD 60364-4-41".
+        // Left unset in seed data until verified against the actual standard text — do not
+        // guess a clause number here, a wrong citation is worse than a missing one.
+        public string? EvsReference { get; set; }
+
         public int RoomsFrom { get; set; }
         public int RoomsTo { get; set; }  // 999 = no upper limit
 

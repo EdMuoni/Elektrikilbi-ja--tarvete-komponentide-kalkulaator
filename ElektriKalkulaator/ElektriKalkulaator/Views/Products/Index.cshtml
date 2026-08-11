@@ -51,6 +51,18 @@ else
         {
             <div class="col-sm-6 col-lg-4 col-xl-3">
                 <div class="product-card">
+                    <!-- Toote pilt -->
+                    <div class="product-card-image mb-2">
+                        @if (!string.IsNullOrEmpty(product.ImagePath))
+                        {
+                            <img src="@product.ImagePath" alt="@product.Name" class="product-card-img" />
+                        }
+                        else
+                        {
+                            <div class="product-card-img-placeholder">📦</div>
+                        }
+                    </div>
+
                     <!-- Toote nimi ja tootja -->
                     <div class="mb-2">
                         <div class="fw-semibold text-white small">@product.Name</div>

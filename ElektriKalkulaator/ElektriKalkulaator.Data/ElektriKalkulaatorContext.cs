@@ -43,6 +43,7 @@ namespace ElektriKalkulaator.Data
             modelBuilder.Entity<Product>().Property(p => p.RatedCurrent).HasPrecision(10, 2);
             modelBuilder.Entity<Product>().Property(p => p.WireCrossSectionMm2).HasPrecision(5, 2);
             modelBuilder.Entity<CalculationRule>().Property(r => r.WireCrossSectionMm2).HasPrecision(5, 2);
+            modelBuilder.Entity<CalculationRule>().Property(r => r.EvsReference).HasMaxLength(50);
             modelBuilder.Entity<PowerboxComponents>().Property(c => c.UnitPrice).HasPrecision(10, 2);
             modelBuilder.Entity<PowerboxComponents>().Property(c => c.TotalPrice).HasPrecision(10, 2);
             modelBuilder.Entity<PowerboxComponents>().Property(c => c.WireCrossSectionMm2).HasPrecision(5, 2);

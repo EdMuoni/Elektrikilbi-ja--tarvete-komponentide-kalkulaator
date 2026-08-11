@@ -2,5 +2,6 @@
   <Project Path="ElektriKalkulaator.ApplicationServices/ElektriKalkulaator.ApplicationServices.csproj" />
   <Project Path="ElektriKalkulaator.Core/ElektriKalkulaator.Core.csproj" />
   <Project Path="ElektriKalkulaator.Data/ElektriKalkulaator.Data.csproj" />
+  <Project Path="ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj" />
   <Project Path="ElektriKalkulaator/ElektriKalkulaator.csproj" />
 </Solution>

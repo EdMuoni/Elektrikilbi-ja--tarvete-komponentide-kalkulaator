@@ -44,6 +44,57 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Upload problems now show as form messages instead of crashing
+
+**Type:** bugfix
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- New `ProductsController.ValidateImageFile(IFormFile?)` — returns `null` when a file is
+  acceptable (including when no file was chosen, since the image is optional), or an
+  Estonian-language message explaining the problem.
+- `Create` and `Edit` POST actions call it first and pass any message to
+  `ModelState.AddModelError("imageFile", …)`, so a rejected file behaves like any other failed
+  form validation.
+- `SaveProductImage` no longer throws for validation; it now assumes the file was already checked
+  and only does the saving.
+- `Views/Products/Create.cshtml` and `Edit.cshtml`: added
+  `@Html.ValidationMessage("imageFile", …)` beneath the file input so the message is visible.
+
+**Why**
+- Previously `SaveProductImage` threw `InvalidOperationException` for a wrong file type or an
+  oversized file. Nothing caught it, so the user got a **blank HTTP 500 error page**, lost
+  everything they had typed into the form, and were given no clue what was wrong. This was
+  recorded as a known limitation when the upload feature was added; this change closes it.
+- Splitting "is this file acceptable?" from "save this file" is what makes the fix possible — the
+  controller can now ask the question *before* committing to anything, and report the answer in
+  the normal way.
+- Messages are in Estonian because every label on that form is in Estonian. Note the codebase is
+  inconsistent here: `TempData` success messages are still in English. Worth unifying later.
+
+**How it was verified**
+- `dotnet build` clean; `dotnet test` **16/16 passing**.
+- Three scenarios exercised against the running app over real HTTP (antiforgery token and session
+  cookie included, exactly as a browser would):
+  1. **Wrong type** (`.txt`) → HTTP **200**, message *"Sobimatu failitüüp. Lubatud on: .jpg,
+     .jpeg, .png, .gif, .webp."* rendered in a `field-validation-error` span, the typed product
+     name preserved in the redisplayed form, **no product created**.
+  2. **Oversized** (6 MB) → HTTP **200**, message *"Pilt on liiga suur (suurim lubatud maht on
+     5 MB)."*, **no product created**.
+  3. **Valid JPEG** → HTTP **302** redirect, product created, file written to
+     `wwwroot/images/uploads/` (confirming the earlier folder split), and removed again when the
+     product was deleted.
+- Test data created during verification was deleted; catalogue is back to its 10 seeded products
+  and the uploads folder is empty.
+
+**Follow-ups or known limitations**
+- File *content* is still not inspected — a renamed executable with a `.jpg` extension would pass.
+  Acceptable for a local thesis demo, must be revisited before any public deployment.
+- Success/error message language is inconsistent across the app (English `TempData`, Estonian
+  validation).
+
+---
+
 ## 2026-08-11 — Fix: seeded product photos were excluded from git; separate uploads from shipped images
 
 **Type:** bugfix

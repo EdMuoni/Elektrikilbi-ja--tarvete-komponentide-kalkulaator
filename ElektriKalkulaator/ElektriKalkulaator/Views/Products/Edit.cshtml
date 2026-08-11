@@ -31,6 +31,9 @@
                             </div>
                         }
                         <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" />
+                        @* Shows the message added by ModelState.AddModelError("imageFile", ...)
+                           in ProductsController when the chosen file is rejected. *@
+                        @Html.ValidationMessage("imageFile", new { @class = "text-danger small" })
                         <div class="form-text text-muted-custom">Jäta tühjaks, kui soovid praegust pilti alles jätta.</div>
                     </div>
                     <div class="col-md-6">

@@ -344,7 +344,7 @@ real money are involved.
 - [ ] Label catalogue photos as illustrative ("pilt on illustratiivne"), as Estonian shops do
 - [ ] **Populate `EvsReference`** with real EVS-HD 60364 clause numbers — *needs Edgar; must not be guessed*
 - [ ] **Commit the current work** — a session's worth of changes is uncommitted (see §A1)
-- [ ] Turn image-upload validation errors into form messages instead of 500 pages
+- [x] **Turn image-upload validation errors into form messages instead of 500 pages** *(2026-08-11)*
 - [ ] Write the thesis's own "limitations / future work" section using §B2's gap table, §D1 and §D3
 - [ ] *Optional:* more test coverage (`CategoryServices`, controllers)
 - [ ] *Optional:* AJAX-ify the calculator submit (pattern in `AdvancedAjax`, jQuery already loaded)

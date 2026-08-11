@@ -36,6 +36,39 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                 .ToListAsync();
         }
 
+        // Catalogue search used by the /Products page.
+        //
+        // The important detail is that the filters are added to the query BEFORE ToListAsync()
+        // is called. Until that point nothing has run — EF Core is still building a description
+        // of the query — so every filter becomes part of the SQL WHERE clause and the database
+        // returns only the rows we actually want.
+        //
+        // The previous version fetched every product and then filtered the list in C#. That works
+        // with ten products and wastes the whole table with ten thousand.
+        public async Task<IEnumerable<Product>> Search(Guid? categoryId, string? searchTerm)
+        {
+            var query = _context.Products
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var term = searchTerm.Trim();
+                // EF Core translates Contains into a SQL LIKE. SQL Server's default collation is
+                // case-insensitive, so no ToLower() is needed — and leaving it out lets the
+                // database use an index instead of transforming every row first.
+                query = query.Where(p => p.Name.Contains(term) || p.Brand.Contains(term));
+            }
+
+            return await query
+                .OrderBy(p => p.Category!.Name)
+                .ThenBy(p => p.Name)
+                .ToListAsync();
+        }
+
         // Returns null if not found — the controller checks and returns NotFound().
         public async Task<Product?> GetById(Guid id)
         {

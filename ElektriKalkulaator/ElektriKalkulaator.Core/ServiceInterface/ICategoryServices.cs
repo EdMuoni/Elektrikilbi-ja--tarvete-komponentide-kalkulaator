@@ -7,6 +7,8 @@ namespace ElektriKalkulaator.Core.ServiceInterface
         Task<IEnumerable<ProductCategory>> GetAll();
         Task<ProductCategory?> GetById(Guid id);
         Task<ProductCategory> Create(ProductCategory category);
-        Task<ProductCategory> Delete(Guid id);
+
+        // Returns which of three things happened rather than throwing — see CategoryDeleteResult.
+        Task<CategoryDeleteResult> Delete(Guid id);
     }
 }

@@ -42,25 +42,31 @@ namespace ElektriKalkulaator.ApplicationServices.Services
             return category;
         }
 
-        // Refuses to delete if products still belong to this category (FK protection).
-        public async Task<ProductCategory> Delete(Guid id)
+        // Deletes a category, but refuses if products still belong to it — removing it would
+        // leave those products pointing at a category that no longer exists.
+        //
+        // The return value tells the caller which of the three things happened, so it can show a
+        // helpful message instead of crashing. This matches how ProductServices reports a missing
+        // record (by returning a value, not by throwing): a category the user asked to delete
+        // being absent is an expected outcome, not a program error.
+        //
+        // NOTE: nothing calls this yet — there is no "delete category" button in the UI. It is
+        // kept because the admin area planned in PROJECT_ROADMAP.md will need it.
+        public async Task<CategoryDeleteResult> Delete(Guid id)
         {
             var category = await _context.ProductCategories
                 .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Id == id)
-                ?? throw new Exception($"Category with ID {id} was not found.");
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+                return CategoryDeleteResult.NotFound;
 
             if (category.Products.Any())
-            {
-                throw new Exception(
-                    $"Cannot delete '{category.Name}' — it still has {category.Products.Count} product(s). " +
-                    "Move or delete those products first."
-                );
-            }
+                return CategoryDeleteResult.StillHasProducts;
 
             _context.ProductCategories.Remove(category);
             await _context.SaveChangesAsync();
-            return category;
+            return CategoryDeleteResult.Deleted;
         }
     }
 }

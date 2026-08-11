@@ -44,6 +44,84 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Security hardening: CSRF, open redirect, input validation, config
+
+**Type:** security
+**Author:** Claude (Sonnet 5) + Edgar
+
+Fixes eight of the ten findings from the security review. The two remaining — missing
+authentication, and stock never being reserved/decremented — are tracked separately: authentication
+is its own piece of work, and stock belongs with the real `Order` entity.
+
+**What changed**
+
+*Cross-site request forgery*
+- `[ValidateAntiForgeryToken]` added to `CartController.Add/Remove/Clear/Checkout` and
+  `CalculatorController.Index [HttpPost]`. `ProductsController` already had it; these five were
+  missed. The forms were already sending the token — it simply was never checked.
+
+*Open redirect*
+- `CartController.Add` passed `returnUrl` straight to `Redirect()`. New private `SafeRedirect`
+  helper only redirects when `Url.IsLocalUrl(returnUrl)` is true, otherwise falls back to the cart.
+
+*Cart input validation*
+- Quantity must now be between `MinQuantity` (1) and `MaxQuantity` (999); repeated adds are clamped
+  with `Math.Min` so they cannot creep past the maximum.
+- The product must exist — `Add` looks it up and returns `NotFound()` otherwise.
+- `Add` became `async` to allow that lookup.
+
+*Upload content verification*
+- New `HasValidImageSignature` checks the file's leading "magic bytes" against JPEG, PNG, GIF and
+  WEBP signatures. Extension checking alone accepted any renamed file.
+
+*Search performance*
+- New `IProductServices.Search(categoryId, searchTerm)` applies both filters to the `IQueryable`
+  **before** `ToListAsync()`, so they become part of the SQL `WHERE` clause.
+  `ProductsController.Index` previously fetched every product and filtered the list in C#.
+- Dropped `ToLower()` — SQL Server's default collation is already case-insensitive, and omitting it
+  lets the database use an index rather than transforming every row.
+
+*Consistency*
+- `CategoryServices.Delete` no longer throws bare `Exception`s. It returns a new
+  `CategoryDeleteResult` enum (`Deleted` / `NotFound` / `StillHasProducts`).
+  **Note: this method is currently unreachable** — no controller calls it and no view offers
+  category deletion. Kept and corrected because the planned admin area will need it.
+
+*Configuration*
+- `appsettings.json` now ships a portable `(localdb)\MSSQLLocalDB` default so a fresh clone runs.
+  The real connection string moved to **User Secrets**, which live outside the project folder and
+  are never committed. Edgar's machine keeps working because the secret was set locally.
+
+*Language*
+- Cart messages converted from English to Estonian to match the rest of that UI.
+
+**How it was verified**
+
+Build clean, `dotnet test` **16/16 passing**, plus every exploit from the review re-run against the
+running app. Each fix was tested **with a valid antiforgery token**, so no result is hidden behind
+another guard:
+
+| Exploit | Before | After |
+|---|---|---|
+| `returnUrl=https://evil.example.com/phish` | `302 → evil.example.com` | `302 → /Cart` |
+| Legitimate `returnUrl=/Products` | worked | still works (no over-blocking) |
+| POST with no token (Add / Clear / Calculator) | `302 / 302 / 200` | `400 / 400 / 400` |
+| `quantity=-5` | cart showed `-3 tk / -27.60 €` | rejected, cart unchanged |
+| Nonexistent product ID | `302` accepted | `404` |
+| Text file renamed `.jpg` | accepted | rejected, *"Fail ei ole korrektne pildifail."* |
+| Real JPEG | accepted | still accepted |
+
+Search correctness after moving to SQL: `ABB`→5, `Schneider`→2, `kaabel`→3, category *Juhtmed*→3,
+category+term→3, nonsense term→"not found". User Secrets confirmed connecting to the real database
+(all 10 seeded products present). Test data removed; catalogue back to 10 products, uploads empty.
+
+**Follow-ups or known limitations**
+- **Authentication is still absent** — the critical finding. Next piece of work.
+- Stock is still never reserved or decremented; belongs with real order persistence.
+- `TempData` messages in `ProductsController` remain in English while the cart is now Estonian.
+
+---
+
 ## 2026-08-11 — Upload problems now show as form messages instead of crashing
 
 **Type:** bugfix

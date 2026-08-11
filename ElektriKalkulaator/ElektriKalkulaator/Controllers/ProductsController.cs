@@ -70,6 +70,13 @@ namespace ElektriKalkulaator.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductDto dto, IFormFile? imageFile)
         {
+            // Check the uploaded file BEFORE anything else. If it's not acceptable we add the
+            // reason to ModelState, which makes ASP.NET treat it exactly like any other failed
+            // form validation: the page is redisplayed with the message next to the field.
+            var imageError = ValidateImageFile(imageFile);
+            if (imageError != null)
+                ModelState.AddModelError(nameof(imageFile), imageError);
+
             if (!ModelState.IsValid)
             {
                 await LoadCategoriesIntoViewBag();
@@ -116,6 +123,11 @@ namespace ElektriKalkulaator.Controllers
         {
             if (!dto.Id.HasValue || id != dto.Id.Value)
                 return BadRequest();
+
+            // Same file check as Create — see the comment there.
+            var imageError = ValidateImageFile(imageFile);
+            if (imageError != null)
+                ModelState.AddModelError(nameof(imageFile), imageError);
 
             if (!ModelState.IsValid)
             {
@@ -229,22 +241,43 @@ namespace ElektriKalkulaator.Controllers
 
         private const long MaxImageSizeBytes = 5 * 1024 * 1024; // 5 MB
 
+        // Checks whether an uploaded file is one we're willing to store.
+        //
+        // Returns null when the file is fine (including when there is no file at all — the image
+        // is optional), or a message written for the person filling in the form when it isn't.
+        // The message is in Estonian because every label on that form is in Estonian.
+        //
+        // Validation lives in its own method, separate from saving, so the controller can report
+        // a problem on the form instead of the upload blowing up halfway through. Previously a
+        // wrong file type threw an exception and the user got a blank 500 error page with no idea
+        // what went wrong.
+        private static string? ValidateImageFile(IFormFile? imageFile)
+        {
+            // No file chosen is perfectly valid — a product simply has no picture.
+            if (imageFile == null || imageFile.Length == 0)
+                return null;
+
+            var extension = Path.GetExtension(imageFile.FileName);
+            if (!AllowedImageExtensions.Contains(extension))
+                return $"Sobimatu failitüüp. Lubatud on: {string.Join(", ", AllowedImageExtensions)}.";
+
+            if (imageFile.Length > MaxImageSizeBytes)
+                return $"Pilt on liiga suur (suurim lubatud maht on {MaxImageSizeBytes / 1024 / 1024} MB).";
+
+            return null;
+        }
+
         // Saves an uploaded image into wwwroot/images/uploads. Anything under wwwroot is served
         // by the default static-file middleware, so no extra configuration is needed.
         // Returns the web-relative path to store in Product.ImagePath, or null if no file was sent.
+        //
+        // Assumes ValidateImageFile has already approved the file — always call that first.
         private async Task<string?> SaveProductImage(IFormFile? imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
                 return null;
 
             var extension = Path.GetExtension(imageFile.FileName);
-            if (!AllowedImageExtensions.Contains(extension))
-                throw new InvalidOperationException(
-                    $"Unsupported image type '{extension}'. Allowed: {string.Join(", ", AllowedImageExtensions)}");
-
-            if (imageFile.Length > MaxImageSizeBytes)
-                throw new InvalidOperationException("Image is too large (max 5 MB).");
-
             var uploadsFolder = Path.Combine(_env.WebRootPath, "images", UploadsFolderName);
             Directory.CreateDirectory(uploadsFolder);
 

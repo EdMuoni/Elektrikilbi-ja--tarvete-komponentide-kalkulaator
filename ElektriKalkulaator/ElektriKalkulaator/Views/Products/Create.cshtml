@@ -21,6 +21,9 @@
                     <div class="col-12">
                         <label for="imageFile" class="form-label">Toote pilt</label>
                         <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" />
+                        @* Shows the message added by ModelState.AddModelError("imageFile", ...)
+                           in ProductsController when the chosen file is rejected. *@
+                        @Html.ValidationMessage("imageFile", new { @class = "text-danger small" })
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Name" class="form-label">Toote nimi *</label>

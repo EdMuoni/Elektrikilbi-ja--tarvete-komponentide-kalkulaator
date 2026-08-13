@@ -44,6 +44,62 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Code review: fixed an image-deletion ordering bug and fail-fast on startup
+
+**Type:** bugfix
+**Author:** Claude (Sonnet 5) + Edgar
+
+A review of the whole codebase for bugs, weak logic and architectural problems. Two clear bugs
+fixed here; the rest are recorded as findings in `PROJECT_ROADMAP.md` rather than changed, because
+they need decisions rather than code.
+
+**What changed**
+
+*1. `ProductsController.Edit` deleted the old image before the update was confirmed*
+- The old code deleted the previous image file, then called `Update`. If `Update` returned `null`
+  (the product had been deleted by someone else in the meantime), the image was already gone and
+  the newly uploaded one was orphaned. The comment above it even claimed the deletion happened
+  "once the new one is confirmed saved" — it did not.
+- It also decided **which file to delete from `dto.ImagePath`**, a hidden form field the browser
+  controls. A stale tab or an edited form could therefore delete a different product's image.
+- Now: the current path is read from the database, the update runs first, and only then is the old
+  file removed. Admin-only, so severity was low, but the ordering was simply wrong.
+
+*2. Startup continued after a failed migration*
+- `Program.cs` logged a migration failure and carried on. The app then served pages against a
+  missing or outdated schema, producing confusing errors all over the site instead of one clear
+  one. It now rethrows, so the app stops where the real cause was logged.
+
+*3. New tests*
+- `ProductImageLifecycleTests` — 7 tests covering how `ImagePath` behaves across create, update
+  and delete, including updating a product that no longer exists (the failure path the old code
+  handled badly). **48 → 55 tests.**
+
+**How it was verified**
+- Build clean, **55/55 tests passing**, `scripts/security-check.sh` **18/18 passing**.
+- The Edit flow was re-tested end to end against the running app as an admin:
+  - edit with no new file → image preserved;
+  - edit with a new file → new image saved, old file removed from disk;
+  - edit submitting a **forged** `ImagePath` pointing at a shared seeded photo → forged value
+    ignored, `breaker.jpg` still present.
+- Catalogue returned to 10 products, uploads folder empty, all 4 seeded photos intact.
+- Note: three apparent failures during testing turned out to be a broken product-ID extraction in
+  the test commands (one grep captured the image filename GUID instead of the product ID). The
+  application behaved correctly throughout; the IDs were eventually read from the database instead
+  of scraped from HTML.
+
+**Findings NOT changed — recorded for decision**
+- `CalculationRule.RoomsFrom` / `RoomsTo` are **dead fields**: declared, seeded with 1/999, and
+  read by nothing. The comment "999 = no upper limit" implies range logic that does not exist.
+- `RulesApplied` stores circuit-type names (`"lighting, socket"`), but the ERD specification says
+  it should hold the rule **IDs** as JSON "for auditing". As stored it cannot tell you which rule
+  produced a given BOM — a weakness given the project's auditability claim.
+- `PowerboxCalculation.UserId` is still never populated, although Identity now exists to fill it.
+- `CalculatorServices.Calculate` issues two queries per rule (up to 8 per calculation), and
+  `CartController.Index` one per cart line. Fine at this size, wrong at scale.
+
+---
+
 ## 2026-08-11 — Move documentation into docs/
 
 **Type:** chore

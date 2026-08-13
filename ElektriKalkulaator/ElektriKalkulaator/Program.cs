@@ -84,7 +84,13 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Database migration failed on startup.");
+        logger.LogError(ex, "Database migration or seeding failed on startup.");
+
+        // Stop instead of continuing. If the schema could not be brought up to date, every page
+        // that touches the database will fail anyway — but with confusing errors scattered across
+        // the site rather than one clear message here. Failing immediately, at the point where the
+        // real cause was logged, is far easier to diagnose.
+        throw;
     }
 }
 

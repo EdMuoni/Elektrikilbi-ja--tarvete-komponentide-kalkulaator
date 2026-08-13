@@ -140,21 +140,32 @@ namespace ElektriKalkulaator.Controllers
                 return View(dto);
             }
 
-            // A new file replaces the image; otherwise dto.ImagePath already holds the existing
-            // path, round-tripped through a hidden field in the Edit form. Keep the old file's
-            // path so we can delete it from disk once the new one is confirmed saved — otherwise
-            // every re-upload leaves an orphaned file behind.
-            var oldImagePath = dto.ImagePath;
+            // Read the image currently stored against this product FROM THE DATABASE, not from
+            // the submitted form. The form carries ImagePath in a hidden field, which means the
+            // browser could send any path at all — and this method deletes the file it names.
+            // Trusting it would let a stale or edited form delete a different product's image.
+            var existing = await _productServices.GetById(id);
+            if (existing == null)
+                return NotFound();
+
+            var oldImagePath = existing.ImagePath;
+
+            // Keep whatever the product already had unless a new file was actually uploaded.
+            dto.ImagePath = oldImagePath;
+
             var newImagePath = await SaveProductImage(imageFile);
             if (newImagePath != null)
-            {
                 dto.ImagePath = newImagePath;
-                DeleteProductImageFile(oldImagePath);
-            }
 
             var updated = await _productServices.Update(dto);
             if (updated == null)
                 return NotFound();
+
+            // Only now that the update has definitely succeeded is it safe to remove the old
+            // file. Deleting it earlier meant a failed update left the product pointing at an
+            // image that had already been erased, with no way to get it back.
+            if (newImagePath != null)
+                DeleteProductImageFile(oldImagePath);
 
             TempData["Success"] = $"Product '{dto.Name}' updated successfully!";
             return RedirectToAction(nameof(Index));

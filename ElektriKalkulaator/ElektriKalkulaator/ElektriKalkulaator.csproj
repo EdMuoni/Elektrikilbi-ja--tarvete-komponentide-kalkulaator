@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -27,6 +27,14 @@
     <ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
     <!-- Teenuste implementatsioonid (CalculatorServices jne) -->
     <ProjectReference Include="..\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
+  </ItemGroup>
+
+
+  <!-- Lets ElektriKalkulaator.Tests call internal members (the image-validation helpers).
+       Without this they would have to be public, which would wrongly suggest other code
+       should call them. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ElektriKalkulaator.Tests" />
   </ItemGroup>
 
 </Project>

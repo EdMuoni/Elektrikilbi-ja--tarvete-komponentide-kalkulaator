@@ -19,6 +19,9 @@ next, without guessing.
 | `CHANGELOG.md` | **What actually happened to the code, and why.** Append-only log, newest first. Never rewritten. |
 | `RESEARCH_LOG.md` | **Facts gathered from outside the project** — market prices, competitor design analysis, UX research, image sourcing. Separate from the changelog because external facts go stale on their own schedule. |
 | `IMAGE_CREDITS.md` | Attribution and licences for every shipped image. Legally required for the CC BY-SA one. |
+| `CLAUDE.md` | **Loaded automatically at the start of every AI session.** Rules, commands, and the things that look like bugs but are deliberate. |
+| `PROMPTS.md` | Ready-made prompts for future AI sessions, with the reasoning behind each. |
+| `scripts/security-check.sh` | Re-runs every exploit from the security review against the running app. `bash scripts/security-check.sh` |
 | `README.md` | Currently just the repo title. Low priority. |
 
 ### House rules for code
@@ -346,6 +349,28 @@ real money are involved.
 - [ ] **Commit the current work** — a session's worth of changes is uncommitted (see §A1)
 - [x] **Turn image-upload validation errors into form messages instead of 500 pages** *(2026-08-11)*
 - [ ] Write the thesis's own "limitations / future work" section using §B2's gap table, §D1 and §D3
+- [ ] **Redesign the site to convert visitors into buyers — both consumers and companies.**
+      Edgar's priority (stated 2026-08-11): the site must *psychologically attract* customers, and
+      companies as B2B buyers. This is a distinct piece of work from the security and correctness
+      fixes done so far, and it is the main thing standing between "a working thesis project" and
+      "something a real customer would buy from".
+
+      Research already gathered in `RESEARCH_LOG.md` (competitor teardowns of Esvika, Onninen and
+      Elektrikaubad.ee, plus Baymard/Stanford/Lindgaard findings). Highest impact ÷ effort first:
+      - [ ] State whether prices include VAT — a cost-estimation tool with a >20 % ambiguity
+      - [ ] Trust strip under the calculator result, saying what is actually true and unusually
+            strong here: calculated to EVS-HD 60364, live catalogue prices, every rule auditable.
+            The project's real differentiator is currently invisible in the interface.
+      - [ ] Sorting (price, name) and price-per-metre on cable — Baymard essentials
+      - [ ] Homepage hero built around the calculator, using the licensed photography already in
+            `wwwroot/images/hero/` (downloaded, still unused)
+      - [ ] **B2B specifically** — this is what makes companies buy: saved/shareable BOM lists
+            (an electrician sends a calculation to a client for approval), a printable/PDF quote,
+            product codes and datasheets on the product page, and eventually account pricing.
+            Onninen's whole interface is built around these; see `RESEARCH_LOG.md`.
+      - [ ] Never: fake scarcity, countdown timers, invented "was" prices. Regulated as unfair
+            commercial practices in the EU, and they would undermine the trustworthiness argument
+            the entire project rests on.
 - [ ] *Optional:* more test coverage (`CategoryServices`, controllers)
 - [ ] *Optional:* AJAX-ify the calculator submit (pattern in `AdvancedAjax`, jQuery already loaded)
 - [ ] *Optional:* broaden `/Products` filtering (price range, brand)

@@ -256,7 +256,7 @@ namespace ElektriKalkulaator.Controllers
         // a problem on the form instead of the upload blowing up halfway through. Previously a
         // wrong file type threw an exception and the user got a blank 500 error page with no idea
         // what went wrong.
-        private static string? ValidateImageFile(IFormFile? imageFile)
+        internal static string? ValidateImageFile(IFormFile? imageFile)
         {
             // No file chosen is perfectly valid — a product simply has no picture.
             if (imageFile == null || imageFile.Length == 0)
@@ -281,7 +281,7 @@ namespace ElektriKalkulaator.Controllers
 
         // Reads the first bytes of the uploaded file and checks them against the known signatures
         // of the formats we accept. Returns true only if one of them matches.
-        private static bool HasValidImageSignature(IFormFile imageFile)
+        internal static bool HasValidImageSignature(IFormFile imageFile)
         {
             // 12 bytes is enough for every signature we check (WEBP needs bytes 8-11).
             Span<byte> header = stackalloc byte[12];

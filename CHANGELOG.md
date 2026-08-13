@@ -44,6 +44,68 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Make the project survive AI context loss: CLAUDE.md, tests, security script
+
+**Type:** docs / test
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- **`CLAUDE.md`** — loaded automatically at the start of every AI session. Holds the rules
+  (changelog every change, English comments, `.jpg` only, test against the running app, never
+  invent EVS clause numbers), the commands, and a "things that look like bugs but are deliberate"
+  list.
+- **`PROMPTS.md`** — ready-made prompts for future sessions with the reasoning behind each, plus a
+  table of vague prompts and what to say instead.
+- **32 new tests** (16 → **48 total**):
+  - `ImageUploadValidationTests` — 16 tests. Accepts real JPEG/PNG/GIF/WEBP, refuses disallowed
+    extensions, oversized files, and — the important one — an executable or plain text renamed to
+    `.jpg`/`.png`.
+  - `CatalogueSearchTests` — 9 tests pinning the SQL-side search: category filter, brand and name
+    matching, filters combined with AND not OR, whitespace ignored, terms trimmed, `Category`
+    still eager-loaded.
+  - `CategoryServicesTests` — 7 tests, the only coverage of `CategoryServices.Delete` and its new
+    `CategoryDeleteResult`.
+- `ValidateImageFile` / `HasValidImageSignature` changed from `private` to `internal`, with
+  `InternalsVisibleTo` in the web `.csproj`, so tests can reach them without making them public
+  (which would wrongly suggest other code should call them).
+- **`scripts/security-check.sh`** — re-runs all 20 checks from the security review against a
+  running app. Exits non-zero on failure so it can go into a build pipeline later.
+- `PROJECT_ROADMAP.md` — recorded the **conversion-focused redesign** as planned work (consumer
+  and B2B), grounded in the competitor research already in `RESEARCH_LOG.md`.
+
+**Why**
+- AI sessions lose detail when their context fills and gets summarised. Documents survive that;
+  conversations do not. But a document only records a *claim* about the past — "verified: admin
+  pages return 302". A test is a *continuously enforced fact*: remove `[Authorize]` and it goes
+  red, while the paragraph stays smugly true.
+- So the aim was to convert everything verified by hand on 2026-08-11 into something executable.
+  The split is deliberate: xUnit covers logic that needs no web server; the shell script covers
+  what only exists once the app is running (auth redirects, antiforgery, HTTP status codes).
+
+**How it was verified**
+- `dotnet build` clean; **48/48 tests passing**.
+- The security script was **proved able to fail**, which matters more than it passing:
+  - pointed at a dead port → exits 1 with a clear message;
+  - the `Url.IsLocalUrl` guard was deliberately removed, the app rebuilt, and the script correctly
+    reported `FAIL external returnUrl was followed → https://evil.example.com/phish` and exited 1;
+  - guard restored, rebuilt, all 20 checks pass and it exits 0.
+- Two bugs in the script itself were found and fixed during that process:
+  1. the cookie jar used an absolute `/tmp` path, which Windows `curl` cannot write while
+     `MSYS_NO_PATHCONV=1` is set — so every request went out session-less and real checks failed
+     for the wrong reason;
+  2. the open-redirect check only asserted "did not go to evil.example.com", which an empty
+     response satisfies trivially — a check that could never fail. It now asserts the redirect
+     goes to `/Cart`.
+
+**Follow-ups or known limitations**
+- The security script must be run manually against a running app; it is not part of `dotnet test`.
+  Proper integration tests (`WebApplicationFactory`) would fold these into the normal test run and
+  are the natural next step.
+- No test yet covers the role split at HTTP level (anonymous vs customer vs admin) — that is
+  script-only for the same reason.
+
+---
+
 ## 2026-08-11 — Authentication and roles (ASP.NET Core Identity)
 
 **Type:** security / feature

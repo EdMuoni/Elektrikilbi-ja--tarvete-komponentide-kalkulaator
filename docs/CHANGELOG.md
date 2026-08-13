@@ -44,6 +44,55 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Broaden test coverage to 128 tests, and document the testing approach
+
+**Type:** test / docs
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- **`docs/TESTING.md`** — how this project is tested, what each test file covers, the conventions,
+  and an honest list of what is still missing. Written so the next person (or model) knows where a
+  new test belongs and what "good" looks like here.
+- **55 → 128 tests**, adding three kinds of coverage that did not exist:
+  - **`SeedDataIntegrityTests`** (13) — asserts things about the *data* rather than the code. Every
+    seeded product has an image file **that actually exists on disk**, belongs to a real category,
+    has a positive price and non-negative stock; every category the calculator matches by name
+    exists and has in-stock products; every building type has rules; every rule has a matching
+    breaker and cable in the catalogue; all seeded IDs are unique.
+  - **`CalculatorEdgeCaseTests`** (~30) — boundaries rather than happy paths: 0/1/7/8/9/16/17/500
+    lights, 0/1/5/6/7/12/500 sockets, all three building types, a commercial building with the
+    stove box ticked (no stove rule exists, so nothing must be added), totals matching the sum of
+    lines, every line referencing a real product, and the 50-entry history limit.
+  - **`FormValidationTests`** (~30) — the `[Required]`, `[Range]` and `[Compare]` attributes on
+    every form DTO, including both sides of each boundary and the password-confirmation mismatch.
+
+**Why**
+- The suite covered the code but never the **data**. A renamed category silently breaks the
+  calculator (it matches by exact string), and an `ImagePath` pointing at an uncommitted file shows
+  broken images to everyone who clones the repo — **a bug this project actually shipped**, which no
+  existing test could have caught.
+- Boundary cases are where "one circuit per 8 lights" goes wrong. Previously only 8 and 9 were
+  covered; now both sides of every multiple are.
+- Validation attributes are one deleted line away from disappearing with nothing failing to
+  compile.
+
+**How it was verified**
+- **128/128 passing**, `scripts/security-check.sh` **18/18 passing**, build clean.
+- Both new test categories were **mutation-tested**, per the rule now written into
+  `docs/TESTING.md`:
+  - a seeded image file was temporarily moved away → `SeedDataIntegrityTests` failed with
+    *"These seeded products reference image files that do not exist"*;
+  - the socket divisor was changed from 6 to 5 → 3 boundary tests failed.
+  - Both reverted; full suite green again.
+
+**Follow-ups or known limitations**
+Listed in `docs/TESTING.md`, honestly: no HTTP-level integration tests
+(`WebApplicationFactory`) — the biggest gap, and it would fold the 18 security checks into
+`dotnet test`; no controller tests; `CartController` has no automated coverage at all (session
+dependency makes it awkward); no UI tests; no CI running any of this on push.
+
+---
+
 ## 2026-08-11 — Code review: fixed an image-deletion ordering bug and fail-fast on startup
 
 **Type:** bugfix

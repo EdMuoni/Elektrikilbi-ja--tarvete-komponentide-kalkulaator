@@ -51,7 +51,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         // being absent is an expected outcome, not a program error.
         //
         // NOTE: nothing calls this yet — there is no "delete category" button in the UI. It is
-        // kept because the admin area planned in PROJECT_ROADMAP.md will need it.
+        // kept because the admin area planned in docs/PROJECT_ROADMAP.md will need it.
         public async Task<CategoryDeleteResult> Delete(Guid id)
         {
             var category = await _context.ProductCategories

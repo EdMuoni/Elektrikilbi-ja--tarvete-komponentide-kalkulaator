@@ -93,7 +93,7 @@ namespace ElektriKalkulaator.Data
             // manufacturer SKUs — manufacturer product photography is copyrighted, so the images
             // come from Wikimedia Commons under CC0 / CC BY-SA instead. This mirrors normal
             // Estonian retail practice of labelling catalogue photos as illustrative.
-            // Attribution for every image is recorded in IMAGE_CREDITS.md at the repo root.
+            // Attribution for every image is recorded in docs/IMAGE_CREDITS.md.
             // In production these would be replaced by real photos from a supplier feed.
             mb.Entity<Product>().HasData(
                 // Breakers — 10A (lighting)

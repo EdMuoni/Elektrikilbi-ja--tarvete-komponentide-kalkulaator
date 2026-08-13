@@ -1,7 +1,7 @@
 # CLAUDE.md — instructions for AI assistants working on this project
 
 This file is loaded automatically at the start of every session. Read it, then read
-`PROJECT_ROADMAP.md` before doing anything else.
+`docs/PROJECT_ROADMAP.md` before doing anything else.
 
 ---
 
@@ -14,20 +14,24 @@ real product catalogue.
 
 The calculator is the point. The shop exists to serve it.
 
-## The four documents
+## The documents
+
+All project documentation lives in `docs/`. Only this file and `README.md` sit at the repo root —
+this one because it is only loaded automatically from there.
 
 | File | What it holds | When to update |
 |---|---|---|
-| `PROJECT_ROADMAP.md` | Architecture, status, decisions, plans | When status or plans change |
-| `CHANGELOG.md` | What changed in the code and **why** | **Every code change** |
-| `RESEARCH_LOG.md` | Facts gathered from outside (prices, competitor design, UX research) | When you research something external |
-| `IMAGE_CREDITS.md` | Licence and attribution for every image | When images change |
+| `docs/PROJECT_ROADMAP.md` | Architecture, status, decisions, plans | When status or plans change |
+| `docs/CHANGELOG.md` | What changed in the code and **why** | **Every code change** |
+| `docs/RESEARCH_LOG.md` | Facts gathered from outside (prices, competitor design, UX research) | When you research something external |
+| `docs/IMAGE_CREDITS.md` | Licence and attribution for every image | When images change |
+| `docs/PROMPTS.md` | Ready-made prompts for future sessions | Rarely; when a new prompt proves useful |
 
 ## Rules — follow these without being asked
 
-1. **Write a `CHANGELOG.md` entry for every code change.** The template is at the top of that file.
+1. **Write a `docs/CHANGELOG.md` entry for every code change.** The template is at the top of that file.
    The *why* matters more than the *what* — code shows what changed, only you know why.
-2. **Tick the matching checkbox** in `PROJECT_ROADMAP.md` §D2/§D3 when you complete a planned item.
+2. **Tick the matching checkbox** in `docs/PROJECT_ROADMAP.md` §D2/§D3 when you complete a planned item.
 3. **All code comments in English**, written so a beginner can follow the reasoning. Some older
    files still have Estonian comments — convert them when you touch those files.
 4. **Images: `.jpg` only.** One format for the whole catalogue.
@@ -70,7 +74,7 @@ Never make `Core` depend on anything. Never make `Data` reference the web projec
   future work, not an oversight.
 - `ICategoryServices.Delete` is **unreachable** — nothing calls it. Kept for the planned admin area.
 - `Product.Price` **does not declare whether it includes VAT.** This is a known open question, not
-  something to guess at. See `RESEARCH_LOG.md`.
+  something to guess at. See `docs/RESEARCH_LOG.md`.
 
 ## Working style Edgar has asked for
 

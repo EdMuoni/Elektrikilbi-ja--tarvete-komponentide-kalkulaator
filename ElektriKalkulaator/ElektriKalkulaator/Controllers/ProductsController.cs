@@ -238,7 +238,7 @@ namespace ElektriKalkulaator.Controllers
         private const string UploadsWebPath = "/images/uploads/";
 
         // There is no login/authorization on this controller (by design, for the thesis scope —
-        // see PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
+        // see docs/PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
         // reach this upload path too. An extension allow-list and a size cap are the minimum
         // guardrails against someone using the form to drop arbitrary files on the server.
         private static readonly HashSet<string> AllowedImageExtensions =

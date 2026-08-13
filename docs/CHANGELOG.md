@@ -44,6 +44,39 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Move documentation into docs/
+
+**Type:** chore
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- `PROJECT_ROADMAP.md`, `CHANGELOG.md`, `RESEARCH_LOG.md`, `IMAGE_CREDITS.md` and `PROMPTS.md`
+  moved into **`docs/`** with `git mv`, so their history is preserved.
+- Every reference updated: `CLAUDE.md`, and the code comments in `ProductsController`,
+  `CartController`, `CategoryServices` and `ElektriKalkulaatorContext`.
+- `README.md` rewritten — it was a single line containing only the repo name. It now explains what
+  the project is, how to run and test it, the project structure, and links to every document.
+
+**Why**
+- The repository root had seven markdown files competing for attention. Anyone opening the repo saw
+  a wall of documents instead of the project.
+- **`CLAUDE.md` deliberately stayed at the root.** It is only loaded automatically from there, so
+  moving it into `docs/` would have quietly disabled the mechanism that makes every future AI
+  session self-orienting — the opposite of what it is for.
+- `README.md` also stays at the root because that is what GitHub renders on the repository page.
+
+**How it was verified**
+- Searched the whole repository for references to the five moved filenames: none remain without the
+  `docs/` prefix.
+- Confirmed every path linked from `README.md` and `CLAUDE.md` exists on disk.
+- `dotnet build` clean, **48/48 tests passing** — the moved files are referenced from code comments,
+  so a bad rename would not break the build; the searches above are what actually proves it.
+
+**Follow-ups or known limitations**
+- None.
+
+---
+
 ## 2026-08-11 — Make the project survive AI context loss: CLAUDE.md, tests, security script
 
 **Type:** docs / test

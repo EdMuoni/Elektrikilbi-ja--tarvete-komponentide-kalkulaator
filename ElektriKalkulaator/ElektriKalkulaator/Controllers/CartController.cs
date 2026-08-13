@@ -114,7 +114,7 @@ namespace ElektriKalkulaator.Controllers
 
         // POST /Cart/Checkout — demo only, clears cart and shows confirmation.
         // NOTE: this deliberately does not create an order or reduce stock — see
-        // PROJECT_ROADMAP.md, where real order persistence is planned work.
+        // docs/PROJECT_ROADMAP.md, where real order persistence is planned work.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Checkout()

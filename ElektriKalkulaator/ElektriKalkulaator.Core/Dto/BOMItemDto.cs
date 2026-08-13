@@ -10,6 +10,15 @@ namespace ElektriKalkulaator.Core.Dto
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
 
+        // What one unit of Quantity actually is: "tk" (pieces) for breakers, RCDs and enclosures,
+        // "m" (metres) for cable.
+        //
+        // This matters more than it looks. Cable is calculated and priced by the metre, but the
+        // result table used to label every row "tk", so a 40-metre cable run was displayed as
+        // "40 tk" — reading as forty separate cables. Same for the price: 1.20 €/m was shown as if
+        // it were 1.20 € per piece.
+        public string Unit { get; set; } = "tk";
+
         // Used for colour-coding rows in the table (lighting / socket / stove / rcd / panel)
         public string? CircuitType { get; set; }
 

@@ -331,6 +331,68 @@ main {
 .bom-circuit-rcd      { color: #a78bfa; } /* lilla — rikkevoolukaitme */
 .bom-circuit-panel    { color: var(--accent-amber); } /* oranž — kilp */
 
+/* ── TRUST STRIP (kalkulaatori tulemuse all) ──────────────────────────────
+   Shown under the BOM. Three short, factually true statements about how the
+   result was produced. Uses a green accent rather than the amber used for
+   prices and buttons, so it reads as reassurance rather than another
+   call to action. */
+.trust-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.trust-item {
+    background-color: rgba(16, 185, 129, 0.05);
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.trust-icon {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+.trust-item strong {
+    display: block;
+    color: var(--accent-green);
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+}
+
+.trust-item span:not(.trust-icon) {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+/* ── AVALEHE KANGELASPILT ─────────────────────────────────────────────────
+   A real photograph instead of a decorative emoji. The dark overlay keeps
+   the white heading readable whatever the photo's own brightness. */
+.hero-photo {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 260px;
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(15,15,26,0.55) 0%, rgba(15,15,26,0.15) 100%);
+}
+
 .bom-total-row {
     background-color: rgba(245, 166, 35, 0.08);
     font-weight: 700;

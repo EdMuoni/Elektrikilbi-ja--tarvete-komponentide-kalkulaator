@@ -157,8 +157,12 @@
                                             <span class="badge-wire ms-1">@item.WireCrossSectionMm2 mm²</span>
                                         }
                                     </td>
-                                    <td class="text-center fw-bold">@item.Quantity tk</td>
-                                    <td class="text-end price-tag-small">@item.UnitPrice.ToString("F2") €</td>
+                                    @* item.Unit is "tk" for countable items and "m" for cable, so a
+                                       40-metre cable run reads "40 m" instead of "40 tk". *@
+                                    <td class="text-center fw-bold">@item.Quantity @item.Unit</td>
+                                    <td class="text-end price-tag-small">
+                                        @item.UnitPrice.ToString("F2") €<span class="text-muted-custom small">/@item.Unit</span>
+                                    </td>
                                     <td class="text-end price-tag-small">@item.TotalPrice.ToString("F2") €</td>
                                     <td>
                                         @* Add to cart — POST form *@
@@ -187,14 +191,48 @@
                     </table>
                 </div>
 
+                @* ── TRUST STRIP ──────────────────────────────────────────────────
+                   Why this exists: the strongest thing about this calculator was invisible.
+                   A visitor saw a price list identical to any other shop's, with no indication
+                   that the quantities come from a published safety standard rather than a
+                   guess. Every claim below is literally true of this application, which is what
+                   separates it from marketing badges. *@
+                <div class="trust-strip mt-4">
+                    <div class="trust-item">
+                        <span class="trust-icon">📐</span>
+                        <div>
+                            <strong>EVS-HD 60364</strong>
+                            <span>Kogused arvutatud Eesti elektripaigaldise standardi järgi</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon">🔍</span>
+                        <div>
+                            <strong>Kontrollitav</strong>
+                            <span>Iga rida tuleb reeglist, mitte hinnangust — arvutuskäik on jälgitav</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon">📦</span>
+                        <div>
+                            <strong>Laoseisuga hinnad</strong>
+                            <span>Valitud on odavaim laos olev toode iga komponendi jaoks</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Lisa kõik ostukorvi -->
-                <div class="mt-3 pt-3 border-top border-secondary d-flex gap-2 flex-wrap">
+                <div class="mt-3 pt-3 border-top border-secondary d-flex gap-2 flex-wrap align-items-center">
                     <a asp-controller="Cart" asp-action="Index" class="btn btn-amber">
                         🛒 Vaata ostukorvi
                     </a>
                     <a asp-controller="Calculator" asp-action="History" class="btn btn-secondary">
                         📋 Arvutuste ajalugu
                     </a>
+                    @* The VAT basis is stated explicitly because a cost estimate that does not say
+                       whether tax is included is ambiguous by more than 20%. Estonian retailers
+                       always state it. The value comes from configuration — see appsettings.json. *@
+                    <span class="ms-auto small text-muted-custom">@VatNotice.Text(Configuration)</span>
                 </div>
             </div>
         }

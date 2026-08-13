@@ -12,6 +12,11 @@ namespace ElektriKalkulaator.ApplicationServices.Services
     {
         private readonly ElektriKalkulaatorContext _context;
 
+        // Units of measure used on BOM lines. Named constants rather than loose strings so a typo
+        // becomes a compile error instead of a wrong label in front of a customer.
+        private const string UnitPieces = "tk";   // tükki — individual items
+        private const string UnitMetres = "m";    // metres — cable is sold by length
+
         public CalculatorServices(ElektriKalkulaatorContext context)
         {
             _context = context;
@@ -74,7 +79,8 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                         UnitPrice           = breaker.Price,
                         TotalPrice          = breaker.Price * circuitCount,
                         CircuitType         = rule.CircuitType,
-                        WireCrossSectionMm2 = rule.WireCrossSectionMm2
+                        WireCrossSectionMm2 = rule.WireCrossSectionMm2,
+                        Unit                = UnitPieces
                     });
                 }
 
@@ -102,7 +108,9 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                         UnitPrice           = wire.Price,
                         TotalPrice          = wire.Price * wireMeters,
                         CircuitType         = rule.CircuitType,
-                        WireCrossSectionMm2 = rule.WireCrossSectionMm2
+                        WireCrossSectionMm2 = rule.WireCrossSectionMm2,
+                        // Cable is measured and priced per metre, not per piece.
+                        Unit                = UnitMetres
                     });
                 }
             }
@@ -124,7 +132,8 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                     Quantity    = 1,
                     UnitPrice   = panelBox.Price,
                     TotalPrice  = panelBox.Price,
-                    CircuitType = "panel"
+                    CircuitType = "panel",
+                    Unit        = UnitPieces
                 });
             }
 
@@ -145,7 +154,8 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                     Quantity    = 1,
                     UnitPrice   = rcd.Price,
                     TotalPrice  = rcd.Price,
-                    CircuitType = "rcd"
+                    CircuitType = "rcd",
+                    Unit        = UnitPieces
                 });
             }
 

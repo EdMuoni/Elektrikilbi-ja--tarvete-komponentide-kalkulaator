@@ -104,7 +104,18 @@
         </nav>
     </header>
 
-    <!-- Põhisisu ala — @RenderBody() = siin renderdatakse iga lehe sisu -->
+    @*
+       Main content area. Each page's own content is inserted by the RenderBody call below.
+
+       This explanation deliberately uses a Razor comment rather than an ordinary HTML comment.
+       Razor does not treat HTML comments as comments: any code written inside one still runs.
+       This block previously WAS an HTML comment containing a RenderBody call, so the whole page
+       body was emitted inside an unterminated comment, the main element came out empty, and the
+       comment's trailing words appeared as stray text on every page.
+
+       A Razor comment is stripped before anything inside it can run, so it is the safe place to
+       mention framework calls by name.
+    *@
     <main class="container py-4">
         <!-- Teadeteplokk (TempData["Success"] ja TempData["Error"]) -->
         @if (TempData["Success"] != null)

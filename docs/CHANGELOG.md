@@ -44,6 +44,63 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Fix two display bugs, and make the calculator's value visible
+
+**Type:** bugfix / feature
+**Author:** Claude (Sonnet 5) + Edgar
+
+**Two bugs found while doing UI work**
+
+*1. Cable was labelled in pieces instead of metres*
+- Every BOM row printed "tk" (pieces). Cable is calculated and priced **per metre**, so a 40-metre
+  run displayed as "40 tk" — reading as forty separate cables — and its price showed as "1.20 €"
+  as though that were the whole run rather than one metre.
+- Anyone using the estimate to order materials would have been badly misled, which undermines the
+  one thing this tool exists to do.
+- `BOMItemDto` gained a `Unit` property; `CalculatorServices` sets `"m"` for cable and `"tk"` for
+  everything else, from named constants. The table now shows `80 m` and `1.20 €/m`.
+
+*2. The entire page body was rendered inside an HTML comment*
+- `_Layout.cshtml` had `<!-- Põhisisu ala — @RenderBody() = ... -->`. **Razor does not treat HTML
+  comments as comments**, so it executed the `@RenderBody()` written inside one.
+- Consequences on every page: 544 lines of content emitted inside an unterminated comment, the
+  `<main>` element rendered **empty**, and the comment's trailing words appeared as visible stray
+  text (`= siin renderdatakse iga lehe sisu -->`). Content only displayed at all because a nested
+  `-->` inside the page happened to close the comment early.
+- Fixed by making it a Razor comment, which is stripped before anything inside it runs. Content is
+  now inside `<main>` (548 lines) where it belongs.
+
+**Conversion work — the site's strongest argument was invisible**
+- **Trust strip** under the calculation result: quantities follow EVS-HD 60364, every line comes
+  from a rule rather than an estimate, prices are the cheapest in-stock option. All three are
+  literally true of this application — that is what separates them from marketing badges. Green
+  accent, not the amber used for prices, so it reads as reassurance rather than another button.
+- **VAT is now stated** next to the total. A cost estimate that does not say whether tax is
+  included is ambiguous by more than 20%, and every Estonian retailer states it. The value comes
+  from a new `Pricing` section in `appsettings.json` (`PricesIncludeVat`, `VatRatePercent`), since
+  it is a business fact that may change without code changing. **Assumption: prices include VAT** —
+  Edgar should confirm, as it is only a display statement and must match how the prices were
+  actually recorded.
+- **Homepage hero** now uses the real photograph downloaded earlier (and until now unused) instead
+  of a faded emoji. Hidden below `lg` so phones do not download a large decorative image.
+
+**How it was verified**
+- Build clean, **134/134 tests** (6 new in `BomUnitOfMeasureTests`), `security-check.sh` **18/18**.
+- Checked in a real browser and via page-text extraction: cable rows read `80 m` at `1.20 €/m`
+  totalling `96.00 €`; breakers read `2 tk` at `7.90 €/tk`; trust strip and VAT line both render.
+- The stray-text bug was confirmed fixed on `/`, `/Products`, `/Calculator` and `/Cart`, and
+  `<main>` verified to contain the page content.
+- Note: the first attempt at the layout fix **broke the build** — the explanatory comment itself
+  contained the literal sequence that ends a Razor comment, closing it early. Rewritten to
+  describe the calls by name instead.
+
+**Follow-ups or known limitations**
+- The VAT setting only changes what the site *says*; it does not convert any price.
+- Catalogue and cart pages do not yet show the VAT notice or per-unit pricing — only the
+  calculator does.
+
+---
+
 ## 2026-08-11 — Broaden test coverage to 128 tests, and document the testing approach
 
 **Type:** test / docs

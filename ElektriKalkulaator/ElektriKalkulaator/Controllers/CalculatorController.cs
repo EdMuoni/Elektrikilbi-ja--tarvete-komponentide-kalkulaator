@@ -21,8 +21,13 @@ namespace ElektriKalkulaator.Controllers
             return View(new CalculatorInputDto());
         }
 
-        // POST /Calculator — run EVS-HD 60364 calculation, save results, show BOM table
+        // POST /Calculator — run EVS-HD 60364 calculation, save results, show BOM table.
+        //
+        // [ValidateAntiForgeryToken] means the request must carry the hidden token that our own
+        // form puts on the page. Without it, another website could silently submit this form on a
+        // visitor's behalf and fill our calculation tables with junk rows.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(CalculatorInputDto dto)
         {
             if (!ModelState.IsValid)

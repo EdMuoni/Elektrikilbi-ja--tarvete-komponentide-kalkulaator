@@ -1,0 +1,21 @@
+@* Shown when a signed-in user opens a page their role does not allow *@
+@{
+    ViewData["Title"] = "Ligipääs keelatud";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-5 text-center">
+            <div style="font-size: 3rem; opacity: 0.4;">🔒</div>
+            <h4 class="text-white fw-bold mt-3">Ligipääs keelatud</h4>
+            <p class="text-muted-custom">
+                Sul pole õigusi selle lehe vaatamiseks. Toodete haldamiseks on vaja
+                administraatori kontot.
+            </p>
+            <div class="d-flex gap-2 justify-content-center mt-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-amber">Avalehele</a>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">Tooted</a>
+            </div>
+        </div>
+    </div>
+</div>

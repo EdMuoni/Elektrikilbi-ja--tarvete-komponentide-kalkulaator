@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4a32f156-7e49-4b28-9180-4bf9fe35d39a</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,14 @@
     <ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
     <!-- Teenuste implementatsioonid (CalculatorServices jne) -->
     <ProjectReference Include="..\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
+  </ItemGroup>
+
+
+  <!-- Lets ElektriKalkulaator.Tests call internal members (the image-validation helpers).
+       Without this they would have to be public, which would wrongly suggest other code
+       should call them. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ElektriKalkulaator.Tests" />
   </ItemGroup>
 
 </Project>

@@ -55,6 +55,49 @@
                                 🛒 Ostukorv
                             </a>
                         </li>
+
+                        @* User.Identity.IsAuthenticated is true once someone has signed in.
+                           User.IsInRole("Admin") checks their role, so the admin link is only
+                           shown to administrators.
+                           NOTE: hiding a link is presentation, not security — the real protection
+                           is [Authorize(Roles = "Admin")] on the controller. Someone typing the
+                           URL directly is still blocked. *@
+                        @if (User.Identity is { IsAuthenticated: true })
+                        {
+                            @if (User.IsInRole(ElektriKalkulaator.Core.Domain.UserRoles.Admin))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" asp-controller="Products" asp-action="Create">
+                                        ⚙️ Halda
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="nav-link px-3 text-muted-custom" style="cursor:default">
+                                    👤 @(User.Identity.Name)
+                                </span>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                @* Logout is a POST so another site cannot sign our users out. *@
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-secondary">Logi välja</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link px-3" asp-controller="Account" asp-action="Login">
+                                    🔑 Logi sisse
+                                </a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                <a class="btn btn-sm btn-amber ms-2" asp-controller="Account" asp-action="Register">
+                                    Loo konto
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

@@ -1,5 +1,7 @@
+using ElektriKalkulaator.Core.Domain;
 using ElektriKalkulaator.Core.Dto;
 using ElektriKalkulaator.Core.ServiceInterface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -7,6 +9,15 @@ namespace ElektriKalkulaator.Controllers
 {
     // Full CRUD for products plus category management.
     // Routes: /Products, /Products/Details, /Products/Create, /Products/Edit, /Products/Delete, /Products/Categories
+    //
+    // [Authorize(Roles = Admin)] on the CLASS means every action here requires an administrator
+    // by default. The two pages the public genuinely needs - the catalogue listing and a product's
+    // details - opt back out with [AllowAnonymous] individually.
+    //
+    // Securing by default and opening up deliberately is safer than the reverse: forgetting to add
+    // [Authorize] to a new action would leave it open, whereas forgetting [AllowAnonymous] only
+    // makes a page stricter than intended, which is obvious immediately.
+    [Authorize(Roles = UserRoles.Admin)]
     public class ProductsController : Controller
     {
         private readonly IProductServices _productServices;
@@ -24,22 +35,15 @@ namespace ElektriKalkulaator.Controllers
         }
 
         // GET /Products — catalogue with optional category filter and name search
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index(Guid? categoryId, string? searchTerm)
         {
             var categories = await _categoryServices.GetAll();
 
-            var products = categoryId.HasValue
-                ? await _productServices.GetByCategory(categoryId.Value)
-                : await _productServices.GetAll();
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                var term = searchTerm.ToLower();
-                products = products.Where(p =>
-                    p.Name.ToLower().Contains(term) ||
-                    p.Brand.ToLower().Contains(term));
-            }
+            // One call does both the category filter and the text search, and it does them in the
+            // database rather than in memory here. See ProductServices.Search.
+            var products = await _productServices.Search(categoryId, searchTerm);
 
             ViewBag.Categories       = new SelectList(categories, "Id", "Name", categoryId);
             ViewBag.SelectedCategory = categoryId;
@@ -49,6 +53,7 @@ namespace ElektriKalkulaator.Controllers
         }
 
         // GET /Products/Details/{id}
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -135,21 +140,32 @@ namespace ElektriKalkulaator.Controllers
                 return View(dto);
             }
 
-            // A new file replaces the image; otherwise dto.ImagePath already holds the existing
-            // path, round-tripped through a hidden field in the Edit form. Keep the old file's
-            // path so we can delete it from disk once the new one is confirmed saved — otherwise
-            // every re-upload leaves an orphaned file behind.
-            var oldImagePath = dto.ImagePath;
+            // Read the image currently stored against this product FROM THE DATABASE, not from
+            // the submitted form. The form carries ImagePath in a hidden field, which means the
+            // browser could send any path at all — and this method deletes the file it names.
+            // Trusting it would let a stale or edited form delete a different product's image.
+            var existing = await _productServices.GetById(id);
+            if (existing == null)
+                return NotFound();
+
+            var oldImagePath = existing.ImagePath;
+
+            // Keep whatever the product already had unless a new file was actually uploaded.
+            dto.ImagePath = oldImagePath;
+
             var newImagePath = await SaveProductImage(imageFile);
             if (newImagePath != null)
-            {
                 dto.ImagePath = newImagePath;
-                DeleteProductImageFile(oldImagePath);
-            }
 
             var updated = await _productServices.Update(dto);
             if (updated == null)
                 return NotFound();
+
+            // Only now that the update has definitely succeeded is it safe to remove the old
+            // file. Deleting it earlier meant a failed update left the product pointing at an
+            // image that had already been erased, with no way to get it back.
+            if (newImagePath != null)
+                DeleteProductImageFile(oldImagePath);
 
             TempData["Success"] = $"Product '{dto.Name}' updated successfully!";
             return RedirectToAction(nameof(Index));
@@ -233,7 +249,7 @@ namespace ElektriKalkulaator.Controllers
         private const string UploadsWebPath = "/images/uploads/";
 
         // There is no login/authorization on this controller (by design, for the thesis scope —
-        // see PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
+        // see docs/PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
         // reach this upload path too. An extension allow-list and a size cap are the minimum
         // guardrails against someone using the form to drop arbitrary files on the server.
         private static readonly HashSet<string> AllowedImageExtensions =
@@ -251,7 +267,7 @@ namespace ElektriKalkulaator.Controllers
         // a problem on the form instead of the upload blowing up halfway through. Previously a
         // wrong file type threw an exception and the user got a blank 500 error page with no idea
         // what went wrong.
-        private static string? ValidateImageFile(IFormFile? imageFile)
+        internal static string? ValidateImageFile(IFormFile? imageFile)
         {
             // No file chosen is perfectly valid — a product simply has no picture.
             if (imageFile == null || imageFile.Length == 0)
@@ -264,7 +280,47 @@ namespace ElektriKalkulaator.Controllers
             if (imageFile.Length > MaxImageSizeBytes)
                 return $"Pilt on liiga suur (suurim lubatud maht on {MaxImageSizeBytes / 1024 / 1024} MB).";
 
+            // A filename is just text the browser sent us — anyone can rename "virus.exe" to
+            // "photo.jpg". So we also look at the first few bytes of the file itself. Real image
+            // formats begin with a fixed signature (often called "magic bytes"), and a file that
+            // doesn't start with one is not the image it claims to be.
+            if (!HasValidImageSignature(imageFile))
+                return "Fail ei ole korrektne pildifail.";
+
             return null;
+        }
+
+        // Reads the first bytes of the uploaded file and checks them against the known signatures
+        // of the formats we accept. Returns true only if one of them matches.
+        internal static bool HasValidImageSignature(IFormFile imageFile)
+        {
+            // 12 bytes is enough for every signature we check (WEBP needs bytes 8-11).
+            Span<byte> header = stackalloc byte[12];
+
+            using var stream = imageFile.OpenReadStream();
+            var bytesRead = stream.Read(header);
+            if (bytesRead < 12)
+                return false; // too short to be any real image
+
+            // JPEG: FF D8 FF
+            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+                return true;
+
+            // PNG: 89 50 4E 47 0D 0A 1A 0A
+            if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
+                header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A)
+                return true;
+
+            // GIF: the ASCII text "GIF87a" or "GIF89a"
+            if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+                return true;
+
+            // WEBP: "RIFF" at the start, then "WEBP" at position 8
+            if (header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
+                header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
+                return true;
+
+            return false;
         }
 
         // Saves an uploaded image into wwwroot/images/uploads. Anything under wwwroot is served

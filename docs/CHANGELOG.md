@@ -44,6 +44,353 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Broaden test coverage to 128 tests, and document the testing approach
+
+**Type:** test / docs
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- **`docs/TESTING.md`** — how this project is tested, what each test file covers, the conventions,
+  and an honest list of what is still missing. Written so the next person (or model) knows where a
+  new test belongs and what "good" looks like here.
+- **55 → 128 tests**, adding three kinds of coverage that did not exist:
+  - **`SeedDataIntegrityTests`** (13) — asserts things about the *data* rather than the code. Every
+    seeded product has an image file **that actually exists on disk**, belongs to a real category,
+    has a positive price and non-negative stock; every category the calculator matches by name
+    exists and has in-stock products; every building type has rules; every rule has a matching
+    breaker and cable in the catalogue; all seeded IDs are unique.
+  - **`CalculatorEdgeCaseTests`** (~30) — boundaries rather than happy paths: 0/1/7/8/9/16/17/500
+    lights, 0/1/5/6/7/12/500 sockets, all three building types, a commercial building with the
+    stove box ticked (no stove rule exists, so nothing must be added), totals matching the sum of
+    lines, every line referencing a real product, and the 50-entry history limit.
+  - **`FormValidationTests`** (~30) — the `[Required]`, `[Range]` and `[Compare]` attributes on
+    every form DTO, including both sides of each boundary and the password-confirmation mismatch.
+
+**Why**
+- The suite covered the code but never the **data**. A renamed category silently breaks the
+  calculator (it matches by exact string), and an `ImagePath` pointing at an uncommitted file shows
+  broken images to everyone who clones the repo — **a bug this project actually shipped**, which no
+  existing test could have caught.
+- Boundary cases are where "one circuit per 8 lights" goes wrong. Previously only 8 and 9 were
+  covered; now both sides of every multiple are.
+- Validation attributes are one deleted line away from disappearing with nothing failing to
+  compile.
+
+**How it was verified**
+- **128/128 passing**, `scripts/security-check.sh` **18/18 passing**, build clean.
+- Both new test categories were **mutation-tested**, per the rule now written into
+  `docs/TESTING.md`:
+  - a seeded image file was temporarily moved away → `SeedDataIntegrityTests` failed with
+    *"These seeded products reference image files that do not exist"*;
+  - the socket divisor was changed from 6 to 5 → 3 boundary tests failed.
+  - Both reverted; full suite green again.
+
+**Follow-ups or known limitations**
+Listed in `docs/TESTING.md`, honestly: no HTTP-level integration tests
+(`WebApplicationFactory`) — the biggest gap, and it would fold the 18 security checks into
+`dotnet test`; no controller tests; `CartController` has no automated coverage at all (session
+dependency makes it awkward); no UI tests; no CI running any of this on push.
+
+---
+
+## 2026-08-11 — Code review: fixed an image-deletion ordering bug and fail-fast on startup
+
+**Type:** bugfix
+**Author:** Claude (Sonnet 5) + Edgar
+
+A review of the whole codebase for bugs, weak logic and architectural problems. Two clear bugs
+fixed here; the rest are recorded as findings in `PROJECT_ROADMAP.md` rather than changed, because
+they need decisions rather than code.
+
+**What changed**
+
+*1. `ProductsController.Edit` deleted the old image before the update was confirmed*
+- The old code deleted the previous image file, then called `Update`. If `Update` returned `null`
+  (the product had been deleted by someone else in the meantime), the image was already gone and
+  the newly uploaded one was orphaned. The comment above it even claimed the deletion happened
+  "once the new one is confirmed saved" — it did not.
+- It also decided **which file to delete from `dto.ImagePath`**, a hidden form field the browser
+  controls. A stale tab or an edited form could therefore delete a different product's image.
+- Now: the current path is read from the database, the update runs first, and only then is the old
+  file removed. Admin-only, so severity was low, but the ordering was simply wrong.
+
+*2. Startup continued after a failed migration*
+- `Program.cs` logged a migration failure and carried on. The app then served pages against a
+  missing or outdated schema, producing confusing errors all over the site instead of one clear
+  one. It now rethrows, so the app stops where the real cause was logged.
+
+*3. New tests*
+- `ProductImageLifecycleTests` — 7 tests covering how `ImagePath` behaves across create, update
+  and delete, including updating a product that no longer exists (the failure path the old code
+  handled badly). **48 → 55 tests.**
+
+**How it was verified**
+- Build clean, **55/55 tests passing**, `scripts/security-check.sh` **18/18 passing**.
+- The Edit flow was re-tested end to end against the running app as an admin:
+  - edit with no new file → image preserved;
+  - edit with a new file → new image saved, old file removed from disk;
+  - edit submitting a **forged** `ImagePath` pointing at a shared seeded photo → forged value
+    ignored, `breaker.jpg` still present.
+- Catalogue returned to 10 products, uploads folder empty, all 4 seeded photos intact.
+- Note: three apparent failures during testing turned out to be a broken product-ID extraction in
+  the test commands (one grep captured the image filename GUID instead of the product ID). The
+  application behaved correctly throughout; the IDs were eventually read from the database instead
+  of scraped from HTML.
+
+**Findings NOT changed — recorded for decision**
+- `CalculationRule.RoomsFrom` / `RoomsTo` are **dead fields**: declared, seeded with 1/999, and
+  read by nothing. The comment "999 = no upper limit" implies range logic that does not exist.
+- `RulesApplied` stores circuit-type names (`"lighting, socket"`), but the ERD specification says
+  it should hold the rule **IDs** as JSON "for auditing". As stored it cannot tell you which rule
+  produced a given BOM — a weakness given the project's auditability claim.
+- `PowerboxCalculation.UserId` is still never populated, although Identity now exists to fill it.
+- `CalculatorServices.Calculate` issues two queries per rule (up to 8 per calculation), and
+  `CartController.Index` one per cart line. Fine at this size, wrong at scale.
+
+---
+
+## 2026-08-11 — Move documentation into docs/
+
+**Type:** chore
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- `PROJECT_ROADMAP.md`, `CHANGELOG.md`, `RESEARCH_LOG.md`, `IMAGE_CREDITS.md` and `PROMPTS.md`
+  moved into **`docs/`** with `git mv`, so their history is preserved.
+- Every reference updated: `CLAUDE.md`, and the code comments in `ProductsController`,
+  `CartController`, `CategoryServices` and `ElektriKalkulaatorContext`.
+- `README.md` rewritten — it was a single line containing only the repo name. It now explains what
+  the project is, how to run and test it, the project structure, and links to every document.
+
+**Why**
+- The repository root had seven markdown files competing for attention. Anyone opening the repo saw
+  a wall of documents instead of the project.
+- **`CLAUDE.md` deliberately stayed at the root.** It is only loaded automatically from there, so
+  moving it into `docs/` would have quietly disabled the mechanism that makes every future AI
+  session self-orienting — the opposite of what it is for.
+- `README.md` also stays at the root because that is what GitHub renders on the repository page.
+
+**How it was verified**
+- Searched the whole repository for references to the five moved filenames: none remain without the
+  `docs/` prefix.
+- Confirmed every path linked from `README.md` and `CLAUDE.md` exists on disk.
+- `dotnet build` clean, **48/48 tests passing** — the moved files are referenced from code comments,
+  so a bad rename would not break the build; the searches above are what actually proves it.
+
+**Follow-ups or known limitations**
+- None.
+
+---
+
+## 2026-08-11 — Make the project survive AI context loss: CLAUDE.md, tests, security script
+
+**Type:** docs / test
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- **`CLAUDE.md`** — loaded automatically at the start of every AI session. Holds the rules
+  (changelog every change, English comments, `.jpg` only, test against the running app, never
+  invent EVS clause numbers), the commands, and a "things that look like bugs but are deliberate"
+  list.
+- **`PROMPTS.md`** — ready-made prompts for future sessions with the reasoning behind each, plus a
+  table of vague prompts and what to say instead.
+- **32 new tests** (16 → **48 total**):
+  - `ImageUploadValidationTests` — 16 tests. Accepts real JPEG/PNG/GIF/WEBP, refuses disallowed
+    extensions, oversized files, and — the important one — an executable or plain text renamed to
+    `.jpg`/`.png`.
+  - `CatalogueSearchTests` — 9 tests pinning the SQL-side search: category filter, brand and name
+    matching, filters combined with AND not OR, whitespace ignored, terms trimmed, `Category`
+    still eager-loaded.
+  - `CategoryServicesTests` — 7 tests, the only coverage of `CategoryServices.Delete` and its new
+    `CategoryDeleteResult`.
+- `ValidateImageFile` / `HasValidImageSignature` changed from `private` to `internal`, with
+  `InternalsVisibleTo` in the web `.csproj`, so tests can reach them without making them public
+  (which would wrongly suggest other code should call them).
+- **`scripts/security-check.sh`** — re-runs all 20 checks from the security review against a
+  running app. Exits non-zero on failure so it can go into a build pipeline later.
+- `PROJECT_ROADMAP.md` — recorded the **conversion-focused redesign** as planned work (consumer
+  and B2B), grounded in the competitor research already in `RESEARCH_LOG.md`.
+
+**Why**
+- AI sessions lose detail when their context fills and gets summarised. Documents survive that;
+  conversations do not. But a document only records a *claim* about the past — "verified: admin
+  pages return 302". A test is a *continuously enforced fact*: remove `[Authorize]` and it goes
+  red, while the paragraph stays smugly true.
+- So the aim was to convert everything verified by hand on 2026-08-11 into something executable.
+  The split is deliberate: xUnit covers logic that needs no web server; the shell script covers
+  what only exists once the app is running (auth redirects, antiforgery, HTTP status codes).
+
+**How it was verified**
+- `dotnet build` clean; **48/48 tests passing**.
+- The security script was **proved able to fail**, which matters more than it passing:
+  - pointed at a dead port → exits 1 with a clear message;
+  - the `Url.IsLocalUrl` guard was deliberately removed, the app rebuilt, and the script correctly
+    reported `FAIL external returnUrl was followed → https://evil.example.com/phish` and exited 1;
+  - guard restored, rebuilt, all 20 checks pass and it exits 0.
+- Two bugs in the script itself were found and fixed during that process:
+  1. the cookie jar used an absolute `/tmp` path, which Windows `curl` cannot write while
+     `MSYS_NO_PATHCONV=1` is set — so every request went out session-less and real checks failed
+     for the wrong reason;
+  2. the open-redirect check only asserted "did not go to evil.example.com", which an empty
+     response satisfies trivially — a check that could never fail. It now asserts the redirect
+     goes to `/Cart`.
+
+**Follow-ups or known limitations**
+- The security script must be run manually against a running app; it is not part of `dotnet test`.
+  Proper integration tests (`WebApplicationFactory`) would fold these into the normal test run and
+  are the natural next step.
+- No test yet covers the role split at HTTP level (anonymous vs customer vs admin) — that is
+  script-only for the same reason.
+
+---
+
+## 2026-08-11 — Authentication and roles (ASP.NET Core Identity)
+
+**Type:** security / feature
+**Author:** Claude (Sonnet 5) + Edgar
+
+Closes the **critical** finding from the security review: the application had no authentication at
+all, so anyone who knew a URL could create, edit and delete products.
+
+**What changed**
+- `ApplicationUser` (extends `IdentityUser`) with `FullName`, `Language` and `CreatedAt`.
+  `UserRoles` holds the two role names as constants, so a typo becomes a compile error rather than
+  a silent hole.
+- `ElektriKalkulaatorContext` now inherits `IdentityDbContext<ApplicationUser>`, with
+  `base.OnModelCreating` called first. Migration `AddIdentityTables` creates the seven `AspNet*`
+  tables in the same database.
+- `Program.cs`: `AddIdentity` + `AddRoles`, password rules (8+ chars, upper, lower, digit),
+  lockout after 5 failed attempts for 5 minutes, unique email, and cookie paths for login and
+  access-denied. **`app.UseAuthentication()` added before `app.UseAuthorization()`** — its absence
+  was the root cause, since authorization has nothing to check without it.
+- `AccountController` with Login, Register, Logout and AccessDenied. Logout is POST-only so
+  another site cannot sign users out.
+- `IdentitySeeder` creates both roles and the first admin at startup. Credentials come from
+  configuration (User Secrets), never from constants — no password is committed.
+- `ProductsController` carries `[Authorize(Roles = Admin)]` at class level, with `[AllowAnonymous]`
+  on `Index` and `Details` only. Secure-by-default: a new action is protected unless explicitly
+  opened.
+- Login/Register/AccessDenied views styled to match the existing dark theme; `_Layout` shows the
+  signed-in user, an admin-only link, and login/register or logout.
+
+**Why this design**
+- **Identity rather than a hand-written login.** Password hashing, lockout and token handling are
+  exactly the things not to write yourself.
+- **Same database and DbContext** — one connection string, one migration chain, and it finally
+  gives the orphaned `PowerboxCalculation.UserId` a real table to reference, as the ERD spec
+  intended.
+- **Hand-written MVC views rather than scaffolded Identity Razor Pages** — the project is MVC with
+  a custom theme; scaffolding would add dozens of inconsistent files.
+- **Admins are seeded, never self-registered.** Everyone registering through the form gets
+  `Customer`; otherwise anyone could grant themselves catalogue deletion rights.
+
+**How it was verified**
+
+Build clean, `dotnet test` **16/16 passing**, plus the full flow exercised over real HTTP:
+
+| Check | Result |
+|---|---|
+| Anonymous → `/Products/Create`, `/Edit`, `/Delete`, `/Categories` | all `302` → `/Account/Login` (were `200`) |
+| Anonymous → `/`, `/Products`, `/Calculator`, `/Cart`, `/Products/Details` | all `200` — public pages unaffected |
+| Admin login | `302`, then admin pages return `200`, nav shows the account |
+| Wrong password | rejected, *"Vale e-post või parool."*, still blocked |
+| Customer registration | `302`, auto-signed-in |
+| **Logged-in customer → admin pages** | `302` → `/Account/AccessDenied` (authenticated but wrong role — correct behaviour) |
+| Customer → calculator / products / cart | all `200` |
+| Weak password `abc` | refused, no account created |
+| Logout | `302`, admin pages blocked again |
+
+Database confirmed directly: two users with correct roles, and `PasswordHash` stored as a hash,
+not plain text. Test customer account deleted afterwards; only the seeded admin remains.
+
+**Follow-ups or known limitations**
+- `PowerboxCalculation.UserId` still is not populated when a signed-in user runs a calculation —
+  the table now exists to point at, but the wiring is not done.
+- No email confirmation, password reset or "remember me" hardening. Fine for a thesis demo.
+- Cart is still session-based, so it is lost on logout and not tied to the account.
+- Admin credentials for this machine are in User Secrets. Anyone else cloning the repo must set
+  `AdminUser:Email` and `AdminUser:Password` themselves or no admin is created (a warning is logged).
+
+---
+
+## 2026-08-11 — Security hardening: CSRF, open redirect, input validation, config
+
+**Type:** security
+**Author:** Claude (Sonnet 5) + Edgar
+
+Fixes eight of the ten findings from the security review. The two remaining — missing
+authentication, and stock never being reserved/decremented — are tracked separately: authentication
+is its own piece of work, and stock belongs with the real `Order` entity.
+
+**What changed**
+
+*Cross-site request forgery*
+- `[ValidateAntiForgeryToken]` added to `CartController.Add/Remove/Clear/Checkout` and
+  `CalculatorController.Index [HttpPost]`. `ProductsController` already had it; these five were
+  missed. The forms were already sending the token — it simply was never checked.
+
+*Open redirect*
+- `CartController.Add` passed `returnUrl` straight to `Redirect()`. New private `SafeRedirect`
+  helper only redirects when `Url.IsLocalUrl(returnUrl)` is true, otherwise falls back to the cart.
+
+*Cart input validation*
+- Quantity must now be between `MinQuantity` (1) and `MaxQuantity` (999); repeated adds are clamped
+  with `Math.Min` so they cannot creep past the maximum.
+- The product must exist — `Add` looks it up and returns `NotFound()` otherwise.
+- `Add` became `async` to allow that lookup.
+
+*Upload content verification*
+- New `HasValidImageSignature` checks the file's leading "magic bytes" against JPEG, PNG, GIF and
+  WEBP signatures. Extension checking alone accepted any renamed file.
+
+*Search performance*
+- New `IProductServices.Search(categoryId, searchTerm)` applies both filters to the `IQueryable`
+  **before** `ToListAsync()`, so they become part of the SQL `WHERE` clause.
+  `ProductsController.Index` previously fetched every product and filtered the list in C#.
+- Dropped `ToLower()` — SQL Server's default collation is already case-insensitive, and omitting it
+  lets the database use an index rather than transforming every row.
+
+*Consistency*
+- `CategoryServices.Delete` no longer throws bare `Exception`s. It returns a new
+  `CategoryDeleteResult` enum (`Deleted` / `NotFound` / `StillHasProducts`).
+  **Note: this method is currently unreachable** — no controller calls it and no view offers
+  category deletion. Kept and corrected because the planned admin area will need it.
+
+*Configuration*
+- `appsettings.json` now ships a portable `(localdb)\MSSQLLocalDB` default so a fresh clone runs.
+  The real connection string moved to **User Secrets**, which live outside the project folder and
+  are never committed. Edgar's machine keeps working because the secret was set locally.
+
+*Language*
+- Cart messages converted from English to Estonian to match the rest of that UI.
+
+**How it was verified**
+
+Build clean, `dotnet test` **16/16 passing**, plus every exploit from the review re-run against the
+running app. Each fix was tested **with a valid antiforgery token**, so no result is hidden behind
+another guard:
+
+| Exploit | Before | After |
+|---|---|---|
+| `returnUrl=https://evil.example.com/phish` | `302 → evil.example.com` | `302 → /Cart` |
+| Legitimate `returnUrl=/Products` | worked | still works (no over-blocking) |
+| POST with no token (Add / Clear / Calculator) | `302 / 302 / 200` | `400 / 400 / 400` |
+| `quantity=-5` | cart showed `-3 tk / -27.60 €` | rejected, cart unchanged |
+| Nonexistent product ID | `302` accepted | `404` |
+| Text file renamed `.jpg` | accepted | rejected, *"Fail ei ole korrektne pildifail."* |
+| Real JPEG | accepted | still accepted |
+
+Search correctness after moving to SQL: `ABB`→5, `Schneider`→2, `kaabel`→3, category *Juhtmed*→3,
+category+term→3, nonsense term→"not found". User Secrets confirmed connecting to the real database
+(all 10 seeded products present). Test data removed; catalogue back to 10 products, uploads empty.
+
+**Follow-ups or known limitations**
+- **Authentication is still absent** — the critical finding. Next piece of work.
+- Stock is still never reserved or decremented; belongs with real order persistence.
+- `TempData` messages in `ProductsController` remain in English while the cart is now Estonian.
+
+---
+
 ## 2026-08-11 — Upload problems now show as form messages instead of crashing
 
 **Type:** bugfix

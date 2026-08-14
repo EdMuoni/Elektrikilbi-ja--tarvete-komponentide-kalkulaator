@@ -34,11 +34,41 @@
     </div>
 </section>
 
+@* ── WORKED EXAMPLE ───────────────────────────────────────────────────────────
+   Showing the actual output is more persuasive than describing the input. These
+   are real figures produced by the calculator for a 3-room apartment, so a
+   visitor can see what they get before filling in anything.
+   NOTE: if the seeded prices change, re-run that calculation and update these. *@
+<section class="worked-example mb-5">
+    <div class="worked-example-head">
+        <span class="worked-example-label">Näidisarvutus</span>
+        <h2 class="worked-example-title">3-toaline korter, elektripliidiga</h2>
+    </div>
+    <div class="worked-example-body">
+        <ul class="worked-example-list">
+            <li><span>2 ×</span> kaitselüliti B10 (valgustus)</li>
+            <li><span>2 ×</span> kaitselüliti B16 (pistikud)</li>
+            <li><span>1 ×</span> kaitselüliti B32 (pliit)</li>
+            <li><span>160 m</span> paigalduskaablit</li>
+            <li><span>1 ×</span> rikkevoolukaitse 30 mA</li>
+            <li><span>1 ×</span> jaotuskilp, 12 moodulit</li>
+        </ul>
+        <div class="worked-example-total">
+            <span class="worked-example-total-label">Hinnanguline maksumus</span>
+            <span class="worked-example-total-value">504,10 €</span>
+            <span class="worked-example-total-note">EVS-HD 60364 järgi · hinnad sisaldavad käibemaksu</span>
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber mt-3">
+                Arvuta oma hoonele
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- OMADUSTE KAARDID -->
 <div class="row g-4 mb-5">
     <div class="col-md-4">
         <div class="card h-100 p-4">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
+            <div class="feature-icon">🔧</div>
             <h5 class="fw-bold text-white mb-2">Kalkulaator</h5>
             <p class="text-muted-custom small mb-3">
                 Sisesta hoone tüüp, tubade ja pistikute arv —
@@ -51,7 +81,7 @@
     </div>
     <div class="col-md-4">
         <div class="card h-100 p-4">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📦</div>
+            <div class="feature-icon">📦</div>
             <h5 class="fw-bold text-white mb-2">Toodete kataloog</h5>
             <p class="text-muted-custom small mb-3">
                 ABB, Schneider ja Hager kaitselülitid, NYM juhtmed,
@@ -64,7 +94,7 @@
     </div>
     <div class="col-md-4">
         <div class="card h-100 p-4">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📋</div>
+            <div class="feature-icon">📋</div>
             <h5 class="fw-bold text-white mb-2">Arvutuste ajalugu</h5>
             <p class="text-muted-custom small mb-3">
                 Vaata kõiki varasemaid arvutusi koos komponentide nimekirja

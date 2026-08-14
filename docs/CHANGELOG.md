@@ -44,6 +44,79 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Implement the design guide: tokens, sorting, print, spec table
+
+**Type:** feature
+**Author:** Claude (Sonnet 5) + Edgar
+
+All nine steps of `docs/DESIGN_GUIDE.md` §6, implemented and verified. **184 tests passing.**
+
+**What changed**
+
+*Foundation (steps 1–3)*
+- **Spacing and type scales** added as CSS tokens. The project had colour tokens but neither of
+  these, which is why 19 inline `style="…"` attributes and 13 distinct font sizes had accumulated —
+  each an isolated decision.
+- **Keyboard focus states.** There were none, so the site could not be operated by keyboard at all.
+  Uses `:focus-visible`, which shows the ring for keyboard users without outlining every mouse
+  click. Also added `prefers-reduced-motion` support.
+- **Colour roles fixed.** Amber previously marked prices, primary buttons, the logo and badges at
+  once — when everything is the accent, nothing is. Prices are no longer amber; they carry emphasis
+  through size, weight and tabular figures instead, leaving amber to mean "the next action".
+
+*Catalogue (steps 4, 7)*
+- **Sorting**, which did not exist. New `ProductSortOrder` enum (an enum rather than loose strings,
+  so a typo is a compile error instead of silently falling back to the default order) with five
+  options. Applied to the `IQueryable` before `ToListAsync`, so it becomes SQL `ORDER BY`. Every
+  branch has a name-based tiebreaker so equally-priced products cannot swap places between page
+  loads.
+- **Result count above the list** as well as below — people check the count before deciding whether
+  to scan or narrow first.
+- **Price per unit on cards.** Cable showed a bare `1.20 €`, reading as the price of a whole reel.
+  Now `1.20 €/m`, matching the fix already made in the calculator's BOM.
+- **Empty state now says what to do next** — a "show all products" button rather than a dead end.
+
+*Calculator (step 5)*
+- **Print stylesheet.** An electrician's real workflow is calculate → show the client → order.
+  Printing previously produced a dark page with navigation and buttons. It now prints as a
+  black-on-white quote: chrome hidden, table borders drawn, header row repeated across pages,
+  rows kept from splitting.
+
+*Product page (step 6)*
+- **Specification table** replacing the grid of stat cards. Technical buyers compare specs between
+  products, and a two-column table reads far faster down the page than boxes across a grid. Rows
+  render only when the product has that value.
+
+*Homepage (step 8)*
+- **Worked example** showing a real calculator result (3-room apartment → 504,10 €) rather than
+  describing what the calculator does. Showing the output is more persuasive than describing the
+  input.
+
+*Cleanup (step 9)*
+- Homepage inline styles replaced with token classes; the CSS file header and its remaining
+  Estonian comments translated to English.
+
+**How it was verified**
+- Build clean with `-warnaserror`; **184/184 tests** (8 new in `CatalogueSortingTests`).
+- Checked over real HTTP: sorting by price ascending returns the 1.20 € cable first and descending
+  the 42.00 € RCD first; stock sorting returns the 5000-unit cable first; the result count renders
+  above the list; cable cards show `1.20 €/m`; the spec table renders on the details page; the
+  worked example renders on the homepage.
+- The sorting tests check more than the endpoints: that the whole sequence is genuinely ordered,
+  that sorting **combines with** filtering rather than replacing it (a common mistake that quietly
+  returns the entire catalogue in the right order), and that repeated identical requests return an
+  identical order.
+
+**Follow-ups or known limitations**
+- The worked example's figures are hard-coded. If seeded prices change, that calculation must be
+  re-run and the numbers updated — noted in a comment in the view.
+- Multi-select filters (guide §3.1 D) deliberately **not** done: at 10 products a dropdown is
+  genuinely adequate and checkboxes would be over-engineering. Revisit past ~20 products.
+- Manufacturer part codes and datasheet links (guide §3.2) need new `Product` fields and are a
+  schema change, so they are left for a separate piece of work.
+
+---
+
 ## 2026-08-11 — Design guide: what "good design" means for this project, and how to implement it
 
 **Type:** docs

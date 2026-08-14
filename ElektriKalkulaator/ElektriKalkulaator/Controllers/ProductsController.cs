@@ -37,17 +37,21 @@ namespace ElektriKalkulaator.Controllers
         // GET /Products — catalogue with optional category filter and name search
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Index(Guid? categoryId, string? searchTerm)
+        public async Task<IActionResult> Index(
+            Guid? categoryId,
+            string? searchTerm,
+            ProductSortOrder sort = ProductSortOrder.CategoryThenName)
         {
             var categories = await _categoryServices.GetAll();
 
-            // One call does both the category filter and the text search, and it does them in the
+            // One call does the category filter, the text search AND the ordering, all in the
             // database rather than in memory here. See ProductServices.Search.
-            var products = await _productServices.Search(categoryId, searchTerm);
+            var products = await _productServices.Search(categoryId, searchTerm, sort);
 
             ViewBag.Categories       = new SelectList(categories, "Id", "Name", categoryId);
             ViewBag.SelectedCategory = categoryId;
             ViewBag.SearchTerm       = searchTerm;
+            ViewBag.Sort             = sort;
 
             return View(products);
         }

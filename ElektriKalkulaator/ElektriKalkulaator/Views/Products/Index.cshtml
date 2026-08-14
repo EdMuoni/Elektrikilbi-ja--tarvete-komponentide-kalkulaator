@@ -13,21 +13,40 @@
     <a asp-action="Create" class="btn btn-amber">+ Lisa toode</a>
 </div>
 
-<!-- FILTRID -->
+@* ── FILTERS AND SORTING ──────────────────────────────────────────────────
+   All three controls sit in ONE form so they combine: filtering by category,
+   searching by name and choosing an order are applied together rather than
+   each one resetting the others. *@
+@{
+    var currentSort = ViewBag.Sort as ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder?
+                      ?? ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.CategoryThenName;
+}
 <div class="card p-3 mb-4">
     <form method="get" asp-action="Index" class="row g-3 align-items-end">
-        <div class="col-md-5">
-            <label class="form-label">Kategooria</label>
-            @* asp-items = Razor lülitab SelectList automaatselt <option> elementideks *@
-            <select name="categoryId" class="form-select"
+        <div class="col-md-4">
+            <label for="categoryId" class="form-label">Kategooria</label>
+            @* asp-items turns a SelectList into <option> elements automatically *@
+            <select id="categoryId" name="categoryId" class="form-select"
                     asp-items="@(ViewBag.Categories as Microsoft.AspNetCore.Mvc.Rendering.SelectList)">
                 <option value="">Kõik kategooriad</option>
             </select>
         </div>
-        <div class="col-md-5">
-            <label class="form-label">Otsi nime järgi</label>
-            <input type="text" name="searchTerm" value="@ViewBag.SearchTerm"
+        <div class="col-md-4">
+            <label for="searchTerm" class="form-label">Otsi nime järgi</label>
+            <input id="searchTerm" type="text" name="searchTerm" value="@ViewBag.SearchTerm"
                    class="form-control" placeholder="nt ABB, NYM, kaitselüliti..." />
+        </div>
+        <div class="col-md-2">
+            <label for="sort" class="form-label">Järjesta</label>
+            @* The value posted is the enum name, e.g. "PriceLowToHigh", which ASP.NET converts
+               back to the enum automatically when the form is submitted. *@
+            <select id="sort" name="sort" class="form-select">
+                <option value="CategoryThenName" selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.CategoryThenName)">Kategooria järgi</option>
+                <option value="NameAToZ"         selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.NameAToZ)">Nimi A–Ü</option>
+                <option value="PriceLowToHigh"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.PriceLowToHigh)">Hind: odavaim enne</option>
+                <option value="PriceHighToLow"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.PriceHighToLow)">Hind: kallim enne</option>
+                <option value="StockHighToLow"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.StockHighToLow)">Laoseis: enim laos</option>
+            </select>
         </div>
         <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">🔍 Otsi</button>
@@ -35,13 +54,33 @@
     </form>
 </div>
 
+@* The result count belongs ABOVE the list as well as below it: people check how many
+   matches there are before deciding whether to scan or narrow the filter first. *@
+@if (Model.Any())
+{
+    <p class="text-muted-custom small mb-3">
+        Leitud <strong class="text-white">@Model.Count()</strong> toodet
+        @if (!string.IsNullOrWhiteSpace(ViewBag.SearchTerm as string))
+        {
+            <span>otsingule „@ViewBag.SearchTerm"</span>
+        }
+    </p>
+}
+
 <!-- TOOTEKAARDID -->
 @if (!Model.Any())
 {
+    @* An empty state must say what to do NEXT, not just report failure. The link clears
+       every filter, which is the action a stuck user actually wants. *@
     <div class="card p-5 text-center">
-        <div style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;">📦</div>
+        <div class="empty-state-icon">📦</div>
         <h5 class="text-white">Tooteid ei leitud</h5>
-        <p class="text-muted-custom small">Muuda filtrit või lisa uusi tooteid.</p>
+        <p class="text-muted-custom small mb-3">
+            Ükski toode ei vasta valitud filtritele.
+        </p>
+        <div>
+            <a asp-action="Index" class="btn btn-amber">Näita kõiki tooteid</a>
+        </div>
     </div>
 }
 else
@@ -109,7 +148,16 @@ else
 
                     <!-- Hind ja tegevused -->
                     <div class="mt-auto">
-                        <div class="price-tag-small mb-2">@product.Price.ToString("F2") €</div>
+                        @* Cable is sold and priced by the METRE, everything else by the piece.
+                           Showing a bare "1.20 €" for cable reads as the price of a whole reel,
+                           which is the same confusion that was fixed in the calculator's BOM. *@
+                        @{
+                            var isCable = product.Category?.Name == "Juhtmed";
+                            var unitLabel = isCable ? "m" : "tk";
+                        }
+                        <div class="price-tag-small mb-2">
+                            @product.Price.ToString("F2") €<span class="price-unit">/@unitLabel</span>
+                        </div>
                         <div class="d-flex gap-2">
                             <a asp-action="Details" asp-route-id="@product.Id"
                                class="btn btn-sm btn-secondary flex-fill" style="font-size:0.75rem">

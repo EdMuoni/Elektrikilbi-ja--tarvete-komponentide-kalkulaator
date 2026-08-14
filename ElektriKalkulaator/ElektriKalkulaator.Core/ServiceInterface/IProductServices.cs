@@ -8,12 +8,16 @@ namespace ElektriKalkulaator.Core.ServiceInterface
         Task<IEnumerable<Product>> GetAll();
         Task<IEnumerable<Product>> GetByCategory(Guid categoryId);
 
-        // Catalogue search. Both arguments are optional:
+        // Catalogue search. All arguments are optional:
         //   categoryId = null  -> all categories
         //   searchTerm = null  -> no name/brand filter
-        // Filtering happens in the database rather than in C#, so only matching rows travel
-        // across the network.
-        Task<IEnumerable<Product>> Search(Guid? categoryId, string? searchTerm);
+        //   sort               -> defaults to category then name
+        // Filtering AND sorting happen in the database rather than in C#, so only the rows that
+        // are wanted, already in the right order, travel across the network.
+        Task<IEnumerable<Product>> Search(
+            Guid? categoryId,
+            string? searchTerm,
+            ProductSortOrder sort = ProductSortOrder.CategoryThenName);
         Task<Product?> GetById(Guid id);
         Task<Product> Create(ProductDto dto);
         Task<Product?> Update(ProductDto dto);

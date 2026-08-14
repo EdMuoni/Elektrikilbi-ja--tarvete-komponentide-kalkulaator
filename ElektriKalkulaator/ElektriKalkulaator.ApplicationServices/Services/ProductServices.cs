@@ -45,7 +45,10 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         //
         // The previous version fetched every product and then filtered the list in C#. That works
         // with ten products and wastes the whole table with ten thousand.
-        public async Task<IEnumerable<Product>> Search(Guid? categoryId, string? searchTerm)
+        public async Task<IEnumerable<Product>> Search(
+            Guid? categoryId,
+            string? searchTerm,
+            ProductSortOrder sort = ProductSortOrder.CategoryThenName)
         {
             var query = _context.Products
                 .Include(p => p.Category)
@@ -63,10 +66,32 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                 query = query.Where(p => p.Name.Contains(term) || p.Brand.Contains(term));
             }
 
-            return await query
-                .OrderBy(p => p.Category!.Name)
-                .ThenBy(p => p.Name)
-                .ToListAsync();
+            // Sorting is applied to the query, not to the results, so it becomes a SQL ORDER BY.
+            // Sorting the list afterwards in C# would give the same answer here but would mean
+            // the database sending rows in an order we immediately throw away.
+            //
+            // Every branch ends with a name-based tiebreaker so that products with equal prices
+            // or equal stock always come back in the same order. Without that, two identically
+            // priced items could swap places between page loads for no visible reason.
+            query = sort switch
+            {
+                ProductSortOrder.NameAToZ =>
+                    query.OrderBy(p => p.Name),
+
+                ProductSortOrder.PriceLowToHigh =>
+                    query.OrderBy(p => p.Price).ThenBy(p => p.Name),
+
+                ProductSortOrder.PriceHighToLow =>
+                    query.OrderByDescending(p => p.Price).ThenBy(p => p.Name),
+
+                ProductSortOrder.StockHighToLow =>
+                    query.OrderByDescending(p => p.StockQuantity).ThenBy(p => p.Name),
+
+                // CategoryThenName, and anything unrecognised, falls back to the browsing default.
+                _ => query.OrderBy(p => p.Category!.Name).ThenBy(p => p.Name)
+            };
+
+            return await query.ToListAsync();
         }
 
         // Returns null if not found — the controller checks and returns NotFound().

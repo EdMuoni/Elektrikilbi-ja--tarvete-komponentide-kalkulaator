@@ -20,7 +20,7 @@
 # Windows paths, which would corrupt URLs like returnUrl=/Products.
 export MSYS_NO_PATHCONV=1
 
-BASE="${1:-http://localhost:5250}"
+BASE="${1:-http://localhost:8080}"
 
 # The cookie jar must be a RELATIVE filename, not an absolute /tmp path.
 # curl on Windows cannot resolve a Unix-style path, and MSYS_NO_PATHCONV above deliberately stops

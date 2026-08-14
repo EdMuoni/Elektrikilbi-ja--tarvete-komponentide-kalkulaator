@@ -1,6 +1,6 @@
 # ElektriKalkulaator — Project Roadmap & Context Document
 
-**Revision 3** · last updated **2026-08-11** · maintained by Edgar Muoni with Claude
+**Revision 6** · last updated **2026-08-14** · maintained by Edgar Muoni with Claude
 
 ---
 
@@ -227,7 +227,7 @@ product & category CRUD · catalogue with search, category filter and **sorting*
 product images (seeded photos + admin upload) · session cart ·
 **authentication with Admin and Customer roles** · **print-ready BOM** ·
 automatic migration and account seeding on startup · custom dark theme with a design-token system ·
-**196 automated tests** · **CI running them on every push**
+**199 automated tests** · **CI running them on every push**
 
 ⚠️ **Cosmetic only:** `CartController.Checkout()` clears the session and shows a confirmation
 page. **It saves nothing to the database.** There is no order, and stock is never reserved or
@@ -328,7 +328,7 @@ unaware. Being able to explain why a layer is absent is a stronger position than
 | 4 | **Auth & Permissions** | 🟢 Good | **Closed 2026-08-11.** ASP.NET Core Identity with `Admin` and `Customer` roles; product/category management requires an admin, catalogue and calculator stay public. Passwords hashed, lockout after 5 failed attempts, admin seeded from User Secrets. Remaining: `PowerboxCalculation.UserId` is still not populated on save. |
 | 5 | **Hosting & Deployment** | 🔴 None | Runs on `localhost` only. Connection string hard-codes one machine name. Never deployed anywhere. |
 | 6 | **Cloud & Compute** | 🔴 None | No cloud resources. Not needed yet. |
-| 7 | **CI/CD & Version Control** | 🟢 Good | **Closed 2026-08-11.** GitHub Actions builds and runs all 196 tests on every push and PR, with `-warnaserror`. Work flows through branches and pull requests. No deployment step, since there is nowhere to deploy yet. |
+| 7 | **CI/CD & Version Control** | 🟢 Good | **Closed 2026-08-11.** GitHub Actions builds and runs all 199 tests on every push and PR, with `-warnaserror`. Work flows through branches and pull requests. No deployment step, since there is nowhere to deploy yet. |
 | 8 | **Security** | 🟢 Good | **Closed 2026-08-11.** Antiforgery on every POST, parameterised queries, HTTPS redirection, upload allow-list + size cap + magic-byte content check + GUID filenames, open-redirect guard, input validation, secrets in User Secrets. Remaining: no rate limiting (row 9), and uploads are not re-encoded. |
 | 9 | **Rate Limiting** | 🔴 None | .NET 9 has `AddRateLimiter` built in — a few lines whenever it's actually needed. |
 | 10 | **Caching & CDN** | 🔴 None | Note: `AddDistributedMemoryCache()` in `Program.cs` looks like caching but only backs session state. |
@@ -346,7 +346,7 @@ real money are involved.
 
 **Done** *(all on branch `feat/conversion-ux`, PRs #1–#4, awaiting merge)*
 
-- [x] Automated test project — now **196 tests**, mutation-verified *(08-10 → 08-11)*
+- [x] Automated test project — now **199 tests**, mutation-verified *(08-10 → 08-11)*
 - [x] Fix nullable-annotation lie and inconsistent not-found handling *(08-10)*
 - [x] Product images: upload, storage, display, security hardening *(08-10)*
 - [x] Add `EvsReference` column to `CalculationRule` *(08-10)*
@@ -363,8 +363,19 @@ real money are involved.
       print stylesheet, specification table, worked example *(08-11)*
 - [x] **Demo admin and customer accounts**, Development-only *(08-11)*
 - [x] Commit the work — 15 commits across four stacked PRs *(08-11)*
+- [x] **Palette rebuilt** — single-hue dark surfaces, saturation falling as lightness rises,
+      card/page separation 1.20 → 1.33, all tints rederived. 0 WCAG AA failures across 22
+      pairs in both themes *(08-14)*
+- [x] **Fixed headings invisible in light mode** — 38 uses of Bootstrap `text-white` across 14
+      views replaced with a token class. Light mode was partly unusable before this *(08-14)*
+- [x] **Corrected the documented port**, 5250 → 8080, in four places including the security
+      script's default *(08-14)*
 
 **Still to do — needs Edgar, not code**
+
+- [ ] **Look at the redesigned palette and say whether it works.** The rebuild was verified
+      numerically only — contrast, hue, served bytes. Nobody has seen it rendered. If light mode
+      still looks flat, the card/page pairing (currently 1.11) is the first thing to change.
 
 - [ ] **Confirm the VAT assumption.** `Pricing:PricesIncludeVat` is set to `true` because that is
       the Estonian consumer convention, but nobody has verified the seeded prices were recorded
@@ -471,6 +482,11 @@ These need Edgar's answer. Don't guess at them.
   orientation and beginner glossary; added §D1 full-stack maturity map (thirteen layers, honestly
   scored); recorded TTHK portal administrative dates in §A1; **introduced `CHANGELOG.md`** and the
   §E1 update protocol; ticked the four Phase 1 items completed on 2026-08-10.
+- **rev. 6** (2026-08-14) — Colour palette rebuilt after Edgar reported the site looked poor;
+  fixed 38 uses of Bootstrap `text-white` that made headings invisible in light mode; added
+  `ThemeTokenTests` (199 tests); corrected the documented port 5250 → 8080 in four places.
+  Also corrected this document's own header, which still said "Revision 3" while the history
+  below already recorded rev. 5.
 - **rev. 5** (2026-08-11) — Brought fully up to date after a large session: §B4 rewritten (auth,
   196 tests, CI, sorting, print view all now real; the remaining rough edges listed honestly),
   §D2 restructured into done / needs-Edgar / optional, §D1 rows 7, 8 and 12 re-scored. The

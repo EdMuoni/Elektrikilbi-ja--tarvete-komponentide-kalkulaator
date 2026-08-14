@@ -44,6 +44,93 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-14 — Rebuilt the colour palette; fixed headings that vanished in light mode
+
+**Type:** bugfix + docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `wwwroot/css/theme.css` — replaced every surface, text and accent value in both themes.
+  Dark surfaces now sit on **one hue (216–224°)** instead of drifting across 215–240°, and
+  saturation **falls as lightness rises** (29% → 16%) the way real materials behave under light.
+  Page went `#0f0f1a → #0A0C10`, cards `#16213e → #242833`.
+- Same file — card shadow gained a 1px inset light rim; a drop shadow alone cannot show elevation
+  on a near-black background because there is nothing darker to cast onto.
+- Same file — the tint fills still referenced the *old* accent RGB values, so badge backgrounds
+  no longer matched the accent they were meant to echo. Rederived all ten from the new accents.
+- `Views/**/*.cshtml` — replaced **38 uses of Bootstrap's `text-white`** across 14 views with
+  `text-strong-custom`.
+- `wwwroot/css/site.css` — defined `.text-strong-custom`, plus a defensive `.text-white` override.
+- `Views/Products/Delete.cshtml` — hard-coded `#ef4444` → `var(--accent-red)`.
+- `docs/DESIGN_GUIDE.md` — its `:root` block still listed the old colours and told the reader to
+  put them in `site.css`. Now points at `theme.css` as the single source and is marked
+  reference-only.
+- `CLAUDE.md`, `README.md`, `docs/TEST_ACCOUNTS.md`, `scripts/security-check.sh` — corrected the
+  documented port from **5250 to 8080**.
+- **New `ElektriKalkulaator.Tests/ThemeTokenTests.cs`** (3 tests) so this cannot happen again:
+  no view may use a Bootstrap colour utility, no inline style may contain a literal colour, and
+  both palettes must define the same token names.
+- `docs/TESTING.md` — corrected "174 tests" to 199 and **deleted the "No CI" item**, which had
+  been false since CI landed on 08-11; registered the new test file; rewrote Part 7 around the
+  gap this session actually exposed.
+- `docs/PROJECT_ROADMAP.md` — its header said "Revision 3" while the revision history below
+  already recorded rev. 5. Now rev. 6.
+
+**Why**
+- Edgar said the site "looks very poor in colours and attractiveness". Measuring the palette rather
+  than guessing found three specific causes:
+  1. **Hue drift.** Surfaces ranged 215°–240°. Backgrounds that do not share a hue do not read as
+     one material — the eye interprets the mismatch as muddiness, not as depth.
+  2. **Saturation outlier.** The card sat at 48% saturation while every other surface was 23–33%.
+     That single oversaturated navy panel is what produced the "cheap" look; a surface should be
+     nearly neutral and let accents carry the colour.
+  3. **No elevation.** Card-to-page contrast was **1.20** — cards barely separated from the page,
+     so the layout read as flat regardless of the spacing around it. Now **1.33**.
+- The `text-white` bug is more serious than the palette: `text-white` hard-codes `#fff`, so every
+  heading using it became **white text on a white card** the moment anyone switched to the light
+  theme. The light mode shipped in the 2026-08-11 entry was therefore partly unusable, and the
+  numbers-only verification done then could not have caught it — the tokens were all correct; the
+  markup was bypassing them. This is the identical bug to the `navbar-dark` one fixed earlier,
+  which should have prompted a search for the rest of the family at the time. It did not.
+- The port was wrong in four places including the security script's default, so the command
+  `bash scripts/security-check.sh` as documented in `CLAUDE.md` would have connected to nothing
+  and reported failures unrelated to security.
+
+**How it was verified**
+- Contrast computed for **22 foreground/background pairs** across both themes: **0 WCAG AA
+  failures**. Lowest is `--accent-red` on a dark card at 4.64; text-strong reaches 13.63 (dark)
+  and 19.32 (light).
+- Verified the two dark blocks are byte-identical to each other and the two light blocks likewise
+  (28 variables each), and that both themes define the **same variable names** — a variable present
+  in one theme only would silently inherit the other theme's value.
+- App run and exercised over HTTP on :8080. Confirmed the server sends the new values, that
+  `/`, `/Calculator`, `/Products`, `/Cart`, `/Account/Login` all return 200, and that
+  **zero `text-white` occurrences remain** in any rendered page.
+- `scripts/security-check.sh`: **all 18 checks pass** against the running app on the corrected port.
+- The three new tests were **mutation-tested**, per Part 2 of `TESTING.md`: adding `text-white`
+  back to a view, adding an inline `#ff0000`, and deleting one token from the light palette each
+  made the matching test **fail**, and all three passed again after reverting.
+- Worth recording: the **first** mutation run reported nothing at all, because the app was still
+  running from the HTTP testing above and held a lock on `ElektriKalkulaator.exe`, so every build
+  failed and no test executed. Silence read as success. This is the same trap as the earlier
+  `-warnaserror` "proof" that proved nothing — **a test run that produces no failure output has
+  not necessarily run.** Stopped the app, confirmed a clean baseline build, then re-ran.
+- Build clean with `-warnaserror`; **199/199 tests pass**.
+
+**Follow-ups or known limitations**
+- **Not visually confirmed.** Every check above is numerical or structural — contrast ratios, hue
+  angles, served bytes. I could not render the page this session, so whether it now *looks* good
+  is Edgar's call, not a verified claim.
+- Light-mode card/page separation is **1.11**, much lower than dark's 1.33. That is intentional and
+  conventional — white cards on a light-grey page rely on the shadow for elevation, not contrast —
+  but it is the pairing to revisit first if light mode still looks flat.
+- The 38 replacements were mechanical. Each rendered page was checked for *absence* of the old
+  class, but the individual headings were not inspected one by one.
+- `ThemeTokenTests` checks colours written in the **markup**. Nothing tests whether the palette
+  itself looks good — that still needs a person. See `docs/TESTING.md` Part 7 item 2.
+
+---
+
 ## 2026-08-11 — All colours in one file, and a working light/dark switch
 
 **Type:** feature

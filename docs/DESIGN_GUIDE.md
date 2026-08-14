@@ -55,20 +55,18 @@ CSS — each one a small decision made in isolation.
 
 Put this in `wwwroot/css/site.css`, extending the existing `:root` block.
 
-```css
-:root {
-    /* ── EXISTING COLOURS — do not change, they are used everywhere ── */
-    --bg-primary:   #0f0f1a;
-    --bg-card:      #16213e;
-    --bg-input:     #1f2937;
-    --bg-nav:       #0d0d1a;
-    --accent-amber: #F5A623;
-    --accent-blue:  #3B82F6;
-    --accent-green: #10B981;
-    --text-primary: #e5e7eb;
-    --text-muted:   #9ca3af;
-    --border-color: #2d3748;
+> **Where colours actually live:** every colour now sits in `wwwroot/css/theme.css`, not here and
+> not in `site.css`. That file holds the full dark and light palettes. The values below are shown
+> for reference only — **edit `theme.css`, never copy these into another file.**
 
+```css
+/* Colours: see wwwroot/css/theme.css. Dark palette, for reference:
+       --bg-primary #0A0C10   --bg-card #242833   --bg-input #2C313D
+       --bg-nav     #06080B   --border-color #3A4150
+       --accent-amber #F2AD36 --accent-blue #5FA1F2 --accent-green #39D09E
+       --text-strong #F5F6FA  --text-primary #D0D4DD --text-muted #9299AA   */
+
+:root {
     /* ── SPACING SCALE ──────────────────────────────────────────────
        Every margin, padding and gap uses one of these. Six options is
        enough for any layout; unlimited options is what produces a page
@@ -111,7 +109,7 @@ Give each colour one job:
 | `--accent-amber` | **The next action.** The primary button on a page, and nothing else. |
 | `--accent-green` | Success, "in stock", trust. Never a button. |
 | `--accent-blue` | Information, links, technical badges. |
-| red (`#ef4444`) | Errors and destructive actions only. |
+| `--accent-red` | Errors and destructive actions only. |
 | `--text-primary` / `--text-muted` | All ordinary text and all prices. |
 
 **Prices should not be amber.** A price is information, not an action. Making it the same colour as

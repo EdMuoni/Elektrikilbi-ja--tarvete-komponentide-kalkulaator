@@ -75,7 +75,7 @@ signed out too.
 
 ```bash
 cd ElektriKalkulaator
-dotnet run --project ElektriKalkulaator      # http://localhost:5250
+dotnet run --project ElektriKalkulaator      # http://localhost:8080
 ```
 
 The console prints the demo credentials at startup, so they are visible without opening this file.

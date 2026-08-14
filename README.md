@@ -22,7 +22,7 @@ cd ElektriKalkulaator
 dotnet run --project ElektriKalkulaator
 ```
 
-Then open <http://localhost:5250>. The database is created and seeded automatically on first run,
+Then open <http://localhost:8080>. The database is created and seeded automatically on first run,
 with 10 demo products and the EVS-HD 60364 calculation rules.
 
 ### Optional configuration

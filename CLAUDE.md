@@ -55,7 +55,7 @@ this one because it is only loaded automatically from there.
 # from ElektriKalkulaator/
 dotnet build ElektriKalkulaator.slnx
 dotnet test ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj
-dotnet run --project ElektriKalkulaator            # http://localhost:5250
+dotnet run --project ElektriKalkulaator            # http://localhost:8080
 
 # re-check the app is still locked down (app must be running)
 bash scripts/security-check.sh

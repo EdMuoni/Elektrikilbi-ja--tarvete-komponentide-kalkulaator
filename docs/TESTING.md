@@ -4,7 +4,7 @@ How this project is tested, why it is tested that way, and exactly what to do wh
 Written for two readers: a **beginner programmer** who has not written tests before, and an **AI
 model** picking this project up with no memory of previous sessions.
 
-**Current state: 174 automated tests, all passing.**
+**Current state: 199 automated tests, all passing, run by CI on every push.**
 
 ```bash
 cd ElektriKalkulaator
@@ -245,6 +245,7 @@ Ordered by how much damage an untested failure would do.
 | `CatalogueSearchTests.cs` | Category + text search combined with AND | DB |
 | `CategoryServicesTests.cs` | Categories, `CategoryDeleteResult` | DB |
 | `SeedDataIntegrityTests.cs` | Seed data consistency, image files existing | DB + files |
+| `ThemeTokenTests.cs` | Views use colour tokens, not literals; both palettes match | files |
 | `ImageUploadValidationTests.cs` | Extension, size and magic-byte checks | — |
 | `FormValidationTests.cs` | `[Required]`, `[Range]`, `[Compare]` on DTOs | — |
 | `Integration/TestWebAppFactory.cs` | Boots the real app for HTTP tests | — |
@@ -270,15 +271,21 @@ Ordered by how much damage an untested failure would do.
 
 An honest list. Good places to start if you are looking for work.
 
-1. **No CI.** Nothing runs these 174 tests automatically on push. `ShopTARge24` has a
-   `.github/workflows` folder worth copying. **This is now the biggest gap** — a large suite that
-   only runs when someone remembers is a suite that will eventually be ignored.
-2. **`CartController` has no unit tests.** It is covered at HTTP level, but its session handling is
+1. **`CartController` has no unit tests.** It is covered at HTTP level, but its session handling is
    untested in isolation. Awkward because of the session dependency; doable by mocking `ISession`.
-3. **No UI tests.** Nothing verifies the pages *look* right or that JavaScript works.
+2. **No UI tests, and no way to catch a purely visual defect.** **This is now the biggest gap.**
+   Nothing verifies that pages *look* right or that JavaScript works.
+
+   What this costs is documented: on 2026-08-14 we found 38 uses of Bootstrap's `text-white` across
+   14 views. `text-white` means literally `#fff`, so those headings were **white text on a white
+   card** in light mode — the light theme shipped three days earlier was partly unusable, and 196
+   passing tests said nothing. `ThemeTokenTests` now catches that specific family of bug, but note
+   its limit: it checks colours written in the *markup*, not whether the palette itself is any good.
+   **Judging whether a design looks good still needs a person looking at a screen.**
+
    `Tarkvarasüsteemide_Testimine/SeleniumShopUITestSampleTARge24-main` in the wider coursework repo
    is a working Selenium template if this is ever wanted.
-4. **No performance tests.** `Calculate` issues two queries per rule and the cart one per line.
+3. **No performance tests.** `Calculate` issues two queries per rule and the cart one per line.
    Fine at this size; nothing would warn you when it stops being fine.
-5. **No test of the migration path.** Tests use `EnsureCreated` against an in-memory database, so a
+4. **No test of the migration path.** Tests use `EnsureCreated` against an in-memory database, so a
    broken SQL Server migration would not be caught until someone runs the app.

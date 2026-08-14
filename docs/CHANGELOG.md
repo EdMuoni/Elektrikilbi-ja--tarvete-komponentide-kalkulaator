@@ -44,6 +44,55 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Zero build warnings, and CI now fails on any new one
+
+**Type:** bugfix / chore
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- `PowerboxCalculation.Components` changed from `ICollection<PowerboxComponents>?` to a
+  non-nullable `ICollection<PowerboxComponents>` initialised to an empty list.
+- `Views/_ViewImports.cshtml` — removed a duplicate `@using ElektriKalkulaator` (added by me when
+  wiring up the VAT notice; the namespace was already imported at the top of the file). Its
+  Estonian comments translated to English while there.
+- `.github/workflows/ci.yml` — the build step now passes `-warnaserror`.
+
+**Why**
+- Two warnings had been present on every build:
+  - **CS8620** in `CalculatorServices.GetHistory`. EF Core's `ThenInclude` expects a non-nullable
+    collection, and `Components` was declared nullable. Beyond the warning, nullable was the wrong
+    description: a calculation always *has* components — possibly none, which an empty list
+    expresses perfectly well. Nullable said "this list might not exist", a different and less
+    useful idea that forced null checks on something never really null. It now matches how
+    `ProductCategory.Products` was already declared.
+  - **CS0105**, a duplicate using directive. Harmless, but noise.
+- With the count at zero, `-warnaserror` keeps it there. A warning is usually the compiler noticing
+  something genuinely wrong; once a few are tolerated they stop being read at all. Both of these
+  were small, and one of them was a real nullability mismatch.
+
+**How it was verified**
+- Clean Release build: **0 Warning(s), 0 Error(s)** — previously 2 warnings.
+- **176/176 tests passing.**
+- `dotnet ef migrations has-pending-model-changes` reports **no model changes**, confirming the
+  navigation-property change does not affect the database schema and needs no migration.
+- **`-warnaserror` was proved to work**, which took two attempts:
+  - The first attempt injected a duplicate using and the build still succeeded — because
+    `--no-restore` with an unchanged project meant the compiler never ran again, so no warning was
+    re-emitted. The test proved nothing.
+  - Re-run with `--no-incremental` to force a real recompile: the warning became
+    `error CS0105` and the build **FAILED**, then passed again once reverted. On CI this is
+    academic — every run starts from a clean machine and always compiles — but a flag nobody has
+    seen fail is a flag nobody should trust.
+
+**Follow-ups or known limitations**
+- If a warning ever has to be allowed, suppress that specific rule with a comment explaining why,
+  rather than removing the flag.
+- EF Core still emits two runtime *model validation* warnings about decimal precision on
+  `Product.Voltage` and `PowerboxRequirements.TotalAreaM2`. Those come from EF at startup, not the
+  compiler, so `-warnaserror` does not cover them. Worth fixing separately with `HasPrecision`.
+
+---
+
 ## 2026-08-11 — Continuous integration: tests now run automatically on every push
 
 **Type:** chore

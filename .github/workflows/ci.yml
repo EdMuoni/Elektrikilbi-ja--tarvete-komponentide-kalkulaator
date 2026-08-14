@@ -46,9 +46,16 @@ jobs:
 
       - name: Build
         # --no-restore because the previous step already did it; repeating it just wastes time.
-        # -warnaserror would be stricter, but the project currently has one known EF Core
-        # nullability warning, so it is deliberately not used yet.
-        run: dotnet build ElektriKalkulaator/ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj --no-restore --configuration Release
+        #
+        # -warnaserror turns every compiler warning into a build failure. The project builds with
+        # zero warnings, so this is what keeps it that way: a warning is usually the compiler
+        # noticing something genuinely wrong, and once a few are tolerated they stop being read at
+        # all. The two that existed here were a real nullability mismatch and a duplicate using —
+        # small, but both worth knowing about.
+        #
+        # If a warning ever needs to be allowed deliberately, suppress that specific rule with a
+        # comment explaining why, rather than removing this flag.
+        run: dotnet build ElektriKalkulaator/ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj --no-restore --configuration Release -warnaserror
 
       - name: Run tests
         run: >

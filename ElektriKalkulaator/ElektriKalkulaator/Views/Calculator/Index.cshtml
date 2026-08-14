@@ -22,7 +22,7 @@
     <!-- VASAK: Sisendvorm -->
     <div class="col-lg-5">
         <div class="card p-4">
-            <h5 class="fw-bold text-white mb-4">📋 Hoone andmed</h5>
+            <h5 class="fw-bold text-strong-custom mb-4">📋 Hoone andmed</h5>
 
             @* POST /Calculator — triggers EVS-HD 60364 calculation *@
             <form asp-action="Index" asp-controller="Calculator" method="post">
@@ -83,7 +83,7 @@
                 <div class="mb-4">
                     <div class="form-check">
                         <input asp-for="HasElectricStove" type="checkbox" class="form-check-input" />
-                        <label asp-for="HasElectricStove" class="form-check-label text-white">
+                        <label asp-for="HasElectricStove" class="form-check-label text-strong-custom">
                             ♨️ Elektripliit (6 mm² / 32A eraldatud ahel)
                         </label>
                     </div>
@@ -100,9 +100,9 @@
         <div class="card p-3 mt-3">
             <h6 class="text-amber fw-bold mb-2">ℹ️ Arvutamise reeglid</h6>
             <div class="small text-muted-custom">
-                <div class="mb-1">💡 <strong class="text-white">Valgustus:</strong> 1 ahel iga 8 lambi kohta · 1.5 mm² · 10A</div>
-                <div class="mb-1">🔌 <strong class="text-white">Pistikud:</strong> 1 ahel iga 6 pistiku kohta · 2.5 mm² · 16A</div>
-                <div class="mb-1">♨️ <strong class="text-white">Pliit:</strong> 1 eraldatud ahel · 6.0 mm² · 32A</div>
+                <div class="mb-1">💡 <strong class="text-strong-custom">Valgustus:</strong> 1 ahel iga 8 lambi kohta · 1.5 mm² · 10A</div>
+                <div class="mb-1">🔌 <strong class="text-strong-custom">Pistikud:</strong> 1 ahel iga 6 pistiku kohta · 2.5 mm² · 16A</div>
+                <div class="mb-1">♨️ <strong class="text-strong-custom">Pliit:</strong> 1 eraldatud ahel · 6.0 mm² · 32A</div>
             </div>
         </div>
     </div>
@@ -114,7 +114,7 @@
             <!-- BOM tabel — materjalide nimekiri -->
             <div class="card p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold text-white mb-0">📊 Komponentide nimekiri</h5>
+                    <h5 class="fw-bold text-strong-custom mb-0">📊 Komponentide nimekiri</h5>
                     <span class="badge bg-success">✅ Arvutus valmis</span>
                 </div>
 
@@ -135,7 +135,7 @@
                                 <!-- Iga BOM rida -->
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold text-white">@item.ProductName</div>
+                                        <div class="fw-semibold text-strong-custom">@item.ProductName</div>
                                         <div class="small text-muted-custom">@item.Brand</div>
                                         @* Circuit type badge with colour coding *@
                                         @if (!string.IsNullOrEmpty(item.CircuitType))
@@ -241,7 +241,7 @@
             <!-- Tühi olek — enne arvutust -->
             <div class="card p-5 text-center h-100 d-flex flex-column align-items-center justify-content-center">
                 <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1.5rem;">⚡</div>
-                <h5 class="text-white mb-2">Täida vorm ja vajuta "Arvuta"</h5>
+                <h5 class="text-strong-custom mb-2">Täida vorm ja vajuta "Arvuta"</h5>
                 <p class="text-muted-custom small">
                     Sisesta hoone andmed vasakul — tulemused ilmuvad siia.<br>
                     Arvutus põhineb EVS-HD 60364 Eesti elektristandardil.

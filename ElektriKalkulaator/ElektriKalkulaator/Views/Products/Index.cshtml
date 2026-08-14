@@ -59,7 +59,7 @@
 @if (Model.Any())
 {
     <p class="text-muted-custom small mb-3">
-        Leitud <strong class="text-white">@Model.Count()</strong> toodet
+        Leitud <strong class="text-strong-custom">@Model.Count()</strong> toodet
         @if (!string.IsNullOrWhiteSpace(ViewBag.SearchTerm as string))
         {
             <span>otsingule „@ViewBag.SearchTerm"</span>
@@ -74,7 +74,7 @@
        every filter, which is the action a stuck user actually wants. *@
     <div class="card p-5 text-center">
         <div class="empty-state-icon">📦</div>
-        <h5 class="text-white">Tooteid ei leitud</h5>
+        <h5 class="text-strong-custom">Tooteid ei leitud</h5>
         <p class="text-muted-custom small mb-3">
             Ükski toode ei vasta valitud filtritele.
         </p>
@@ -104,7 +104,7 @@ else
 
                     <!-- Toote nimi ja tootja -->
                     <div class="mb-2">
-                        <div class="fw-semibold text-white small">@product.Name</div>
+                        <div class="fw-semibold text-strong-custom small">@product.Name</div>
                         <div class="text-muted-custom" style="font-size: 0.75rem;">@product.Brand</div>
                     </div>
 

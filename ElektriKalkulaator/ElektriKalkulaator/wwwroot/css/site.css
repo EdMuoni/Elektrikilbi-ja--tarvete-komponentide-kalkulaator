@@ -532,9 +532,24 @@ main {
     margin: 1.5rem 0;
 }
 
-/* ── ABIVAHENDID ──────────────────────────────────────────────────── */
+/* ── HELPER CLASSES ───────────────────────────────────────────────────────────
+   Each one is a name for a token, so views never write a colour value. */
 .text-amber { color: var(--accent-amber-ink) !important; }
 .text-muted-custom { color: var(--text-muted) !important; }
+
+/* Headings and figures that must dominate. This replaced Bootstrap's text-white
+   throughout the views.
+
+   Why it had to change: text-white hard-codes #fff. That is correct on a dark
+   background and invisible on a light one, so every heading using it vanished
+   the moment someone switched to the light theme. Following the token instead
+   means the colour is whichever theme is active — near-white on dark, near-black
+   on light. (Same bug the navbar had with navbar-dark.) */
+.text-strong-custom { color: var(--text-strong) !important; }
+
+/* Safety net: if text-white creeps back in — copied from a Bootstrap example, or
+   from an older view — it must not reintroduce the invisible-on-light bug. */
+.text-white { color: var(--text-strong) !important; }
 
 .bg-card { background-color: var(--bg-card) !important; }
 .border-custom { border-color: var(--border-color) !important; }

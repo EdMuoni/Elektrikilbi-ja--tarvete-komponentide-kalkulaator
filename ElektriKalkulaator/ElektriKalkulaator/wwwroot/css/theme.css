@@ -22,7 +22,7 @@
    person on a light OS must be able to force dark, and vice versa. That is why
    the media query below is written as
 
-        :root:not([data-theme="light"])
+        :root:not([data-theme="dark"])
 
    rather than plain :root. Without that guard, a light OS setting would keep
    overriding someone who explicitly asked for dark.
@@ -36,48 +36,48 @@
    asks for light gets the light palette below; everyone else sees this. */
 :root {
     /* Surfaces, from furthest back to nearest front */
-    --bg-primary:      #0f0f1a;   /* page background */
-    --bg-card:         #16213e;   /* cards and panels */
-    --bg-input:        #1f2937;   /* form fields */
-    --bg-nav:          #0d0d1a;   /* navigation bar */
+    --bg-primary:      #0A0C10;   /* page background */
+    --bg-card:         #242833;   /* cards and panels */
+    --bg-input:        #2C313D;   /* form fields */
+    --bg-nav:          #06080B;   /* navigation bar */
     --bg-subtle:       rgba(255, 255, 255, 0.04);   /* table header, hover fills */
 
     /* Accents. Each has exactly one job — see docs/DESIGN_GUIDE.md.
        --accent-amber is used as a BACKGROUND (buttons); --accent-amber-ink is the
        same idea as TEXT. They differ because a colour readable as a button fill is
        not necessarily readable as small text, and vice versa. */
-    --accent-amber:     #F5A623;   /* the next action — button fills */
-    --accent-amber-ink: #F5A623;   /* the same accent used as text or a border */
-    --accent-amber-hover: #ffbe4f;
-    --on-accent:        #0f0f1a;   /* text placed ON an amber button */
+    --accent-amber:     #F2AD36;   /* the next action — button fills */
+    --accent-amber-ink: #F2AD36;   /* the same accent used as text or a border */
+    --accent-amber-hover: #FFC15E;
+    --on-accent:        #0A0C10;   /* text placed ON an amber button */
 
-    --accent-blue:     #3B82F6;   /* information, links, technical badges */
-    --accent-green:    #10B981;   /* success, in stock, trust */
-    --accent-red:      #ef4444;   /* errors and destructive actions only */
-    --accent-warning:  #fbbf24;   /* low stock */
+    --accent-blue:     #5FA1F2;   /* information, links, technical badges */
+    --accent-green:    #39D09E;   /* success, in stock, trust */
+    --accent-red:      #E86868;   /* errors and destructive actions only */
+    --accent-warning:  #F5B547;   /* low stock */
 
     /* Text */
-    --text-strong:     #ffffff;   /* headings and figures that must dominate */
-    --text-primary:    #e5e7eb;   /* body text and prices */
-    --text-muted:      #9ca3af;   /* secondary text */
+    --text-strong:     #F5F6FA;   /* headings and figures that must dominate */
+    --text-primary:    #D0D4DD;   /* body text and prices */
+    --text-muted:      #9299AA;   /* secondary text */
 
-    --border-color:    #2d3748;
+    --border-color:    #3A4150;
 
     /* Circuit-type colours in the BOM table */
-    --circuit-lighting: #60a5fa;
-    --circuit-socket:   #34d399;
-    --circuit-stove:    #f87171;
-    --circuit-rcd:      #a78bfa;
-    --circuit-panel:    #F5A623;
+    --circuit-lighting: #5FA1F2;
+    --circuit-socket:   #39D09E;
+    --circuit-stove:    #E86868;
+    --circuit-rcd:      #B79BFF;
+    --circuit-panel:    #F2AD36;
 
     /* Tinted fills, used behind badges and the trust strip */
-    --tint-amber:  rgba(245, 166, 35, 0.15);
-    --tint-blue:   rgba(59, 130, 246, 0.15);
-    --tint-green:  rgba(16, 185, 129, 0.12);
-    --tint-red:    rgba(239, 68, 68, 0.15);
-    --tint-warning: rgba(245, 158, 11, 0.15);
+    --tint-amber:   rgba(242, 173, 54, 0.14);
+    --tint-blue:    rgba(95, 161, 242, 0.14);
+    --tint-green:   rgba(57, 208, 158, 0.12);
+    --tint-red:     rgba(232, 104, 104, 0.14);
+    --tint-warning: rgba(245, 181, 71, 0.14);
 
-    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 30px rgba(0, 0, 0, 0.45);
 
     /* Tells the browser to draw its own controls (scrollbars, form widgets) dark. */
     color-scheme: dark;
@@ -88,7 +88,7 @@
    Not an inversion. Several colours are genuinely different values, because a
    colour readable on near-black is often unreadable on near-white.
 
-   The clearest example is amber: #F5A623 on a dark card is comfortable, but as
+   The clearest example is amber: #F2AD36 on a dark card is comfortable, but as
    small text on white it falls below the WCAG AA contrast minimum. So the light
    palette uses a darker amber for TEXT while keeping the bright one for BUTTON
    FILLS, where the dark label on top provides the contrast.
@@ -100,41 +100,41 @@
 @media (prefers-color-scheme: light) {
     /* :not([data-theme="dark"]) means "unless the user explicitly asked for dark". */
     :root:not([data-theme="dark"]) {
-        --bg-primary:      #f4f6f8;
-        --bg-card:         #ffffff;
-        --bg-input:        #ffffff;
-        --bg-nav:          #ffffff;
-        --bg-subtle:       rgba(15, 23, 42, 0.04);
+        --bg-primary:      #F1F3F7;
+        --bg-card:         #FFFFFF;
+        --bg-input:        #FFFFFF;
+        --bg-nav:          #FFFFFF;
+        --bg-subtle:       rgba(10, 12, 16, 0.04);
 
-        --accent-amber:     #F5A623;   /* still the button fill — dark text sits on it */
-        --accent-amber-ink: #9a5b00;   /* darker, so it is readable as text on white */
-        --accent-amber-hover: #e0940f;
-        --on-accent:        #1f2937;
+        --accent-amber:     #F2AD36;   /* button fill — the dark label on top gives contrast */
+        --accent-amber-ink: #8A5200;   /* darker, so amber is readable as TEXT on white */
+        --accent-amber-hover: #E09C22;
+        --on-accent:        #231704;
 
-        --accent-blue:     #1d4ed8;
+        --accent-blue:     #1D4ED8;
         --accent-green:    #047857;
-        --accent-red:      #b42318;
-        --accent-warning:  #92610a;
+        --accent-red:      #B42318;
+        --accent-warning:  #92610A;
 
-        --text-strong:     #0f172a;
-        --text-primary:    #1f2937;
-        --text-muted:      #5b6675;
+        --text-strong:     #0B0E14;
+        --text-primary:    #2A303C;
+        --text-muted:      #5D6675;
 
-        --border-color:    #d9dee6;
+        --border-color:    #DBE0E8;
 
-        --circuit-lighting: #1d4ed8;
+        --circuit-lighting: #1D4ED8;
         --circuit-socket:   #047857;
-        --circuit-stove:    #b42318;
-        --circuit-rcd:      #6d28d9;
-        --circuit-panel:    #9a5b00;
+        --circuit-stove:    #B42318;
+        --circuit-rcd:      #6D28D9;
+        --circuit-panel:    #8A5200;
 
-        --tint-amber:   rgba(245, 166, 35, 0.16);
+        --tint-amber:   rgba(242, 173, 54, 0.18);
         --tint-blue:    rgba(29, 78, 216, 0.10);
         --tint-green:   rgba(4, 120, 87, 0.10);
         --tint-red:     rgba(180, 35, 24, 0.10);
         --tint-warning: rgba(146, 97, 10, 0.12);
 
-        --shadow-card: 0 6px 18px rgba(15, 23, 42, 0.10);
+        --shadow-card: 0 1px 2px rgba(10,12,16,0.06), 0 8px 24px rgba(10, 12, 16, 0.08);
 
         color-scheme: light;
     }
@@ -143,41 +143,41 @@
 /* The user explicitly chose light. Identical to the block above, but applied
    regardless of what the operating system prefers. */
 :root[data-theme="light"] {
-    --bg-primary:      #f4f6f8;
-    --bg-card:         #ffffff;
-    --bg-input:        #ffffff;
-    --bg-nav:          #ffffff;
-    --bg-subtle:       rgba(15, 23, 42, 0.04);
+    --bg-primary:      #F1F3F7;
+    --bg-card:         #FFFFFF;
+    --bg-input:        #FFFFFF;
+    --bg-nav:          #FFFFFF;
+    --bg-subtle:       rgba(10, 12, 16, 0.04);
 
-    --accent-amber:     #F5A623;
-    --accent-amber-ink: #9a5b00;
-    --accent-amber-hover: #e0940f;
-    --on-accent:        #1f2937;
+    --accent-amber:     #F2AD36;   /* button fill — the dark label on top gives contrast */
+    --accent-amber-ink: #8A5200;   /* darker, so amber is readable as TEXT on white */
+    --accent-amber-hover: #E09C22;
+    --on-accent:        #231704;
 
-    --accent-blue:     #1d4ed8;
+    --accent-blue:     #1D4ED8;
     --accent-green:    #047857;
-    --accent-red:      #b42318;
-    --accent-warning:  #92610a;
+    --accent-red:      #B42318;
+    --accent-warning:  #92610A;
 
-    --text-strong:     #0f172a;
-    --text-primary:    #1f2937;
-    --text-muted:      #5b6675;
+    --text-strong:     #0B0E14;
+    --text-primary:    #2A303C;
+    --text-muted:      #5D6675;
 
-    --border-color:    #d9dee6;
+    --border-color:    #DBE0E8;
 
-    --circuit-lighting: #1d4ed8;
+    --circuit-lighting: #1D4ED8;
     --circuit-socket:   #047857;
-    --circuit-stove:    #b42318;
-    --circuit-rcd:      #6d28d9;
-    --circuit-panel:    #9a5b00;
+    --circuit-stove:    #B42318;
+    --circuit-rcd:      #6D28D9;
+    --circuit-panel:    #8A5200;
 
-    --tint-amber:   rgba(245, 166, 35, 0.16);
+    --tint-amber:   rgba(242, 173, 54, 0.18);
     --tint-blue:    rgba(29, 78, 216, 0.10);
     --tint-green:   rgba(4, 120, 87, 0.10);
     --tint-red:     rgba(180, 35, 24, 0.10);
     --tint-warning: rgba(146, 97, 10, 0.12);
 
-    --shadow-card: 0 6px 18px rgba(15, 23, 42, 0.10);
+    --shadow-card: 0 1px 2px rgba(10,12,16,0.06), 0 8px 24px rgba(10, 12, 16, 0.08);
 
     color-scheme: light;
 }
@@ -185,41 +185,41 @@
 /* The user explicitly chose dark. Repeats the defaults so that choosing dark on
    a light-preferring system works. */
 :root[data-theme="dark"] {
-    --bg-primary:      #0f0f1a;
-    --bg-card:         #16213e;
-    --bg-input:        #1f2937;
-    --bg-nav:          #0d0d1a;
+    --bg-primary:      #0A0C10;
+    --bg-card:         #242833;
+    --bg-input:        #2C313D;
+    --bg-nav:          #06080B;
     --bg-subtle:       rgba(255, 255, 255, 0.04);
 
-    --accent-amber:     #F5A623;
-    --accent-amber-ink: #F5A623;
-    --accent-amber-hover: #ffbe4f;
-    --on-accent:        #0f0f1a;
+    --accent-amber:     #F2AD36;
+    --accent-amber-ink: #F2AD36;
+    --accent-amber-hover: #FFC15E;
+    --on-accent:        #0A0C10;
 
-    --accent-blue:     #3B82F6;
-    --accent-green:    #10B981;
-    --accent-red:      #ef4444;
-    --accent-warning:  #fbbf24;
+    --accent-blue:     #5FA1F2;
+    --accent-green:    #39D09E;
+    --accent-red:      #E86868;
+    --accent-warning:  #F5B547;
 
-    --text-strong:     #ffffff;
-    --text-primary:    #e5e7eb;
-    --text-muted:      #9ca3af;
+    --text-strong:     #F5F6FA;
+    --text-primary:    #D0D4DD;
+    --text-muted:      #9299AA;
 
-    --border-color:    #2d3748;
+    --border-color:    #3A4150;
 
-    --circuit-lighting: #60a5fa;
-    --circuit-socket:   #34d399;
-    --circuit-stove:    #f87171;
-    --circuit-rcd:      #a78bfa;
-    --circuit-panel:    #F5A623;
+    --circuit-lighting: #5FA1F2;
+    --circuit-socket:   #39D09E;
+    --circuit-stove:    #E86868;
+    --circuit-rcd:      #B79BFF;
+    --circuit-panel:    #F2AD36;
 
-    --tint-amber:   rgba(245, 166, 35, 0.15);
-    --tint-blue:    rgba(59, 130, 246, 0.15);
-    --tint-green:   rgba(16, 185, 129, 0.12);
-    --tint-red:     rgba(239, 68, 68, 0.15);
-    --tint-warning: rgba(245, 158, 11, 0.15);
+    --tint-amber:   rgba(242, 173, 54, 0.14);
+    --tint-blue:    rgba(95, 161, 242, 0.14);
+    --tint-green:   rgba(57, 208, 158, 0.12);
+    --tint-red:     rgba(232, 104, 104, 0.14);
+    --tint-warning: rgba(245, 181, 71, 0.14);
 
-    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 30px rgba(0, 0, 0, 0.45);
 
     color-scheme: dark;
 }

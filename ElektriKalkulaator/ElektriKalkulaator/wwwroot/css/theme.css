@@ -1,0 +1,225 @@
+/* =============================================================================
+   theme.css — ALL COLOURS FOR THE WHOLE SITE
+   =============================================================================
+   Every colour used anywhere lives in this file and nowhere else. site.css and
+   the views refer to them by name — var(--bg-card) — and never write a colour
+   value of their own.
+
+   Why keep them separate:
+     • Changing the look means editing ONE file, not hunting through components.
+     • Two complete palettes can sit side by side and be swapped at runtime.
+     • A colour that is not in here is a mistake, which makes it easy to spot.
+
+   ── HOW THE LIGHT / DARK SWITCH WORKS ───────────────────────────────────────
+   There are THREE states, not two:
+
+     1. "system"  — no data-theme attribute. The operating system decides, via
+                    the prefers-color-scheme media query. This is the default.
+     2. "dark"    — the user chose dark:  <html data-theme="dark">
+     3. "light"   — the user chose light: <html data-theme="light">
+
+   The user's choice must beat the system preference in BOTH directions — a
+   person on a light OS must be able to force dark, and vice versa. That is why
+   the media query below is written as
+
+        :root:not([data-theme="light"])
+
+   rather than plain :root. Without that guard, a light OS setting would keep
+   overriding someone who explicitly asked for dark.
+
+   wwwroot/js/theme.js sets the attribute and remembers the choice.
+   ============================================================================= */
+
+
+/* ── DARK: the default palette ───────────────────────────────────────────────
+   Dark is this project's identity, so it is the base. A visitor whose system
+   asks for light gets the light palette below; everyone else sees this. */
+:root {
+    /* Surfaces, from furthest back to nearest front */
+    --bg-primary:      #0f0f1a;   /* page background */
+    --bg-card:         #16213e;   /* cards and panels */
+    --bg-input:        #1f2937;   /* form fields */
+    --bg-nav:          #0d0d1a;   /* navigation bar */
+    --bg-subtle:       rgba(255, 255, 255, 0.04);   /* table header, hover fills */
+
+    /* Accents. Each has exactly one job — see docs/DESIGN_GUIDE.md.
+       --accent-amber is used as a BACKGROUND (buttons); --accent-amber-ink is the
+       same idea as TEXT. They differ because a colour readable as a button fill is
+       not necessarily readable as small text, and vice versa. */
+    --accent-amber:     #F5A623;   /* the next action — button fills */
+    --accent-amber-ink: #F5A623;   /* the same accent used as text or a border */
+    --accent-amber-hover: #ffbe4f;
+    --on-accent:        #0f0f1a;   /* text placed ON an amber button */
+
+    --accent-blue:     #3B82F6;   /* information, links, technical badges */
+    --accent-green:    #10B981;   /* success, in stock, trust */
+    --accent-red:      #ef4444;   /* errors and destructive actions only */
+    --accent-warning:  #fbbf24;   /* low stock */
+
+    /* Text */
+    --text-strong:     #ffffff;   /* headings and figures that must dominate */
+    --text-primary:    #e5e7eb;   /* body text and prices */
+    --text-muted:      #9ca3af;   /* secondary text */
+
+    --border-color:    #2d3748;
+
+    /* Circuit-type colours in the BOM table */
+    --circuit-lighting: #60a5fa;
+    --circuit-socket:   #34d399;
+    --circuit-stove:    #f87171;
+    --circuit-rcd:      #a78bfa;
+    --circuit-panel:    #F5A623;
+
+    /* Tinted fills, used behind badges and the trust strip */
+    --tint-amber:  rgba(245, 166, 35, 0.15);
+    --tint-blue:   rgba(59, 130, 246, 0.15);
+    --tint-green:  rgba(16, 185, 129, 0.12);
+    --tint-red:    rgba(239, 68, 68, 0.15);
+    --tint-warning: rgba(245, 158, 11, 0.15);
+
+    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+    /* Tells the browser to draw its own controls (scrollbars, form widgets) dark. */
+    color-scheme: dark;
+}
+
+
+/* ── LIGHT ───────────────────────────────────────────────────────────────────
+   Not an inversion. Several colours are genuinely different values, because a
+   colour readable on near-black is often unreadable on near-white.
+
+   The clearest example is amber: #F5A623 on a dark card is comfortable, but as
+   small text on white it falls below the WCAG AA contrast minimum. So the light
+   palette uses a darker amber for TEXT while keeping the bright one for BUTTON
+   FILLS, where the dark label on top provides the contrast.
+
+   Backgrounds are a soft grey-blue rather than pure white: pure white beside a
+   dark UI is harsh, and on a bright site in daylight it glares. */
+:root:not([data-theme="dark"]) {}   /* (no-op; keeps the cascade order obvious) */
+
+@media (prefers-color-scheme: light) {
+    /* :not([data-theme="dark"]) means "unless the user explicitly asked for dark". */
+    :root:not([data-theme="dark"]) {
+        --bg-primary:      #f4f6f8;
+        --bg-card:         #ffffff;
+        --bg-input:        #ffffff;
+        --bg-nav:          #ffffff;
+        --bg-subtle:       rgba(15, 23, 42, 0.04);
+
+        --accent-amber:     #F5A623;   /* still the button fill — dark text sits on it */
+        --accent-amber-ink: #9a5b00;   /* darker, so it is readable as text on white */
+        --accent-amber-hover: #e0940f;
+        --on-accent:        #1f2937;
+
+        --accent-blue:     #1d4ed8;
+        --accent-green:    #047857;
+        --accent-red:      #b42318;
+        --accent-warning:  #92610a;
+
+        --text-strong:     #0f172a;
+        --text-primary:    #1f2937;
+        --text-muted:      #5b6675;
+
+        --border-color:    #d9dee6;
+
+        --circuit-lighting: #1d4ed8;
+        --circuit-socket:   #047857;
+        --circuit-stove:    #b42318;
+        --circuit-rcd:      #6d28d9;
+        --circuit-panel:    #9a5b00;
+
+        --tint-amber:   rgba(245, 166, 35, 0.16);
+        --tint-blue:    rgba(29, 78, 216, 0.10);
+        --tint-green:   rgba(4, 120, 87, 0.10);
+        --tint-red:     rgba(180, 35, 24, 0.10);
+        --tint-warning: rgba(146, 97, 10, 0.12);
+
+        --shadow-card: 0 6px 18px rgba(15, 23, 42, 0.10);
+
+        color-scheme: light;
+    }
+}
+
+/* The user explicitly chose light. Identical to the block above, but applied
+   regardless of what the operating system prefers. */
+:root[data-theme="light"] {
+    --bg-primary:      #f4f6f8;
+    --bg-card:         #ffffff;
+    --bg-input:        #ffffff;
+    --bg-nav:          #ffffff;
+    --bg-subtle:       rgba(15, 23, 42, 0.04);
+
+    --accent-amber:     #F5A623;
+    --accent-amber-ink: #9a5b00;
+    --accent-amber-hover: #e0940f;
+    --on-accent:        #1f2937;
+
+    --accent-blue:     #1d4ed8;
+    --accent-green:    #047857;
+    --accent-red:      #b42318;
+    --accent-warning:  #92610a;
+
+    --text-strong:     #0f172a;
+    --text-primary:    #1f2937;
+    --text-muted:      #5b6675;
+
+    --border-color:    #d9dee6;
+
+    --circuit-lighting: #1d4ed8;
+    --circuit-socket:   #047857;
+    --circuit-stove:    #b42318;
+    --circuit-rcd:      #6d28d9;
+    --circuit-panel:    #9a5b00;
+
+    --tint-amber:   rgba(245, 166, 35, 0.16);
+    --tint-blue:    rgba(29, 78, 216, 0.10);
+    --tint-green:   rgba(4, 120, 87, 0.10);
+    --tint-red:     rgba(180, 35, 24, 0.10);
+    --tint-warning: rgba(146, 97, 10, 0.12);
+
+    --shadow-card: 0 6px 18px rgba(15, 23, 42, 0.10);
+
+    color-scheme: light;
+}
+
+/* The user explicitly chose dark. Repeats the defaults so that choosing dark on
+   a light-preferring system works. */
+:root[data-theme="dark"] {
+    --bg-primary:      #0f0f1a;
+    --bg-card:         #16213e;
+    --bg-input:        #1f2937;
+    --bg-nav:          #0d0d1a;
+    --bg-subtle:       rgba(255, 255, 255, 0.04);
+
+    --accent-amber:     #F5A623;
+    --accent-amber-ink: #F5A623;
+    --accent-amber-hover: #ffbe4f;
+    --on-accent:        #0f0f1a;
+
+    --accent-blue:     #3B82F6;
+    --accent-green:    #10B981;
+    --accent-red:      #ef4444;
+    --accent-warning:  #fbbf24;
+
+    --text-strong:     #ffffff;
+    --text-primary:    #e5e7eb;
+    --text-muted:      #9ca3af;
+
+    --border-color:    #2d3748;
+
+    --circuit-lighting: #60a5fa;
+    --circuit-socket:   #34d399;
+    --circuit-stove:    #f87171;
+    --circuit-rcd:      #a78bfa;
+    --circuit-panel:    #F5A623;
+
+    --tint-amber:   rgba(245, 166, 35, 0.15);
+    --tint-blue:    rgba(59, 130, 246, 0.15);
+    --tint-green:   rgba(16, 185, 129, 0.12);
+    --tint-red:     rgba(239, 68, 68, 0.15);
+    --tint-warning: rgba(245, 158, 11, 0.15);
+
+    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+    color-scheme: dark;
+}

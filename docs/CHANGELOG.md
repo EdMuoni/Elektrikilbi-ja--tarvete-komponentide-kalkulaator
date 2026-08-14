@@ -44,6 +44,69 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — All colours in one file, and a working light/dark switch
+
+**Type:** feature
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- New **`wwwroot/css/theme.css`** holds every colour on the site. `site.css` keeps component styles
+  and now contains **zero hard-coded colours** outside the print block, where fixed black-on-white
+  is the point.
+- New **`wwwroot/js/theme.js`** — a light/dark toggle in the navigation, remembered in
+  `localStorage`.
+- `_Layout.cshtml` loads `theme.css` **before** `site.css`, and carries a small inline script in
+  `<head>`.
+
+**Three states, not two**
+`system` (no attribute — the OS decides, and is the default), `light`, and `dark`. The user's choice
+must beat the system preference **in both directions**, so the media query is written
+`:root:not([data-theme="dark"])` rather than plain `:root`. Without that guard a light OS setting
+would keep overriding someone who explicitly asked for dark.
+
+**Why the duplicated inline script**
+The `<head>` script repeats logic that also lives in `theme.js`. That is deliberate: it has to run
+**before the stylesheets load**, or every page paints in the default colours and then switches — a
+visible flash on each navigation. Both copies are wrapped in `try/catch`, since `localStorage`
+throws in private browsing and under some corporate policies.
+
+**Light is not an inversion**
+Several colours are genuinely different values. The clearest case is amber: `#F5A623` is comfortable
+on a dark card but fails contrast as small text on white. So there are now two tokens —
+`--accent-amber` for button **fills** (a dark label supplies the contrast) and `--accent-amber-ink`
+for **text and borders**, which becomes `#9a5b00` in light mode. Backgrounds are a soft grey-blue
+rather than pure white, which glares in daylight — relevant for a tool used on site.
+
+**A bug found while doing this:** the navigation carried Bootstrap's `navbar-dark` class, which
+hard-codes light text. In light mode that would have produced white text on a white bar. Removed,
+and the styling it provided (including the hamburger icon, whose colour Bootstrap bakes into an
+inline SVG) reimplemented with tokens.
+
+**How it was verified**
+- Build clean with `-warnaserror`; **196/196 tests passing**.
+- `theme.css` and `theme.js` serve with HTTP 200, and the stylesheet order is correct.
+- **Switching tested in a real browser**, checking computed styles rather than just the attribute:
+  | | `data-theme` | `--bg-primary` | `--accent-amber-ink` | saved |
+  |---|---|---|---|---|
+  | initial (OS = light) | *none* | `#f4f6f8` | `#9a5b00` | — |
+  | after 1st click | `dark` | `#0f0f1a` | `#F5A623` | `dark` |
+  | after 2nd click | `light` | `#f4f6f8` | `#9a5b00` | `light` |
+- **Contrast measured on the light theme**, since that is where it could realistically fail. Every
+  pair passes WCAG AA: body text 13.55, muted text 5.83, amber-ink 5.43, green 5.48, red 6.57,
+  blue 6.70, button label on amber 7.24.
+
+**Behaviour change worth knowing**
+Visitors whose operating system prefers light will now see the **light** theme by default, where
+previously everyone saw dark. That is the correct, accessible behaviour, and the toggle overrides
+it — but it does mean the site no longer looks the same to everyone on first visit.
+
+**Follow-ups or known limitations**
+- The choice is stored per browser, not per account, so it does not follow a signed-in user between
+  devices. Deliberate: someone may want dark on a phone and light on a bright workshop laptop.
+- The light theme has not been reviewed by eye at every page, only measured for contrast.
+
+---
+
 ## 2026-08-11 — Voice guide, and a written spec for the supplier-sync model
 
 **Type:** docs

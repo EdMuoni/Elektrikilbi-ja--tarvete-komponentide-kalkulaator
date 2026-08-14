@@ -4,9 +4,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] – ElektrikilbiKalkulaator</title>
-    <!-- Bootstrap 5 — grid ja komponendid -->
+
+    @* ── THEME, APPLIED BEFORE ANYTHING IS DRAWN ────────────────────────────────
+       This tiny script MUST stay here: inline, in <head>, and above the
+       stylesheets. It reads the visitor's saved light/dark choice and puts it on
+       the <html> element before the browser paints anything.
+
+       Move it to the bottom of the page, or into theme.js, and every page load
+       flashes the default colours for a moment before switching — the effect
+       usually called FOUC. It is duplicated (theme.js has the same logic) purely
+       because it has to run this early, and that is worth the duplication.
+
+       try/catch because localStorage throws in private browsing and under some
+       corporate policies; a failure here must never stop the page rendering. *@
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('ek-theme');
+                if (saved === 'light' || saved === 'dark') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                }
+            } catch (e) { /* no saved preference available; fall back to the OS setting */ }
+        })();
+    </script>
+
+    <!-- Bootstrap 5 — grid and components -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <!-- Meie kohandatud tume teema -->
+    @* theme.css defines every colour and MUST load before site.css, which uses them. *@
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <!-- Google Fonts — Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +44,7 @@
          Razor genereerib automaatselt õige URL-i kontrolleri ja actioni järgi
          ================================================================ -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark-nav shadow-sm">
+        <nav class="navbar navbar-expand-lg bg-dark-nav shadow-sm">
             <div class="container">
                 <!-- Logo / brändimärk — klõps viib avalehele -->
                 <a class="navbar-brand fw-bold fs-5" asp-controller="Home" asp-action="Index">
@@ -54,6 +79,15 @@
                             <a class="nav-link px-3 cart-link" asp-controller="Cart" asp-action="Index">
                                 🛒 Ostukorv
                             </a>
+                        </li>
+
+                        @* Light/dark switch. A <button> rather than a link because it performs an
+                           action instead of navigating. theme.js fills in the icon and label, so
+                           it starts empty — that also means it does nothing visible if JavaScript
+                           is off, rather than showing a button that cannot work. *@
+                        <li class="nav-item d-flex align-items-center">
+                            <button id="themeToggle" type="button" class="theme-toggle"
+                                    aria-label="Vaheta tausta värvi"></button>
                         </li>
 
                         @* User.Identity.IsAuthenticated is true once someone has signed in.
@@ -149,6 +183,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
 
     <!-- Lehekülje spetsiifilised skriptid (vorm, validatsioon jne) -->
     @await RenderSectionAsync("Scripts", required: false)

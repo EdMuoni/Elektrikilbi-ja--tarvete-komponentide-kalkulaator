@@ -44,6 +44,60 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Voice guide, and a written spec for the supplier-sync model
+
+**Type:** docs
+**Author:** Claude (Sonnet 5) + Edgar
+
+Two documents, no code.
+
+**`docs/VOICE_AND_PERSONALITY.md`** — how to make the site memorable and warm.
+
+It opens by resolving an apparent contradiction with `DESIGN_GUIDE.md`, which concluded that
+plainness wins. Both hold, because they govern different layers: **structure, speed and information
+stay ruthlessly plain; language, tone and small moments are where personality lives** — and those
+cost nothing to load.
+
+The central argument is that this project's distinctiveness already exists and only needs saying
+out loud. It is a shop that shows its working, cites a national safety standard, and can be audited
+line by line. Nobody expects that, so no invented quirk is needed — and manufactured quirk on a
+safety-relevant tool would be actively worse than plainness.
+
+Contains: a one-line voice rule (write as an electrician explaining something to a colleague), a
+before/after table of real Estonian strings, warmth at the points where sites are usually coldest
+(errors, empty states, waiting), five "weird bits worth doing" — the strongest being a reasoning
+line under each BOM row, which turns a price list into a teaching tool and is only possible because
+the calculation is rule-based — and an explicit do-not list. International references (Oatly,
+McMaster-Carr, Basecamp, Patagonia, Duolingo, Stripe) each with what to take and what to leave.
+
+One deliberate exception is called out: the login error stays vague, because a friendlier message
+would reveal which email addresses have accounts. **Warmth never overrides safety.**
+
+**`docs/SUPPLIER_SYNC_SPEC.md`** — the dropshipping model, written down and clearly marked
+**NOT BUILT**.
+
+The honest framing is that the scheduled price-sync job is the *easy* part, and the things that
+decide whether the model works are commercial and legal:
+- Estonian retailers have **no ordering API**, and automating their checkout would breach terms of
+  service and be indistinguishable from an attack. Recommended order is manual relay → reseller
+  agreement → automation.
+- Taking payment makes this site the **seller of record** in the EU: 14-day withdrawal, 2-year
+  conformity guarantee, and a supplier's stock error becomes our late delivery.
+- **25 % must be stored as data, not `* 1.25` in code** — it has to vary by supplier and category,
+  and must absorb payment fees, returns and price drift.
+
+Also specifies the schema (`Supplier`, `SupplierProduct`, `PriceHistory`), why price history is
+append-only (a quote given Monday must still be explainable Friday — the same auditability argument
+the whole project rests on), sync safety rules, and a seven-phase order in which **most of the value
+arrives at phase 4**, before any automation.
+
+**Follow-ups**
+- Four open questions for Edgar at the end of the spec, including whether 25 % is researched or a
+  starting guess.
+- Nothing in the voice guide is implemented; the cheapest items are copy edits of about 30 minutes.
+
+---
+
 ## 2026-08-11 — Session close: roadmap brought up to date
 
 **Type:** docs

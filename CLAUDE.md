@@ -29,6 +29,8 @@ this one because it is only loaded automatically from there.
 | `docs/DESIGN_GUIDE.md` | Design system, page-by-page UI instructions, what not to do | When a UI decision is made |
 | `docs/TESTING.md` | How this project is tested and what to test | When adding a kind of test |
 | `docs/TEST_ACCOUNTS.md` | Demo admin/customer logins and how they are kept out of production | When accounts change |
+| `docs/VOICE_AND_PERSONALITY.md` | How the site should sound; warmth without slowing it down | When writing user-facing copy |
+| `docs/SUPPLIER_SYNC_SPEC.md` | **Not built.** Plan for the dropshipping / price-sync model | Post-thesis only |
 
 ## Rules — follow these without being asked
 

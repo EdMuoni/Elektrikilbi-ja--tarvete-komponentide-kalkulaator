@@ -100,7 +100,20 @@ namespace ElektriKalkulaator.Controllers
             // Everyone who registers through this page is a Customer. Admin accounts are created
             // by seeding (see IdentitySeeder), never by self-registration — otherwise anyone
             // could grant themselves the ability to delete the whole catalogue.
-            await _userManager.AddToRoleAsync(user, UserRoles.Customer);
+            //
+            // The result is checked rather than ignored. If assigning the role fails, the account
+            // already exists but belongs to no role at all — a confusing half-created state where
+            // the person is signed in yet treated as though they had never registered. Better to
+            // remove the account and let them try again than to leave that behind.
+            var roleResult = await _userManager.AddToRoleAsync(user, UserRoles.Customer);
+            if (!roleResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+
+                ModelState.AddModelError(string.Empty,
+                    "Konto loomine ebaõnnestus. Palun proovi uuesti.");
+                return View(dto);
+            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -117,6 +130,15 @@ namespace ElektriKalkulaator.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+
+            // Clear the session as well as the login cookie.
+            //
+            // The shopping cart is stored in the session rather than against the account, so
+            // signing out alone left it behind. On a shared computer — a library, a workshop, a
+            // college machine — the next person to open the browser would see the previous
+            // person's cart. Signing out is precisely when someone expects their traces gone.
+            HttpContext.Session.Clear();
+
             TempData["Success"] = "Oled välja logitud.";
             return RedirectToAction("Index", "Home");
         }

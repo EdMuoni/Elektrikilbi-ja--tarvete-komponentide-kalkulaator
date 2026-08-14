@@ -10,8 +10,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
   </ItemGroup>
 
-  <!-- ApplicationServices vajab ainult Core (interface'id) ja Data (DbContext) -->
-  <!-- EI viita veebiprojektile — see tekitaks ringviite! -->
+  <!-- ApplicationServices needs only Core (interfaces) and Data (DbContext) -->
+  <!-- It must NOT reference the web project - that would create a circular reference -->
   <ItemGroup>
     <ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
     <ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />

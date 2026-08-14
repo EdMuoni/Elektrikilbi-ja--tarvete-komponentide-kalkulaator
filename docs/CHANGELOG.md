@@ -44,6 +44,69 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Real HTTP integration tests, and two more bugs found with them
+
+**Type:** test / bugfix
+**Author:** Claude (Sonnet 5) + Edgar
+
+**134 → 176 tests.** The security checks that previously needed a manually started application and
+a shell script now run as part of `dotnet test`.
+
+**What changed**
+
+*Integration test infrastructure*
+- `Integration/TestWebAppFactory.cs` — boots the **real** `Program.cs` in memory using
+  `WebApplicationFactory`: same DI, same middleware order, same attributes. Only the database is
+  swapped for an in-memory one.
+- `Integration/HttpTestHelpers.cs` — fetching antiforgery tokens, logging in, reading redirect paths.
+- `Integration/AuthorizationTests.cs` (21) — anonymous, customer and admin against every admin-only
+  and public page, plus wrong password, unknown email and logout.
+- `Integration/RequestSecurityTests.cs` (19) — antiforgery on all five POST endpoints, four
+  varieties of hostile `returnUrl`, quantity limits, unknown product IDs.
+- `Program.cs` — startup now uses `EnsureCreated` when the provider is not relational, so the same
+  startup code works under test instead of the test host needing its own copy. Also gained an empty
+  `public partial class Program` so the factory can reference it.
+
+*Two bugs the new tests exposed*
+1. **The shopping cart survived logout.** The cart lives in the session, not against the account,
+   so signing out left it behind. On a shared computer the next person would inherit it.
+   `Logout` now calls `HttpContext.Session.Clear()`. **A test was written first and failed**,
+   confirming the bug before the fix.
+2. **`AddToRoleAsync` was not checked during registration.** If it failed the account existed with
+   no role at all — signed in, but treated as though never registered. The result is now checked
+   and the half-created account removed.
+
+*Housekeeping*
+- The last Estonian comments (in all four `.csproj` files) translated to English, per the house rule.
+
+*Documentation*
+- `docs/TESTING.md` rewritten as a full methodology guide in seven parts: what a test is for a
+  beginner, the "a test must be able to fail" rule with this project's real examples, the five
+  kinds of test and when each applies, what must be tested and what must not, conventions, an
+  add-a-test checklist, and an honest list of what is still missing.
+
+**How it was verified**
+- Build clean, **176/176 tests passing**.
+- The integration tests were **mutation-tested three ways**, and all three were caught:
+  | Mutation | Tests that failed |
+  |---|---|
+  | removed `[Authorize]` from `ProductsController` | 10 |
+  | removed the `Url.IsLocalUrl` guard | 4 |
+  | removed one `[ValidateAntiForgeryToken]` | 1 |
+- Getting the factory working required fixing a real trap: `AddDbContext` in .NET 9 also registers
+  an `IDbContextOptionsConfiguration<T>`, and removing only `DbContextOptions` left the SQL Server
+  provider attached — EF then refused to start with two providers registered.
+
+**Follow-ups or known limitations**
+- **No CI is now the biggest gap.** 176 tests that only run when someone remembers will eventually
+  be ignored.
+- `scripts/security-check.sh` is now redundant with the integration tests, but is kept because it
+  can be pointed at a deployed server, which `dotnet test` cannot.
+- Cart prices are read at display time, so a price change between adding and viewing is reflected
+  immediately. Arguably correct; worth a deliberate decision once orders are real.
+
+---
+
 ## 2026-08-11 — Fix two display bugs, and make the calculator's value visible
 
 **Type:** bugfix / feature

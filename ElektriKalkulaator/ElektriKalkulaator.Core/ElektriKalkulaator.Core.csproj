@@ -10,8 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.1" />
   </ItemGroup>
 
-  <!-- Core projekt EI viita ühelegi teisele projektile -->
-  <!-- Core on "alus" — kõik teised sõltuvad sellest, mitte vastupidi -->
-  <!-- Sõltuvushierarhia: Core ← Data ← ApplicationServices ← Web -->
+  <!-- The Core project references NO other project in this solution. -->
+  <!-- Core is the foundation: everything else depends on it, never the other way round. -->
+  <!-- Dependency order: Core <- Data <- ApplicationServices <- Web -->
 
 </Project>

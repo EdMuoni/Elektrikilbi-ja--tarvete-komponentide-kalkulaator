@@ -44,6 +44,54 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Continuous integration: tests now run automatically on every push
+
+**Type:** chore
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- `.github/workflows/ci.yml` — GitHub Actions builds the project and runs all 176 tests on every
+  push to any branch, on every pull request into `main`, and on demand from the Actions tab.
+- The repository already had an empty, untracked `.github/workflows/` folder. It is now used.
+
+**Why**
+- This was the largest remaining gap after the test work. **176 tests only protect the project if
+  something actually runs them**, and depending on a person to remember means that eventually they
+  will not be run. CI removes that dependency.
+- It also makes a pull request self-verifying: a reviewer can see the tests passed rather than
+  taking the author's word for it.
+
+**Design decisions worth knowing**
+- **No database service in the workflow.** Every test — including the integration tests that boot
+  the real application — uses an in-memory database, so the runner needs only the .NET SDK. No SQL
+  Server, no connection string, no secrets.
+- **Targets the test `.csproj`, not the `.slnx` solution.** Building the test project pulls in all
+  four other projects through its references anyway, and this avoids depending on the newer `.slnx`
+  format being supported by whatever SDK the runner has.
+- **Restore, build and test are three separate steps**, so a failure names itself in the GitHub UI
+  instead of hiding in one long log.
+- **Test results are uploaded even when tests fail** (`if: always()`), since that is exactly when
+  they are worth reading.
+- `-warnaserror` is deliberately *not* enabled yet: the project still has one known EF Core
+  nullability warning in `CalculatorServices.GetHistory`, and turning it on now would fail every
+  build until that is addressed.
+
+**How it was verified**
+- The exact three commands the workflow runs were executed locally **in Release configuration**
+  (the tests had only ever been run in Debug): restore, `build --no-restore`, `test --no-build`.
+  Build clean, **176/176 passing**, and the `.trx` file was produced at the path the upload step
+  expects.
+- Confirmed `TestResults/` is already covered by `.gitignore`, so CI output cannot be committed by
+  accident.
+
+**Follow-ups or known limitations**
+- The workflow does not run `scripts/security-check.sh`, which needs a started application. Its
+  checks are already covered by the integration tests; the script remains useful only for pointing
+  at a deployed server.
+- No deployment step — the project is not hosted anywhere yet.
+
+---
+
 ## 2026-08-11 — Real HTTP integration tests, and two more bugs found with them
 
 **Type:** test / bugfix

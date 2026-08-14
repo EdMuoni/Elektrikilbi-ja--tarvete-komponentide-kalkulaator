@@ -44,6 +44,44 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Session close: roadmap brought up to date
+
+**Type:** docs
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- `docs/PROJECT_ROADMAP.md` updated to **rev. 5**, matching reality after a long session:
+  - **§B4 (what works)** rewritten. It still claimed 16 tests, no authentication, and listed
+    already-fixed rough edges. Now records authentication, 196 tests, CI, sorting, the print view
+    and the design-token system — and lists the *current* rough edges honestly: dead
+    `RoomsFrom`/`RoomsTo` fields, `RulesApplied` storing names instead of rule IDs, `UserId` still
+    unpopulated, N+1 queries, and the hard-coded homepage figures.
+  - **§D2 (Phase 1)** restructured into **done / needs Edgar / optional**. Fifteen items are now
+    complete; what remains is mostly **decisions rather than code**.
+  - **§D1 maturity map** re-scored: CI/CD and Security move from 🟡 to 🟢; Error Tracking notes
+    that startup now fails fast.
+
+**Why**
+- A status document that overstates progress is worse than none: the next session trusts it, skips
+  work it thinks is done, and redoes work it thinks is not. Accuracy matters more here than
+  optimism.
+- Written so that context loss between AI sessions costs nothing. Everything verified this session
+  lives in files — tests that re-run, a CI pipeline that enforces them, and documents that explain
+  the reasoning — rather than in a conversation that will be summarised away.
+
+**How it was verified**
+- Clean `--no-incremental` Release build with `-warnaserror`: **0 warnings, 0 errors**.
+- **196/196 tests passing.**
+- Working tree clean, branch pushed, four PRs open and stacked.
+
+**State at session close**
+- Branch `feat/conversion-ux`, 15 commits ahead of `main`, everything pushed.
+- **PRs #1 → #2 → #3 → #4 are stacked and must be merged in that order.**
+- Outstanding items needing Edgar rather than code: confirm the VAT assumption, fill in real
+  EVS-HD 60364 clause numbers, decide whether to re-base the seeded prices, merge the PRs.
+
+---
+
 ## 2026-08-11 — Demo admin and customer accounts, created only in Development
 
 **Type:** feature / docs

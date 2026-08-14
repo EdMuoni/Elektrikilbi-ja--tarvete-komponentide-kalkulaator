@@ -12,7 +12,7 @@ never seen this codebase** — a new AI model with no chat history, a classmate,
 Edgar himself in six months — can understand what it is, why it's built this way, and what to do
 next, without guessing.
 
-### Its two companion files
+### Its companion files
 | File | Purpose |
 |---|---|
 | `PROJECT_ROADMAP.md` (this file) | **Where things stand and where they're going.** Living document — sections get rewritten as reality changes. |
@@ -222,20 +222,30 @@ over the AI-based approach in the original prototype. See §C3.
 
 ## §B4 — What works right now
 
-✅ **Working:** product & category CRUD · the calculator (form → BOM → saved history) ·
-session-based cart (add/remove/clear) · product image upload and display · automatic database
-migration on startup · custom dark theme · **16 automated tests, all passing**
+✅ **Working:** the calculator (form → priced BOM → saved history, with correct units) ·
+product & category CRUD · catalogue with search, category filter and **sorting** ·
+product images (seeded photos + admin upload) · session cart ·
+**authentication with Admin and Customer roles** · **print-ready BOM** ·
+automatic migration and account seeding on startup · custom dark theme with a design-token system ·
+**196 automated tests** · **CI running them on every push**
 
 ⚠️ **Cosmetic only:** `CartController.Checkout()` clears the session and shows a confirmation
-page. **It saves nothing to the database.** There is no order.
+page. **It saves nothing to the database.** There is no order, and stock is never reserved or
+reduced. This is scoped future work, not an oversight.
 
-❌ **Absent:** authentication · i18n · orders/payment · deployment · everything in §D1 marked
-"Not started"
+❌ **Absent:** orders & payment · i18n (Estonian only) · deployment · manufacturer part codes and
+datasheets · everything in §D1 still marked red
 
-🐞 **Known rough edges:** image-upload validation failures throw an exception (raw 500 page)
-instead of showing a friendly form error · one EF Core nullability warning (CS8620) in
-`CalculatorServices.GetHistory()` · connection string is hard-coded to a specific machine name
-(`DESKTOP-KMVSVQK`) in `appsettings.json`
+🐞 **Known rough edges:**
+- `CalculationRule.RoomsFrom` / `RoomsTo` are **dead fields** — seeded, read by nothing.
+- `RulesApplied` stores circuit-type names, but the ERD spec says it should hold rule **IDs** as
+  JSON "for auditing". As stored it cannot tell you which rule produced a given BOM.
+- `PowerboxCalculation.UserId` is still never populated, although Identity now exists to fill it.
+- N+1 queries: `Calculate` issues two per rule, `CartController.Index` one per cart line. Fine at
+  this size, wrong at scale.
+- The homepage worked example has hard-coded figures; if seeded prices change it must be redone.
+- EF Core emits two runtime warnings about decimal precision (`Product.Voltage`,
+  `PowerboxRequirements.TotalAreaM2`). Compiler warnings are at zero and enforced by CI.
 
 ---
 
@@ -318,12 +328,12 @@ unaware. Being able to explain why a layer is absent is a stronger position than
 | 4 | **Auth & Permissions** | 🟢 Good | **Closed 2026-08-11.** ASP.NET Core Identity with `Admin` and `Customer` roles; product/category management requires an admin, catalogue and calculator stay public. Passwords hashed, lockout after 5 failed attempts, admin seeded from User Secrets. Remaining: `PowerboxCalculation.UserId` is still not populated on save. |
 | 5 | **Hosting & Deployment** | 🔴 None | Runs on `localhost` only. Connection string hard-codes one machine name. Never deployed anywhere. |
 | 6 | **Cloud & Compute** | 🔴 None | No cloud resources. Not needed yet. |
-| 7 | **CI/CD & Version Control** | 🟡 Half | Git yes — but 4 commits, one branch, and ~a full session of work currently uncommitted. No CI pipeline, though `dotnet test` now makes one genuinely worthwhile, and ShopTARge24 has a `.github/workflows` folder to copy from. |
-| 8 | **Security** | 🟡 Half | Present: antiforgery tokens on POSTs, EF Core parameterised queries (no SQL injection), HTTPS redirection, upload allow-list + size cap + GUID filenames. Missing: auth (row 4), content-type verification on uploads, secret management. |
+| 7 | **CI/CD & Version Control** | 🟢 Good | **Closed 2026-08-11.** GitHub Actions builds and runs all 196 tests on every push and PR, with `-warnaserror`. Work flows through branches and pull requests. No deployment step, since there is nowhere to deploy yet. |
+| 8 | **Security** | 🟢 Good | **Closed 2026-08-11.** Antiforgery on every POST, parameterised queries, HTTPS redirection, upload allow-list + size cap + magic-byte content check + GUID filenames, open-redirect guard, input validation, secrets in User Secrets. Remaining: no rate limiting (row 9), and uploads are not re-encoded. |
 | 9 | **Rate Limiting** | 🔴 None | .NET 9 has `AddRateLimiter` built in — a few lines whenever it's actually needed. |
 | 10 | **Caching & CDN** | 🔴 None | Note: `AddDistributedMemoryCache()` in `Program.cs` looks like caching but only backs session state. |
 | 11 | **Load Balancing & Scaling** | 🔴 None | Worth knowing: the cart lives in **in-memory** session state, so running two instances would randomly lose carts. A real blocker for the dropshipping vision, not for the thesis. |
-| 12 | **Error Tracking & Logs** | 🟡 Half | Default `ILogger`, migration failures logged, `UseExceptionHandler` in production. No structured logging, no aggregation. |
+| 12 | **Error Tracking & Logs** | 🟡 Half | Default `ILogger`, `UseExceptionHandler` in production, and startup now **fails fast** on a migration error rather than serving a broken site. No structured logging or aggregation. |
 | 13 | **Availability & Recovery** | 🔴 None | No backups, health checks or recovery plan. |
 
 **For the defence:** rows 1–3 are solid, row 4 is the one you should proactively acknowledge, and
@@ -334,46 +344,46 @@ real money are involved.
 
 ## §D2 — Phase 1: before the defence
 
-- [x] **Automated test project** — `ElektriKalkulaator.Tests`, 16 tests passing, mutation-verified. *(2026-08-10)*
-- [x] **Fix nullable-annotation lie + inconsistent not-found handling** *(2026-08-10)*
-- [x] **Product images** — upload, storage, display, plus security hardening *(2026-08-10)*
-- [x] **Add `EvsReference` column** to `CalculationRule` *(2026-08-10)*
-- [x] **Real product photography** for all ten seeded products, licensed and attributed *(2026-08-11)*
-- [ ] **Decide and display the VAT basis of prices** — `Product.Price` doesn't say whether it
-      includes VAT, a >20 % ambiguity in a tool whose purpose is cost estimation. Estonian
-      retailers always state it. See `RESEARCH_LOG.md` *(2026-08-11)*
-- [ ] Consider re-basing seeded prices on observed market rates — the seeded 9.20 € for an
-      ABB S201-B16 is above the ~5.78 € a real customer pays, so the calculator over-estimates
-- [ ] Label catalogue photos as illustrative ("pilt on illustratiivne"), as Estonian shops do
-- [ ] **Populate `EvsReference`** with real EVS-HD 60364 clause numbers — *needs Edgar; must not be guessed*
-- [ ] **Commit the current work** — a session's worth of changes is uncommitted (see §A1)
-- [x] **Turn image-upload validation errors into form messages instead of 500 pages** *(2026-08-11)*
-- [ ] Write the thesis's own "limitations / future work" section using §B2's gap table, §D1 and §D3
-- [ ] **Redesign the site to convert visitors into buyers — both consumers and companies.**
-      Edgar's priority (stated 2026-08-11): the site must *psychologically attract* customers, and
-      companies as B2B buyers. This is a distinct piece of work from the security and correctness
-      fixes done so far, and it is the main thing standing between "a working thesis project" and
-      "something a real customer would buy from".
+**Done** *(all on branch `feat/conversion-ux`, PRs #1–#4, awaiting merge)*
 
-      Research already gathered in `RESEARCH_LOG.md` (competitor teardowns of Esvika, Onninen and
-      Elektrikaubad.ee, plus Baymard/Stanford/Lindgaard findings). Highest impact ÷ effort first:
-      - [ ] State whether prices include VAT — a cost-estimation tool with a >20 % ambiguity
-      - [ ] Trust strip under the calculator result, saying what is actually true and unusually
-            strong here: calculated to EVS-HD 60364, live catalogue prices, every rule auditable.
-            The project's real differentiator is currently invisible in the interface.
-      - [ ] Sorting (price, name) and price-per-metre on cable — Baymard essentials
-      - [ ] Homepage hero built around the calculator, using the licensed photography already in
-            `wwwroot/images/hero/` (downloaded, still unused)
-      - [ ] **B2B specifically** — this is what makes companies buy: saved/shareable BOM lists
-            (an electrician sends a calculation to a client for approval), a printable/PDF quote,
-            product codes and datasheets on the product page, and eventually account pricing.
-            Onninen's whole interface is built around these; see `RESEARCH_LOG.md`.
-      - [ ] Never: fake scarcity, countdown timers, invented "was" prices. Regulated as unfair
-            commercial practices in the EU, and they would undermine the trustworthiness argument
-            the entire project rests on.
-- [ ] *Optional:* more test coverage (`CategoryServices`, controllers)
-- [ ] *Optional:* AJAX-ify the calculator submit (pattern in `AdvancedAjax`, jQuery already loaded)
-- [ ] *Optional:* broaden `/Products` filtering (price range, brand)
+- [x] Automated test project — now **196 tests**, mutation-verified *(08-10 → 08-11)*
+- [x] Fix nullable-annotation lie and inconsistent not-found handling *(08-10)*
+- [x] Product images: upload, storage, display, security hardening *(08-10)*
+- [x] Add `EvsReference` column to `CalculationRule` *(08-10)*
+- [x] Real licensed product photography for all ten seeded products *(08-11)*
+- [x] Upload validation errors show on the form instead of a 500 page *(08-11)*
+- [x] **Authentication** — ASP.NET Core Identity, Admin + Customer roles *(08-11)*
+- [x] **Nine other security findings** — CSRF, open redirect, cart input, upload content, SQL-side
+      search, config secrets *(08-11)*
+- [x] **HTTP integration tests** — the security checks now run inside `dotnet test` *(08-11)*
+- [x] **CI** — GitHub Actions builds and tests on every push, `-warnaserror` *(08-11)*
+- [x] **Zero build warnings** *(08-11)*
+- [x] **Display the VAT basis of prices** — configurable, shown next to the total *(08-11)*
+- [x] **Design system + conversion work** — tokens, focus states, colour roles, catalogue sorting,
+      print stylesheet, specification table, worked example *(08-11)*
+- [x] **Demo admin and customer accounts**, Development-only *(08-11)*
+- [x] Commit the work — 15 commits across four stacked PRs *(08-11)*
+
+**Still to do — needs Edgar, not code**
+
+- [ ] **Confirm the VAT assumption.** `Pricing:PricesIncludeVat` is set to `true` because that is
+      the Estonian consumer convention, but nobody has verified the seeded prices were recorded
+      that way. It only changes what the site *says*, so a wrong setting is a wrong claim.
+- [ ] **Populate `EvsReference`** with real EVS-HD 60364 clause numbers. Deliberately left blank —
+      a fabricated citation in a thesis about standards compliance is worse than a blank field.
+- [ ] **Consider re-basing seeded prices.** The seeded 9.20 € for an ABB S201-B16 is above the
+      ~5.78 € a real customer pays (see `RESEARCH_LOG.md`), so the calculator over-estimates.
+- [ ] **Merge PRs #1 → #2 → #3 → #4**, in that order — they are stacked.
+- [ ] Write the thesis's "limitations / future work" section from §B2's gap table, §D1 and §D3.
+
+**Optional, if time allows**
+
+- [ ] Label catalogue photos as illustrative, as Estonian shops do
+- [ ] Manufacturer part codes + datasheet links (needs new `Product` fields — a schema change)
+- [ ] Multi-select filters — *deliberately deferred*: at 10 products a dropdown is adequate
+- [ ] AJAX-ify the calculator submit (pattern in `AdvancedAjax`, jQuery already loaded)
+- [ ] Fix the dead `RoomsFrom`/`RoomsTo` fields — either use them or remove them
+- [ ] Populate `PowerboxCalculation.UserId` so signed-in users get their own history
 
 ## §D3 — Later phases (post-defence)
 
@@ -461,6 +471,10 @@ These need Edgar's answer. Don't guess at them.
   orientation and beginner glossary; added §D1 full-stack maturity map (thirteen layers, honestly
   scored); recorded TTHK portal administrative dates in §A1; **introduced `CHANGELOG.md`** and the
   §E1 update protocol; ticked the four Phase 1 items completed on 2026-08-10.
+- **rev. 5** (2026-08-11) — Brought fully up to date after a large session: §B4 rewritten (auth,
+  196 tests, CI, sorting, print view all now real; the remaining rough edges listed honestly),
+  §D2 restructured into done / needs-Edgar / optional, §D1 rows 7, 8 and 12 re-scored. The
+  outstanding items are now mostly **decisions rather than code**.
 - **rev. 4** (2026-08-11) — Added `RESEARCH_LOG.md` and `IMAGE_CREDITS.md` to §0 and house rules
   (English-only comments, single `.jpg` image format). Recorded the real-product-photography work
   and three new price/VAT follow-ups in §D2. Expanded Phase 4 with the **25 % markup dropshipping

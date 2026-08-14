@@ -13,7 +13,10 @@ namespace ElektriKalkulaator.Data
     // So this runs once at startup instead, and does nothing if the data already exists.
     public static class IdentitySeeder
     {
-        public static async Task SeedAsync(IServiceProvider services, IConfiguration configuration)
+        public static async Task SeedAsync(
+            IServiceProvider services,
+            IConfiguration configuration,
+            bool isDevelopment = false)
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
@@ -26,7 +29,7 @@ namespace ElektriKalkulaator.Data
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // 2. Create the first admin, if there isn't one yet.
+            // 2. Create the real administrator from configuration.
             //
             // The credentials come from configuration, NOT from constants in this file, so no
             // password is ever committed to git. Set them with User Secrets:
@@ -40,33 +43,91 @@ namespace ElektriKalkulaator.Data
                 logger.LogWarning(
                     "No admin account seeded: AdminUser:Email and AdminUser:Password are not configured. " +
                     "Set them with 'dotnet user-secrets set' to create the first administrator.");
-                return;
+            }
+            else
+            {
+                await CreateUserAsync(userManager, logger,
+                    adminEmail, adminPassword, "Administraator", UserRoles.Admin);
             }
 
-            if (await userManager.FindByEmailAsync(adminEmail) != null)
-                return; // already created on a previous run
-
-            var admin = new ApplicationUser
+            // 3. Demo accounts — DEVELOPMENT ONLY.
+            //
+            // These exist so the site can be tried out as both an administrator and an ordinary
+            // customer without anyone having to register first, and so a fresh clone is usable
+            // immediately.
+            //
+            // THE ENVIRONMENT CHECK IS THE WHOLE SAFETY MECHANISM. These passwords are written in
+            // plain text below and are therefore public — anyone who reads the repository knows
+            // them. Creating them on a real server would hand an attacker an administrator account.
+            // Never remove this guard, and never reuse these passwords anywhere real.
+            if (isDevelopment)
             {
-                UserName = adminEmail,
-                Email = adminEmail,
-                FullName = "Administraator",
+                await CreateUserAsync(userManager, logger,
+                    DemoAdminEmail, DemoAdminPassword, "Demo Administraator", UserRoles.Admin);
+
+                await CreateUserAsync(userManager, logger,
+                    DemoCustomerEmail, DemoCustomerPassword, "Demo Klient", UserRoles.Customer);
+
+                // Printed at startup so the credentials are visible in the console rather than
+                // having to be looked up in this file.
+                logger.LogInformation(
+                    "Development demo accounts available — admin: {AdminEmail} / {AdminPassword} · customer: {CustomerEmail} / {CustomerPassword}",
+                    DemoAdminEmail, DemoAdminPassword, DemoCustomerEmail, DemoCustomerPassword);
+            }
+        }
+
+        // ── DEMO CREDENTIALS (development only — see the guard above) ────────────────
+        public const string DemoAdminEmail       = "admin@demo.local";
+        public const string DemoAdminPassword    = "Admin123";
+
+        public const string DemoCustomerEmail    = "klient@demo.local";
+        public const string DemoCustomerPassword = "Klient123";
+
+        // Creates one user and puts them in a role. Does nothing if the account already exists,
+        // so restarting the application never duplicates anyone or resets a changed password.
+        private static async Task CreateUserAsync(
+            UserManager<ApplicationUser> userManager,
+            ILogger logger,
+            string email,
+            string password,
+            string fullName,
+            string role)
+        {
+            if (await userManager.FindByEmailAsync(email) != null)
+                return;
+
+            var user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                FullName = fullName,
                 EmailConfirmed = true,
                 CreatedAt = DateTime.Now
             };
 
-            var result = await userManager.CreateAsync(admin, adminPassword);
+            var result = await userManager.CreateAsync(user, password);
 
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                await userManager.AddToRoleAsync(admin, UserRoles.Admin);
-                logger.LogInformation("Seeded administrator account {Email}.", adminEmail);
+                // Most often the password fails the strength rules configured in Program.cs.
+                logger.LogError("Failed to seed {Role} account {Email}: {Errors}",
+                    role, email, string.Join("; ", result.Errors.Select(e => e.Description)));
+                return;
+            }
+
+            var roleResult = await userManager.AddToRoleAsync(user, role);
+
+            if (roleResult.Succeeded)
+            {
+                logger.LogInformation("Seeded {Role} account {Email}.", role, email);
             }
             else
             {
-                // Most often the configured password fails the strength rules in Program.cs.
-                logger.LogError("Failed to seed administrator: {Errors}",
-                    string.Join("; ", result.Errors.Select(e => e.Description)));
+                // An account with no role is a confusing half-created state: the person can sign
+                // in but is treated as though they never registered. Remove it and say so.
+                await userManager.DeleteAsync(user);
+                logger.LogError("Could not assign role {Role} to {Email}; the account was removed.",
+                    role, email);
             }
         }
     }

@@ -44,6 +44,68 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Demo admin and customer accounts, created only in Development
+
+**Type:** feature / docs
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- `IdentitySeeder` now also creates two demo accounts — an administrator and a customer — **only
+  when the application runs in the Development environment**. Credentials are printed to the console
+  at startup.
+- New **`docs/TEST_ACCOUNTS.md`** listing every account, what each is for, a five-minute manual pass
+  that exercises the whole permission model, and a pre-deployment checklist.
+- New `DemoAccountSeedingTests` (12 tests). **196 tests total.**
+- The user-creation logic was extracted into one `CreateUserAsync` helper, so the configured admin
+  and the demo accounts follow identical rules — including deleting the account if the role
+  assignment fails, rather than leaving someone signed in with no role.
+
+**Why**
+- There was a seeded administrator but **no customer account**, so the most important thing to test —
+  what a non-administrator actually sees — required registering by hand every time the database was
+  reset. It is also the case most easily got wrong, precisely because development is always done
+  while logged in as an admin.
+
+**The safety question, and how it is answered**
+- These passwords are in the source code and in the documentation, so they are public to anyone who
+  reads the repository. Creating them on a real server would hand out an administrator account.
+- The **only** thing preventing that is `app.Environment.IsDevelopment()`. Because that is the whole
+  safety mechanism, the first test written was the negative one —
+  `DemoAccounts_AreNotCreated_OutsideDevelopment`. A guard nobody has tested is a guard nobody
+  should trust.
+- `docs/TEST_ACCOUNTS.md` opens with that warning rather than burying it, and ends with a
+  pre-deployment checklist whose first item is confirming the server is not running in Development.
+
+**How it was verified**
+- Build clean with `-warnaserror`; **196/196 tests passing**.
+- Both accounts exercised against the running application over real HTTP:
+  | Check | Admin | Customer |
+  |---|---|---|
+  | Login | 302 ✓ | 302 ✓ |
+  | `/Products/Create` | 200 | **302 → /Account/AccessDenied** |
+  | `/Calculator`, `/Products` | 200 | 200 |
+  | Admin link in nav | shown | hidden |
+  - Wrong password still refused.
+- Startup log confirms both accounts seeded and the credentials printed.
+- Tests also cover: repeated seeding not duplicating anyone, a password changed during testing not
+  being silently reset, passwords stored hashed, and the customer **not** accidentally holding the
+  Admin role — which would make the account useless for its only purpose.
+
+**Two mistakes made while doing this, both mine**
+- The first version of `AChangedPassword_IsNotResetByRestarting` used a password-reset token, which
+  needs token providers the deliberately minimal test setup does not register. Switched to
+  `ChangePasswordAsync`, which tests the same thing without that dependency.
+- The first manual verification reported HTTP 400 for both logins and looked like a real failure. It
+  was the trap already documented in `scripts/security-check.sh`: with `MSYS_NO_PATHCONV=1`, Windows
+  `curl` cannot write a cookie jar at an absolute `/tmp` path, so the antiforgery cookie was lost.
+  Relative paths fixed it. Worth remembering — I had written that warning myself and still hit it.
+
+**Follow-ups or known limitations**
+- If the site is ever started in Development against a production database, the demo accounts would
+  be created there and must be deleted manually. Noted in the checklist.
+
+---
+
 ## 2026-08-11 — Implement the design guide: tokens, sorting, print, spec table
 
 **Type:** feature

@@ -92,7 +92,13 @@ using (var scope = app.Services.CreateScope())
 
         // Create the Admin and Customer roles and, if configured, the first admin account.
         // Runs after migrations so the Identity tables definitely exist.
-        await IdentitySeeder.SeedAsync(scope.ServiceProvider, builder.Configuration);
+        //
+        // The environment flag also enables the demo admin/customer accounts, which must NEVER be
+        // created on a real server — their passwords are in the source code. See IdentitySeeder.
+        await IdentitySeeder.SeedAsync(
+            scope.ServiceProvider,
+            builder.Configuration,
+            app.Environment.IsDevelopment());
     }
     catch (Exception ex)
     {

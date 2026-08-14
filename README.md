@@ -81,6 +81,7 @@ Everything is in [`docs/`](docs/):
 | [IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md) | Licence and attribution for every image |
 | [DESIGN_GUIDE.md](docs/DESIGN_GUIDE.md) | Design system and page-by-page UI instructions |
 | [TESTING.md](docs/TESTING.md) | How the project is tested, and what to test |
+| [TEST_ACCOUNTS.md](docs/TEST_ACCOUNTS.md) | Demo admin and customer logins for trying the site |
 | [PROMPTS.md](docs/PROMPTS.md) | Prompts for working on this project with an AI assistant |
 
 [`CLAUDE.md`](CLAUDE.md) sits at the repo root because AI assistants load it automatically from

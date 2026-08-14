@@ -26,6 +26,8 @@ this one because it is only loaded automatically from there.
 | `docs/RESEARCH_LOG.md` | Facts gathered from outside (prices, competitor design, UX research) | When you research something external |
 | `docs/IMAGE_CREDITS.md` | Licence and attribution for every image | When images change |
 | `docs/PROMPTS.md` | Ready-made prompts for future sessions | Rarely; when a new prompt proves useful |
+| `docs/DESIGN_GUIDE.md` | Design system, page-by-page UI instructions, what not to do | When a UI decision is made |
+| `docs/TESTING.md` | How this project is tested and what to test | When adding a kind of test |
 
 ## Rules — follow these without being asked
 
@@ -62,7 +64,8 @@ Local secrets already set on Edgar's machine (`dotnet user-secrets list` from th
 ## Architecture in one line
 
 `Core` (domain, DTOs, interfaces) ← `Data` (DbContext, migrations, seed) ← `ApplicationServices`
-(service implementations) ← `ElektriKalkulaator` (web). `Tests` references the first three.
+(service implementations) ← `ElektriKalkulaator` (web). `Tests` references **all four** — the web
+project too, for the integration tests and the upload-validation helpers.
 
 Never make `Core` depend on anything. Never make `Data` reference the web project.
 
@@ -73,8 +76,11 @@ Never make `Core` depend on anything. Never make `Data` reference the web projec
 - `CartController.Checkout()` **saves nothing**. There is no `Order` entity yet; this is scoped
   future work, not an oversight.
 - `ICategoryServices.Delete` is **unreachable** — nothing calls it. Kept for the planned admin area.
-- `Product.Price` **does not declare whether it includes VAT.** This is a known open question, not
-  something to guess at. See `docs/RESEARCH_LOG.md`.
+- `Product.Price` stores a bare number. Whether it includes VAT is declared in **configuration**
+  (`Pricing:PricesIncludeVat` in `appsettings.json`, currently `true`) and only *displayed* by
+  `VatNotice` — nothing converts any price. **Edgar has not yet confirmed the seeded prices really
+  are VAT-inclusive**, so treat that setting as an assumption, not a fact. See
+  `docs/RESEARCH_LOG.md`.
 
 ## Working style Edgar has asked for
 

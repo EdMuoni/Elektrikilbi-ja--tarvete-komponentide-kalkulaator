@@ -44,6 +44,63 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Design guide: what "good design" means for this project, and how to implement it
+
+**Type:** docs
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- New **`docs/DESIGN_GUIDE.md`** — a design system and page-by-page instruction set, written to be
+  implemented from directly rather than admired.
+- `CLAUDE.md` and `README.md` document tables updated to list it and `TESTING.md`.
+- Two stale claims in `CLAUDE.md` corrected: `Tests` now references all four projects (not three),
+  and the VAT question is no longer "open" — it is configuration, though the *value* remains an
+  unconfirmed assumption.
+
+**Why, and what the research changed**
+- The obvious approach would have been to copy whatever looks impressive on award-winning sites.
+  Researching it produced the opposite conclusion, and that conclusion is the guide's central point:
+  **the users are not shopping, they are looking something up.** An electrician pricing a job wants
+  the answer, not an experience.
+- The strongest evidence is [McMaster-Carr](https://www.mcmaster.com), widely regarded as one of the
+  best-designed commerce sites in existence — by engineers rather than by design awards. It is
+  deliberately plain, server-rendered, and almost JavaScript-free, because its users need a part
+  *now*. **That is the same architecture this project already has**, which reframes the current
+  design as a strength to sharpen rather than something to replace.
+
+**What the guide contains**
+- A spacing scale and type scale as CSS tokens. The project had colour tokens but neither of these,
+  which is why there are 19 inline `style="…"` attributes and 13 distinct font sizes — each an
+  isolated decision.
+- **A colour rule the project currently breaks:** amber is used for prices, buttons, the logo and
+  badges simultaneously. When everything is the accent, nothing is. Prices should carry emphasis
+  through size and weight, not hue; amber should mean "the next action" and appear roughly once per
+  screen.
+- Page-by-page instructions with the problem, the fix, and how to verify it — catalogue sorting
+  (still missing), a specification table on product pages, a **print stylesheet** so a BOM becomes a
+  quote an electrician can hand to a client, and a worked example on the homepage.
+- Universal rules: focus states (currently absent, so the site cannot be used by keyboard), minimum
+  readable font size, tables scrolling inside themselves, empty states that say what to do next.
+- A "what NOT to do" section covering fake scarcity, countdown timers and invented "was" prices —
+  regulated as unfair commercial practices in the EU, and directly contradictory to a project whose
+  whole argument is that its output is auditable.
+- A nine-step implementation order, smallest and highest-value first, plus four ways to check a
+  design change actually worked (squint test, 5-second test, keyboard-only, 375px width).
+
+**How it was verified**
+- No code changed, so nothing to test. Existing token values were read from `site.css` and the
+  inline-style and font-size counts measured, so the guide describes the project as it actually is
+  rather than in the abstract.
+- Every external claim is cited and recorded with its source.
+
+**Follow-ups or known limitations**
+- Nothing in the guide is implemented yet — it is the plan, not the work. Step 1 is adding the
+  tokens.
+- The colour-role change (prices no longer amber) will visibly alter several pages and is worth
+  reviewing on screen before committing.
+
+---
+
 ## 2026-08-11 — Zero build warnings, and CI now fails on any new one
 
 **Type:** bugfix / chore

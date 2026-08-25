@@ -1,82 +1,91 @@
-@* Toodete kataloog — filtri ja otsinguiga *@
+@*
+    Toodete kataloog (product catalogue).
+
+    This page follows the CATALOGUE genre described at the top of the redesign
+    section in site.css - the opposite of the home page. Someone here already
+    knows what a B16 is and wants to find one, so the page is dense, photo-led
+    and scannable, with no large empty areas and no marketing copy.
+
+    That is how every trade supplier in the references works: SupplyHouse,
+    Electrical2Go, AutomationDirect and Proelectro all put a compact filter bar
+    above a tight grid of photographed parts, and nothing else.
+*@
 @model IEnumerable<ElektriKalkulaator.Core.Domain.Product>
 
 @{
     ViewData["Title"] = "Tooted";
-}
-
-<div class="d-flex justify-content-between align-items-end mb-4">
-    <div>
-        <h1 class="page-title">📦 Toodete kataloog</h1>
-        <p class="page-subtitle">ABB, Schneider, Hager elektrikomponendid</p>
-    </div>
-    <a asp-action="Create" class="btn btn-amber">+ Lisa toode</a>
-</div>
-
-@* ── FILTERS AND SORTING ──────────────────────────────────────────────────
-   All three controls sit in ONE form so they combine: filtering by category,
-   searching by name and choosing an order are applied together rather than
-   each one resetting the others. *@
-@{
     var currentSort = ViewBag.Sort as ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder?
                       ?? ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.CategoryThenName;
+    var searchTerm = ViewBag.SearchTerm as string;
+
+    // Hiding an admin control is presentation, not security - the real protection is
+    // [Authorize(Roles = "Admin")] on the controller. But showing a button that sends
+    // an anonymous visitor to a login page is a dead end, so the check belongs here too.
+    var isAdmin = User.IsInRole(ElektriKalkulaator.Core.Domain.UserRoles.Admin);
 }
-<div class="card p-3 mb-4">
-    <form method="get" asp-action="Index" class="row g-3 align-items-end">
-        <div class="col-md-4">
-            <label for="categoryId" class="form-label">Kategooria</label>
-            @* asp-items turns a SelectList into <option> elements automatically *@
-            <select id="categoryId" name="categoryId" class="form-select"
-                    asp-items="@(ViewBag.Categories as Microsoft.AspNetCore.Mvc.Rendering.SelectList)">
-                <option value="">Kõik kategooriad</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label for="searchTerm" class="form-label">Otsi nime järgi</label>
-            <input id="searchTerm" type="text" name="searchTerm" value="@ViewBag.SearchTerm"
-                   class="form-control" placeholder="nt ABB, NYM, kaitselüliti..." />
-        </div>
-        <div class="col-md-2">
-            <label for="sort" class="form-label">Järjesta</label>
-            @* The value posted is the enum name, e.g. "PriceLowToHigh", which ASP.NET converts
-               back to the enum automatically when the form is submitted. *@
-            <select id="sort" name="sort" class="form-select">
-                <option value="CategoryThenName" selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.CategoryThenName)">Kategooria järgi</option>
-                <option value="NameAToZ"         selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.NameAToZ)">Nimi A–Ü</option>
-                <option value="PriceLowToHigh"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.PriceLowToHigh)">Hind: odavaim enne</option>
-                <option value="PriceHighToLow"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.PriceHighToLow)">Hind: kallim enne</option>
-                <option value="StockHighToLow"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.StockHighToLow)">Laoseis: enim laos</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">🔍 Otsi</button>
-        </div>
-    </form>
+
+<div class="catalogue-head">
+    <div>
+        <h1 class="page-title">Toodete kataloog</h1>
+        <p class="page-subtitle mb-0">ABB, Schneider ja Hager elektrikomponendid</p>
+    </div>
+    @if (isAdmin)
+    {
+        <a asp-action="Create" class="btn btn-amber">+ Lisa toode</a>
+    }
 </div>
 
-@* The result count belongs ABOVE the list as well as below it: people check how many
-   matches there are before deciding whether to scan or narrow the filter first. *@
-@if (Model.Any())
-{
-    <p class="text-muted-custom small mb-3">
-        Leitud <strong class="text-strong-custom">@Model.Count()</strong> toodet
-        @if (!string.IsNullOrWhiteSpace(ViewBag.SearchTerm as string))
-        {
-            <span>otsingule „@ViewBag.SearchTerm"</span>
-        }
-    </p>
-}
+@* ── FILTERS AND SORTING ──────────────────────────────────────────────────────
+   All three controls sit in ONE form so they combine: filtering by category,
+   searching by name and choosing an order apply together rather than each one
+   resetting the others. *@
+<form method="get" asp-action="Index" class="catalogue-toolbar">
+    <div class="catalogue-field catalogue-field-grow">
+        <label for="searchTerm" class="form-label">Otsi nime järgi</label>
+        <input id="searchTerm" type="text" name="searchTerm" value="@searchTerm"
+               class="form-control" placeholder="nt ABB, NYM, kaitselüliti..." />
+    </div>
+    <div class="catalogue-field">
+        <label for="categoryId" class="form-label">Kategooria</label>
+        @* asp-items turns a SelectList into <option> elements automatically *@
+        <select id="categoryId" name="categoryId" class="form-select"
+                asp-items="@(ViewBag.Categories as Microsoft.AspNetCore.Mvc.Rendering.SelectList)">
+            <option value="">Kõik kategooriad</option>
+        </select>
+    </div>
+    <div class="catalogue-field">
+        <label for="sort" class="form-label">Järjesta</label>
+        @* The value posted is the enum name, e.g. "PriceLowToHigh", which ASP.NET
+           converts back to the enum automatically when the form is submitted. *@
+        <select id="sort" name="sort" class="form-select">
+            <option value="CategoryThenName" selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.CategoryThenName)">Kategooria järgi</option>
+            <option value="NameAToZ"         selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.NameAToZ)">Nimi A–Ü</option>
+            <option value="PriceLowToHigh"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.PriceLowToHigh)">Hind: odavaim enne</option>
+            <option value="PriceHighToLow"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.PriceHighToLow)">Hind: kallim enne</option>
+            <option value="StockHighToLow"   selected="@(currentSort == ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.StockHighToLow)">Laoseis: enim laos</option>
+        </select>
+    </div>
+    <div class="catalogue-field catalogue-field-action">
+        <button type="submit" class="btn btn-primary w-100">Otsi</button>
+    </div>
+</form>
 
-<!-- TOOTEKAARDID -->
 @if (!Model.Any())
 {
-    @* An empty state must say what to do NEXT, not just report failure. The link clears
-       every filter, which is the action a stuck user actually wants. *@
+    @* An empty state must say what to do NEXT, not just report failure. The link
+       clears every filter, which is the action a stuck person actually wants. *@
     <div class="card p-5 text-center">
         <div class="empty-state-icon">📦</div>
-        <h5 class="text-strong-custom">Tooteid ei leitud</h5>
+        <h2 class="h5 text-strong-custom">Ühtegi toodet ei leidnud</h2>
         <p class="text-muted-custom small mb-3">
-            Ükski toode ei vasta valitud filtritele.
+            @if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                <text>Otsing „@searchTerm" ei andnud tulemusi. Proovi lühemat sõna — näiteks „ABB" või „kaabel".</text>
+            }
+            else
+            {
+                <text>Ükski toode ei vasta valitud filtritele.</text>
+            }
         </p>
         <div>
             <a asp-action="Index" class="btn btn-amber">Näita kõiki tooteid</a>
@@ -85,41 +94,45 @@
 }
 else
 {
-    <div class="row g-3">
+    @* The count belongs above the grid: people check how many matches there are
+       before deciding whether to scan the list or narrow the filter first. *@
+    <p class="catalogue-count">
+        <strong class="text-strong-custom">@Model.Count()</strong> toodet
+        @if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            <span>otsingule „@searchTerm"</span>
+        }
+    </p>
+
+    <div class="product-grid">
         @foreach (var product in Model)
         {
-            <div class="col-sm-6 col-lg-4 col-xl-3">
-                <div class="product-card">
-                    <!-- Toote pilt -->
-                    <div class="product-card-image mb-2">
-                        @if (!string.IsNullOrEmpty(product.ImagePath))
-                        {
-                            <img src="@product.ImagePath" alt="@product.Name" class="product-card-img" />
-                        }
-                        else
-                        {
-                            <div class="product-card-img-placeholder">📦</div>
-                        }
-                    </div>
+            @* Cable is sold and priced by the METRE, everything else by the piece.
+               Showing a bare "1.20 €" for cable reads as the price of a whole reel,
+               which is the same confusion that was fixed in the calculator's BOM. *@
+            var isCable = product.Category?.Name == "Juhtmed";
+            var unitLabel = isCable ? "m" : "tk";
 
-                    <!-- Toote nimi ja tootja -->
-                    <div class="mb-2">
-                        <div class="fw-semibold text-strong-custom small">@product.Name</div>
-                        <div class="text-muted-custom" style="font-size: 0.75rem;">@product.Brand</div>
-                    </div>
-
-                    <!-- Kategooria -->
-                    @if (product.Category != null)
+            <article class="product-card">
+                <a class="product-card-media" asp-action="Details" asp-route-id="@product.Id"
+                   aria-label="@product.Name — vaata detaile">
+                    @if (!string.IsNullOrEmpty(product.ImagePath))
                     {
-                        <div class="mb-2">
-                            <span class="badge bg-secondary" style="font-size: 0.65rem;">
-                                @product.Category.Name
-                            </span>
-                        </div>
+                        <img src="@product.ImagePath" alt="@product.Name" class="product-card-img" loading="lazy" />
                     }
+                    else
+                    {
+                        <div class="product-card-img-placeholder">📦</div>
+                    }
+                </a>
 
-                    <!-- Tehnilised märgised -->
-                    <div class="d-flex flex-wrap gap-1 mb-3">
+                <div class="product-card-body">
+                    <div class="product-card-brand">@product.Brand</div>
+                    <a class="product-card-name" asp-action="Details" asp-route-id="@product.Id">@product.Name</a>
+
+                    @* Technical badges are the fastest way to confirm a part is the right
+                       one, so they sit directly under the name rather than at the bottom. *@
+                    <div class="product-card-specs">
                         @if (product.RatedCurrent > 0)
                         {
                             <span class="product-badge badge-ampere">@product.RatedCurrent A</span>
@@ -128,66 +141,54 @@ else
                         {
                             <span class="product-badge badge-wire">@product.WireCrossSectionMm2 mm²</span>
                         }
+                        @if (product.Category != null)
+                        {
+                            <span class="product-badge badge-category">@product.Category.Name</span>
+                        }
                     </div>
 
-                    <!-- Laoseis -->
-                    <div class="mb-2">
+                    @* Stock wording warns instead of upselling - see VOICE_AND_PERSONALITY.md.
+                       Telling someone to check before a big order is what a colleague would
+                       say, and it is worth more than the sale it might cost. *@
+                    <div class="product-card-stock">
                         @if (product.StockQuantity > 10)
                         {
-                            <span class="badge-stock-ok">✅ Laos: @product.StockQuantity tk</span>
+                            <span class="badge-stock-ok">Laos @product.StockQuantity @unitLabel — jätkub</span>
                         }
                         else if (product.StockQuantity > 0)
                         {
-                            <span class="badge-stock-low">⚠️ Vähe: @product.StockQuantity tk</span>
+                            <span class="badge-stock-low">Ainult @product.StockQuantity @unitLabel — kontrolli enne suurt tellimust</span>
                         }
                         else
                         {
-                            <span class="badge-stock-none">❌ Otsas</span>
+                            <span class="badge-stock-none">Otsas</span>
                         }
                     </div>
 
-                    <!-- Hind ja tegevused -->
-                    <div class="mt-auto">
-                        @* Cable is sold and priced by the METRE, everything else by the piece.
-                           Showing a bare "1.20 €" for cable reads as the price of a whole reel,
-                           which is the same confusion that was fixed in the calculator's BOM. *@
-                        @{
-                            var isCable = product.Category?.Name == "Juhtmed";
-                            var unitLabel = isCable ? "m" : "tk";
-                        }
-                        <div class="price-tag-small mb-2">
+                    <div class="product-card-foot">
+                        <div class="price-tag-small">
                             @product.Price.ToString("F2") €<span class="price-unit">/@unitLabel</span>
                         </div>
-                        <div class="d-flex gap-2">
-                            <a asp-action="Details" asp-route-id="@product.Id"
-                               class="btn btn-sm btn-secondary flex-fill" style="font-size:0.75rem">
-                                Detailid
-                            </a>
-                            @if (product.StockQuantity > 0)
-                            {
-                                <form asp-controller="Cart" asp-action="Add" method="post" class="flex-fill">
-                                    <input type="hidden" name="productId" value="@product.Id" />
-                                    <input type="hidden" name="quantity" value="1" />
-                                    <input type="hidden" name="returnUrl" value="/Products" />
-                                    <button type="submit" class="btn btn-sm btn-amber w-100" style="font-size:0.75rem">
-                                        🛒 Lisa
-                                    </button>
-                                </form>
-                            }
-                        </div>
+                        @if (product.StockQuantity > 0)
+                        {
+                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <input type="hidden" name="returnUrl" value="/Products" />
+                                <button type="submit" class="btn btn-sm btn-amber">Lisa korvi</button>
+                            </form>
+                        }
                     </div>
                 </div>
-            </div>
+            </article>
         }
-    </div>
-
-    <div class="mt-3 text-muted-custom small">
-        Näidatakse @Model.Count() toodet
     </div>
 }
 
-<!-- ADMIN LINGID -->
-<hr class="section-divider mt-4" />
-<div class="d-flex gap-2">
-    <a asp-action="Categories" class="btn btn-secondary btn-sm">⚙️ Halda kategooriaid</a>
-</div>
+@if (isAdmin)
+{
+    <hr class="section-divider mt-4" />
+    <div class="d-flex gap-2">
+        <a asp-action="Categories" class="btn btn-secondary btn-sm">⚙️ Halda kategooriaid</a>
+    </div>
+}

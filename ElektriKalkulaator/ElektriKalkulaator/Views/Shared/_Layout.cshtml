@@ -62,22 +62,22 @@
                     <ul class="navbar-nav ms-auto gap-1">
                         <li class="nav-item">
                             <a class="nav-link px-3" asp-controller="Home" asp-action="Index">
-                                🏠 Avaleht
+                                Avaleht
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link px-3" asp-controller="Calculator" asp-action="Index">
-                                🔧 Kalkulaator
+                                Kalkulaator
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link px-3" asp-controller="Products" asp-action="Index">
-                                📦 Tooted
+                                Tooted
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link px-3 cart-link" asp-controller="Cart" asp-action="Index">
-                                🛒 Ostukorv
+                                Ostukorv
                             </a>
                         </li>
 
@@ -102,7 +102,7 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link px-3" asp-controller="Products" asp-action="Create">
-                                        ⚙️ Halda
+                                        Halda
                                     </a>
                                 </li>
                             }
@@ -123,7 +123,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link px-3" asp-controller="Account" asp-action="Login">
-                                    🔑 Logi sisse
+                                    Logi sisse
                                 </a>
                             </li>
                             <li class="nav-item d-flex align-items-center">
@@ -173,9 +173,13 @@
     <!-- Jalus -->
     <footer class="footer mt-auto py-4">
         <div class="container text-center">
-            <span class="text-muted small">
-                ⚡ ElektrikilbiKalkulaator &copy; 2025 — EVS-HD 60364 standardil põhinev kalkulaator
-            </span>
+            <p class="footer-line mb-1">
+                ⚡ <strong>ElektrikilbiKalkulaator</strong> — EVS-HD 60364 standardil põhinev kalkulaator
+            </p>
+            <p class="footer-note mb-0">
+                Tehtud Tallinnas. Arvutus on hinnang, mitte valmis projekt —
+                enne paigaldust laseb pädev elektrik selle üle vaadata.
+            </p>
         </div>
     </footer>
 

@@ -6,24 +6,27 @@
 }
 
 <div class="mb-4">
-    <h1 class="page-title">🛒 Ostukorv</h1>
+    <h1 class="page-title">Ostukorv</h1>
     <p class="page-subtitle">Sinu valitud tooted</p>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="card p-5 text-center">
-        <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">🛒</div>
-        <h5 class="text-strong-custom">Ostukorv on tühi</h5>
+    @* data-cart-state is a stable hook for SessionPrivacyTests. Without it the
+       test has to assert on the visible sentence, and any rewording of the copy
+       breaks a test that is really about signing out clearing the session. *@
+    <div class="card p-5 text-center" data-cart-state="empty">
+        <div class="empty-state-icon">🛒</div>
+        <h5 class="text-strong-custom">Ostukorv on veel tühi</h5>
         <p class="text-muted-custom small mb-4">
-            Lisa tooteid kataloogist või kasuta kalkulaatorit.
+            Alusta kalkulaatorist — see paneb nimekirja sinu eest kokku.
         </p>
-        <div class="d-flex gap-3 justify-content-center">
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
             <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber">
-                🔧 Kalkulaator
+                Ava kalkulaator →
             </a>
             <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">
-                📦 Tooted
+                Sirvi tooteid
             </a>
         </div>
     </div>
@@ -82,7 +85,7 @@ else
         <!-- Kassa sektsioon -->
         <div class="col-lg-4">
             <div class="card p-4">
-                <h5 class="text-strong-custom fw-bold mb-3">💳 Tellimuse kokkuvõte</h5>
+                <h5 class="text-strong-custom fw-bold mb-3">Kokkuvõte</h5>
 
                 <div class="d-flex justify-content-between mb-2">
                     <span class="text-muted-custom">Tooteid kokku:</span>

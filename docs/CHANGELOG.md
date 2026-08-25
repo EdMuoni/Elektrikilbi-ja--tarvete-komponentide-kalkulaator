@@ -44,6 +44,103 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-14 — Full redesign against real industry references, and a false figure on the landing page
+
+**Type:** feature + bugfix + test
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+
+*The two-genre principle (the main design decision)*
+- Edgar supplied six reference sites. They split cleanly into **two opposite genres**, and that
+  distinction drove everything else:
+  - **Marketing** (Nesta Sites): dark, one huge headline, one accent, large empty areas.
+  - **Catalogue** (SupplyHouse, Electrical2Go, AutomationDirect, Proelectro): light, dense,
+    photo-led grids, everything scannable, almost no empty space.
+- This project is **both**. The home page sells the calculator; the catalogue serves someone who
+  already knows what a B16 is. Applying one genre to the other is what makes a site feel wrong —
+  a dense grid on a landing page looks cluttered, an airy hero on a parts list wastes the screen.
+- So the home page follows the marketing genre, `/Products` follows the trade genre, and they
+  share the palette, the type scale and the buttons. Written up at the top of the redesign
+  section in `site.css`.
+
+*Palette*
+- `theme.css` is now **generated from one source** (both palettes come from one table), so the
+  two can no longer drift apart. Surfaces moved from blue-black to a **green-tinted charcoal**:
+  blue-black is the default of every developer tool and reads as generic, while a warm dark
+  green-charcoal is closer to workshop equipment. Accent moved to a coral-orange `#F2764B`.
+- Card-vs-page elevation **1.20 → 1.43**. Surface hues now sit in a 156–169° band.
+- **New: `--bg-band`,** the one token that *inverts* between themes — cream on dark, near-black
+  on light. This is the single biggest reason the references look designed rather than assembled:
+  a long page of one background reads as flat however good the components on it are. Contrast
+  against the page is **15.9**.
+
+*Components*
+- New in `site.css`: hero with display type, floating proof card, stat strip, accent-bordered
+  feature cards, the contrast band with numbered steps, catalogue toolbar, product grid, pill
+  buttons. All from tokens; no literal colours.
+- Home page rebuilt. `/Products` rebuilt as a trade catalogue. Calculator, cart, nav and footer
+  restyled, and copy moved onto `docs/VOICE_AND_PERSONALITY.md` wording.
+
+**Bugs found and fixed while doing it**
+
+1. **The landing page advertised a figure the calculator does not produce.** It claimed a worked
+   example of *"160 m paigalduskaablit"* costing *"504,10 €"*. Running the calculator with the
+   inputs that example describes returns **120 m and 348,90 €**. The numbers were hand-typed into
+   the view and had drifted from the code.
+
+   On most sites that is a typo. Here it is the worst bug on the page: the whole claim of the
+   project is that its quantities come from EVS-HD 60364 and can be audited line by line.
+2. **`.page-title { color: white }` in `site.css`** — the *same* invisible-in-light-mode bug as
+   the `text-white` one fixed earlier, one file further down, where the view tests could not see
+   it. Every page heading on the site was white-on-white in light mode.
+3. **Admin controls rendered for everyone** on `/Products` — "Lisa toode" and "Halda
+   kategooriaid" were shown to anonymous visitors, who got bounced to a login page.
+4. **The print stylesheet hid a class that no longer existed** (`.hero-section`), so the hero
+   would have printed.
+5. Two `box-shadow`s and the BOM total row still carried the **old amber** as a literal `rgba`,
+   so the button glow was a different orange from the button.
+6. Dead CSS: the entire old hero block was unreferenced after the rebuild.
+
+**New tests (199 → 203)**
+- `LandingPageFiguresTests` (3) — runs the **real calculator** and asserts the landing page shows
+  the total, the cable length and the line count it actually returns. This is the fix for bug 1:
+  the figures drifted because nothing checked them.
+- `ThemeTokenTests.SiteCss_DoesNotHardCodeColours_OutsideTheDeclaredExceptions` — closes the gap
+  bug 2 hid in. Two exceptions stay allowed: the print stylesheet (paper is always white) and a
+  photo scrim (must stay dark in both themes), and the second must be justified in a comment so
+  a future literal cannot quietly claim the same excuse.
+
+**How it was verified**
+- Contrast recomputed for **30 pairings** across both themes: **0 WCAG AA failures.** Parity
+  checked: both dark blocks identical, both light blocks identical, both themes define the same
+  36 token names.
+- App run and exercised over HTTP. All seven pages return 200. A **real calculation was posted**
+  with an antiforgery token and returned 8 BOM lines totalling 348.90 € — which is how bug 1 was
+  found, and what the corrected figures were taken from.
+- `scripts/security-check.sh`: **all 18 checks pass.**
+- All six new tests **mutation-tested**. Build clean with `-warnaserror`; **203/203 pass.**
+
+**Two mistakes worth recording, because both produced a green result that meant nothing**
+- A mutation run reported *nothing at all* because Visual Studio held a lock on the build output,
+  so every build failed and no test executed. Silence read as success.
+- More seriously: `TheWorkedExampleCableLength` **passed when mutated**. The test searched the
+  raw `.cshtml`, and the explanatory comment above the worked example contains the phrase
+  "120 m", so it matched inside the comment while the number a visitor actually sees was wrong.
+  Fixed by stripping Razor comments before searching. The same trap had already appeared in the
+  CSS test earlier the same day — **a test that reads a file must ignore its comments.**
+
+**Follow-ups or known limitations**
+- **Still not visually confirmed.** Every check is numerical or structural. Whether it now looks
+  good is Edgar's call.
+- Light-mode card/page separation is 1.10, relying on the shadow rather than contrast. Standard
+  for a light theme, but it is the first thing to revisit if light mode looks flat.
+- `Views/Products/Details.cshtml`, `Categories.cshtml` and the Create/Edit/Delete admin forms
+  were **not** restyled — they inherit the palette and buttons but keep their old layout.
+- The seeded prices are still ~9.20 € against ~5.78 € real market (`docs/RESEARCH_LOG.md`), and
+  `Pricing:PricesIncludeVat` remains unverified. The worked example is now *internally* correct;
+  whether the underlying prices are right is a separate open question.
+
 ## 2026-08-14 — Rebuilt the colour palette; fixed headings that vanished in light mode
 
 **Type:** bugfix + docs

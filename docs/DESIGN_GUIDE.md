@@ -8,7 +8,68 @@ will break the first time it is inconvenient.
 
 ---
 
+# Part 0 — The two genres (read this before anything else)
+
+Added 2026-08-14, after studying six real sites in this industry that Edgar supplied:
+**Nesta Sites**, **SupplyHouse**, **Electrical2Go**, **AutomationDirect** and **Proelectro**.
+
+They do not share a design language. They split into **two opposite genres**:
+
+| | **Marketing page** | **Catalogue page** |
+|---|---|---|
+| Example | Nesta Sites | SupplyHouse, Electrical2Go, AutomationDirect, Proelectro |
+| Background | Dark | Light |
+| Density | Very low — 3–4 things per screen | Very high — everything visible at once |
+| Headline | Enormous, 60 px+ | Small; there barely is one |
+| Empty space | A lot, deliberately | Almost none |
+| Images | One big photo, staged | Many small photos, of parts |
+| Job | Convince you this is worth trying | Help you find a specific item fast |
+
+**This project is both.** The home page has to persuade someone that a calculator they have never
+heard of is worth a minute. `/Products` has to help someone who already knows what a B16 is find
+one. Those are different jobs and they need different pages.
+
+### The rule
+
+> Landing and explanation pages follow the **marketing** genre.
+> Catalogue, results and admin pages follow the **catalogue** genre.
+> They share the palette, the type scale and the buttons — nothing else.
+
+### Why this matters more than any colour choice
+
+Getting it backwards is the single most common way a site looks wrong while every individual
+component is fine:
+
+- A dense grid on a landing page reads as **cluttered** — the visitor has no idea where to look
+  first, so they leave before understanding what the thing does.
+- A huge airy hero on a parts list reads as **wasteful and slow** — a tradesperson scrolling past
+  a 600 px photograph to reach a table of breakers concludes the site was not built for them.
+
+Both failures are invisible if you only ever look at one page at a time, which is why this is
+Part 0 rather than a footnote.
+
+### The one trick worth copying above all others
+
+Nesta breaks its long dark page with a single **cream section** — "How It Works" — and that one
+inversion is what makes the page feel designed rather than assembled.
+
+A long page of one background reads as flat no matter how good the components on it are. One band
+of the opposite value gives the page a rhythm and makes the section inside it feel like a distinct
+place.
+
+Implemented here as `--bg-band`, the only token that **inverts between themes**: cream on the dark
+theme, near-black on the light one, so the rhythm survives the theme switch instead of vanishing
+in one of them. Anything drawn inside it must use `--band-ink` / `--band-muted` / `--band-card`;
+`--text-primary` in there is invisible in one theme.
+
+---
+
 # Part 1 — The governing principle
+
+> **Scope note (2026-08-14):** everything in this part describes the **catalogue** genre from
+> Part 0, which is where users spend their time and where speed is the whole product. It is still
+> the governing principle for this project. The landing page is the deliberate exception, and it
+> is exempt only from the density rules — never from the honesty ones.
 
 ## Your users are not shopping. They are looking something up.
 
@@ -47,24 +108,25 @@ Design consistency is not an aesthetic preference; it is how a user learns your 
 instead of relearning it on every page. The way to get it is to **stop inventing values** and pick
 from a fixed set.
 
-The project already has colour tokens. It has **no spacing scale and no type scale**, which is why
-there are currently 19 inline `style="…"` attributes in the views and 13 different font sizes in the
-CSS — each one a small decision made in isolation.
+**Status (2026-08-14): done.** The spacing and type scales below now exist in the `:root` block of
+`site.css`, and the inline `style="…"` attributes they were meant to replace are gone from the
+calculator, cart and catalogue views. `ThemeTokenTests` fails the build if a colour literal comes
+back into a view or into `site.css`.
 
-## 2.1 Add these tokens
-
-Put this in `wwwroot/css/site.css`, extending the existing `:root` block.
+## 2.1 The tokens
 
 > **Where colours actually live:** every colour now sits in `wwwroot/css/theme.css`, not here and
 > not in `site.css`. That file holds the full dark and light palettes. The values below are shown
 > for reference only — **edit `theme.css`, never copy these into another file.**
 
 ```css
-/* Colours: see wwwroot/css/theme.css. Dark palette, for reference:
-       --bg-primary #0A0C10   --bg-card #242833   --bg-input #2C313D
-       --bg-nav     #06080B   --border-color #3A4150
-       --accent-amber #F2AD36 --accent-blue #5FA1F2 --accent-green #39D09E
-       --text-strong #F5F6FA  --text-primary #D0D4DD --text-muted #9299AA   */
+/* Colours: see wwwroot/css/theme.css, which is the ONLY place they live.
+   Dark palette, for reference only - do not copy these anywhere:
+       --bg-primary #101614   --bg-card #273532   --bg-card-raised #2F3E3A
+       --bg-input   #2B3A36   --bg-nav   #0B100E  --border-color   #3A4A46
+       --bg-band    #F0EFEA   <- inverts between themes, see Part 0
+       --accent-amber #F2764B --accent-blue #5FA8E8 --accent-green #3FCF9A
+       --text-strong  #F4F7F6 --text-primary #C9D3D0 --text-muted #96A4A0   */
 
 :root {
     /* ── SPACING SCALE ──────────────────────────────────────────────
@@ -87,10 +149,17 @@ Put this in `wwwroot/css/site.css`, extending the existing `:root` block.
     --text-base: 1rem;      /* 16px — body. NEVER smaller for reading text */
     --text-lg:   1.125rem;  /* 18px — card titles */
     --text-xl:   1.5rem;    /* 24px — page titles */
-    --text-2xl:  2rem;      /* 32px — hero */
+    --text-2xl:  2rem;      /* 32px — page titles */
+
+    /* Display sizes, landing page only. clamp() shrinks them on a phone with
+       no media query, which is why the hero needs only one breakpoint. */
+    --text-display: clamp(2.25rem, 5.5vw, 3.75rem);
+    --text-lede:    clamp(1.2rem, 2.4vw, 1.65rem);
 
     /* ── OTHER ──────────────────────────────────────────────────── */
-    --radius:     8px;      /* one corner radius everywhere */
+    --radius:      8px;     /* one corner radius everywhere */
+    --radius-band: 28px;    /* the contrast band only */
+    --radius-pill: 999px;   /* primary buttons and step numbers */
     --radius-lg:  12px;     /* cards and panels only */
     --border:     1px solid var(--border-color);
     --transition: 0.15s ease;   /* fast enough to feel instant */

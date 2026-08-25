@@ -1,6 +1,6 @@
 # ElektriKalkulaator — Project Roadmap & Context Document
 
-**Revision 6** · last updated **2026-08-14** · maintained by Edgar Muoni with Claude
+**Revision 7** · last updated **2026-08-14** · maintained by Edgar Muoni with Claude
 
 ---
 
@@ -227,7 +227,7 @@ product & category CRUD · catalogue with search, category filter and **sorting*
 product images (seeded photos + admin upload) · session cart ·
 **authentication with Admin and Customer roles** · **print-ready BOM** ·
 automatic migration and account seeding on startup · custom dark theme with a design-token system ·
-**199 automated tests** · **CI running them on every push**
+**203 automated tests** · **CI running them on every push**
 
 ⚠️ **Cosmetic only:** `CartController.Checkout()` clears the session and shows a confirmation
 page. **It saves nothing to the database.** There is no order, and stock is never reserved or
@@ -328,7 +328,7 @@ unaware. Being able to explain why a layer is absent is a stronger position than
 | 4 | **Auth & Permissions** | 🟢 Good | **Closed 2026-08-11.** ASP.NET Core Identity with `Admin` and `Customer` roles; product/category management requires an admin, catalogue and calculator stay public. Passwords hashed, lockout after 5 failed attempts, admin seeded from User Secrets. Remaining: `PowerboxCalculation.UserId` is still not populated on save. |
 | 5 | **Hosting & Deployment** | 🔴 None | Runs on `localhost` only. Connection string hard-codes one machine name. Never deployed anywhere. |
 | 6 | **Cloud & Compute** | 🔴 None | No cloud resources. Not needed yet. |
-| 7 | **CI/CD & Version Control** | 🟢 Good | **Closed 2026-08-11.** GitHub Actions builds and runs all 199 tests on every push and PR, with `-warnaserror`. Work flows through branches and pull requests. No deployment step, since there is nowhere to deploy yet. |
+| 7 | **CI/CD & Version Control** | 🟢 Good | **Closed 2026-08-11.** GitHub Actions builds and runs all 203 tests on every push and PR, with `-warnaserror`. Work flows through branches and pull requests. No deployment step, since there is nowhere to deploy yet. |
 | 8 | **Security** | 🟢 Good | **Closed 2026-08-11.** Antiforgery on every POST, parameterised queries, HTTPS redirection, upload allow-list + size cap + magic-byte content check + GUID filenames, open-redirect guard, input validation, secrets in User Secrets. Remaining: no rate limiting (row 9), and uploads are not re-encoded. |
 | 9 | **Rate Limiting** | 🔴 None | .NET 9 has `AddRateLimiter` built in — a few lines whenever it's actually needed. |
 | 10 | **Caching & CDN** | 🔴 None | Note: `AddDistributedMemoryCache()` in `Program.cs` looks like caching but only backs session state. |
@@ -346,7 +346,7 @@ real money are involved.
 
 **Done** *(all on branch `feat/conversion-ux`, PRs #1–#4, awaiting merge)*
 
-- [x] Automated test project — now **199 tests**, mutation-verified *(08-10 → 08-11)*
+- [x] Automated test project — now **203 tests**, mutation-verified *(08-10 → 08-11)*
 - [x] Fix nullable-annotation lie and inconsistent not-found handling *(08-10)*
 - [x] Product images: upload, storage, display, security hardening *(08-10)*
 - [x] Add `EvsReference` column to `CalculationRule` *(08-10)*
@@ -370,6 +370,12 @@ real money are involved.
       views replaced with a token class. Light mode was partly unusable before this *(08-14)*
 - [x] **Corrected the documented port**, 5250 → 8080, in four places including the security
       script's default *(08-14)*
+- [x] **Full redesign against six real industry references.** Established the two-genre rule
+      (marketing vs catalogue) now in `DESIGN_GUIDE.md` Part 0; green-charcoal palette with a
+      theme-inverting contrast band; home page and catalogue rebuilt *(08-14)*
+- [x] **Fixed a false figure on the landing page** — it advertised 160 m / 504,10 € where the
+      calculator returns 120 m / 348,90 €. Now covered by `LandingPageFiguresTests` *(08-14)*
+- [x] **Fixed admin controls showing to anonymous visitors** on `/Products` *(08-14)*
 
 **Still to do — needs Edgar, not code**
 
@@ -482,6 +488,10 @@ These need Edgar's answer. Don't guess at them.
   orientation and beginner glossary; added §D1 full-stack maturity map (thirteen layers, honestly
   scored); recorded TTHK portal administrative dates in §A1; **introduced `CHANGELOG.md`** and the
   §E1 update protocol; ticked the four Phase 1 items completed on 2026-08-10.
+- **rev. 7** (2026-08-14) — Full redesign from Edgar's six reference sites. Recorded the
+  marketing-vs-catalogue genre split as `DESIGN_GUIDE.md` Part 0. Found and fixed a landing-page
+  figure that did not match the calculator, `color: white` in `site.css`, and admin controls
+  visible to anonymous visitors. 203 tests.
 - **rev. 6** (2026-08-14) — Colour palette rebuilt after Edgar reported the site looked poor;
   fixed 38 uses of Bootstrap `text-white` that made headings invisible in light mode; added
   `ThemeTokenTests` (199 tests); corrected the documented port 5250 → 8080 in four places.

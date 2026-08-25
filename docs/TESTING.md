@@ -4,7 +4,7 @@ How this project is tested, why it is tested that way, and exactly what to do wh
 Written for two readers: a **beginner programmer** who has not written tests before, and an **AI
 model** picking this project up with no memory of previous sessions.
 
-**Current state: 199 automated tests, all passing, run by CI on every push.**
+**Current state: 203 automated tests, all passing, run by CI on every push.**
 
 ```bash
 cd ElektriKalkulaator
@@ -82,8 +82,20 @@ dotnet test --filter "FullyQualifiedName~YourTestName"
 # 5. Run again, confirm it passes
 ```
 
-This is called **mutation testing**. Every important test in this project has been through it. Some
-that were verified this way:
+This is called **mutation testing**. Every important test in this project has been through it.
+
+> **Two ways a mutation run lies to you — both happened on 2026-08-14:**
+>
+> 1. **The build did not run.** Visual Studio held a lock on the output, every build failed, and
+>    no test executed. The run printed no failures, which read as success. *Always confirm a clean
+>    baseline build before trusting a mutation result.*
+> 2. **The test found the right value in a comment.** `TheWorkedExampleCableLength` searched the
+>    raw `.cshtml`; the explanatory comment above the example contains the phrase "120 m", so the
+>    test passed even after the number a visitor actually sees was changed to something wrong.
+>    *A test that reads a file must strip that file's comments first.* The same trap had appeared
+>    hours earlier in the CSS test.
+
+Some mutations verified this way:
 
 | Mutation applied | Tests that went red |
 |---|---|
@@ -93,6 +105,9 @@ that were verified this way:
 | removed `[Authorize]` from `ProductsController` | 10 |
 | removed the `Url.IsLocalUrl` guard | 4 |
 | removed one `[ValidateAntiForgeryToken]` | 1 |
+| put `text-white` back into a view | 1 |
+| wrote `color: white` into `site.css` | 1 |
+| changed the landing page total to a wrong number | 1 |
 
 ---
 
@@ -245,7 +260,8 @@ Ordered by how much damage an untested failure would do.
 | `CatalogueSearchTests.cs` | Category + text search combined with AND | DB |
 | `CategoryServicesTests.cs` | Categories, `CategoryDeleteResult` | DB |
 | `SeedDataIntegrityTests.cs` | Seed data consistency, image files existing | DB + files |
-| `ThemeTokenTests.cs` | Views use colour tokens, not literals; both palettes match | files |
+| `ThemeTokenTests.cs` | Views AND site.css use colour tokens, not literals; palettes match | files |
+| `LandingPageFiguresTests.cs` | The home page shows the figures the calculator really returns | DB + files |
 | `ImageUploadValidationTests.cs` | Extension, size and magic-byte checks | — |
 | `FormValidationTests.cs` | `[Required]`, `[Range]`, `[Compare]` on DTOs | — |
 | `Integration/TestWebAppFactory.cs` | Boots the real app for HTTP tests | — |

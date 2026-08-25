@@ -34,9 +34,16 @@
     --text-xl:   1.5rem;
     --text-2xl:  2rem;
 
+    /* Display sizes for the landing page. clamp(min, preferred, max) shrinks
+       them on a phone without needing a media query. */
+    --text-display: clamp(2.25rem, 5.5vw, 3.75rem);
+    --text-lede:    clamp(1.2rem, 2.4vw, 1.65rem);
+
     /* ── SHAPE AND MOTION ─────────────────────────────────────────────────── */
     --radius:     8px;
     --radius-lg:  12px;
+    --radius-band: 28px;   /* the contrast band, which needs a softer corner */
+    --radius-pill: 999px;  /* primary buttons and step numbers */
     --border:     1px solid var(--border-color);
     --transition: 0.15s ease;
 }
@@ -142,7 +149,7 @@ main {
     background-color: var(--accent-amber-hover);
     color: var(--on-accent);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(245, 166, 35, 0.3);
+    box-shadow: 0 4px 16px var(--tint-amber);
 }
 
 .btn-outline-amber {
@@ -197,7 +204,7 @@ main {
     background-color: var(--bg-input);
     border-color: var(--accent-amber);
     color: var(--text-primary);
-    box-shadow: 0 0 0 0.2rem rgba(245, 166, 35, 0.15);
+    box-shadow: 0 0 0 0.2rem var(--tint-amber);
 }
 
 /* Dropdown optionite taust (operatsioonisüsteemist sõltuv) */
@@ -252,92 +259,10 @@ main {
     --bs-table-bg: var(--bg-card);
 }
 
-/* ── AVALEHT KANGELASESEKTSIOON ───────────────────────────────────── */
-.hero-section {
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-card) 50%, var(--bg-primary) 100%);
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    border-radius: 16px;
-    padding: 60px 40px;
-    border: 1px solid var(--border-color);
-    margin-bottom: 2rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-section::before {
-    /* Dekoratiivne gradient taust */
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 60%;
-    height: 200%;
-    background: radial-gradient(ellipse, var(--tint-amber) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-.hero-title {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 700;
-    color: white;
-    line-height: 1.2;
-}
-
-.hero-accent {
-    color: var(--accent-amber-ink);
-}
-
-.hero-subtitle {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    margin-top: 1rem;
-    max-width: 600px;
-}
-
-/* ── TOOTEKAARDID ─────────────────────────────────────────────────── */
-.product-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.25rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.2s ease;
-}
-
-.product-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent-amber-ink);
-    box-shadow: var(--shadow-card);
-}
-
-.product-card-image {
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: var(--bg-input);
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.product-card-img {
-    width: 100%;
-    height: 100%;
-    /* "contain", not "cover": the seeded product images are SVG illustrations whose rating
-       label sits at the bottom of the drawing. "cover" crops it off. Uploaded photos simply
-       letterbox against the matching dark background instead, which is acceptable. */
-    object-fit: contain;
-}
-
-.product-card-img-placeholder {
-    font-size: 2.5rem;
-    opacity: 0.3;
-}
-
+/* ── TOOTEKAARDID ─────────────────────────────────────────────────────────────
+   The card layout itself now lives in the CATALOGUE section of the redesign
+   layer at the bottom of this file. Only the technical badges remain here,
+   because nothing further down redefines them. */
 .product-badge {
     display: inline-block;
     padding: 2px 8px;
@@ -350,7 +275,7 @@ main {
 
 .badge-ampere {
     background-color: var(--tint-amber);
-    color: var(--accent-amber);
+    color: var(--accent-amber-ink);
     border: 1px solid var(--accent-amber-ink);
 }
 
@@ -412,25 +337,9 @@ main {
 
 /* ── AVALEHE KANGELASPILT ─────────────────────────────────────────────────
    A real photograph instead of a decorative emoji. The dark overlay keeps
-   the white heading readable whatever the photo's own brightness. */
-.hero-photo {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    min-height: 260px;
-    background-size: cover;
-    background-position: center;
-}
-
-.hero-photo::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(15,15,26,0.55) 0%, rgba(15,15,26,0.15) 100%);
-}
 
 .bom-total-row {
-    background-color: rgba(245, 166, 35, 0.08);
+    background-color: var(--tint-amber);
     font-weight: 700;
     font-size: 1.05rem;
     border-top: 2px solid var(--accent-amber);
@@ -487,12 +396,6 @@ main {
 }
 
 /* ── JALUS ────────────────────────────────────────────────────────── */
-.footer {
-    background-color: var(--bg-nav);
-    border-top: 1px solid var(--border-color);
-    padding: 1.5rem 0;
-}
-
 /* ── TEADETERIBAD ─────────────────────────────────────────────────── */
 .alert-success {
     background-color: var(--tint-green);
@@ -513,18 +416,6 @@ main {
 }
 
 /* ── LEHEPEALKIRI ─────────────────────────────────────────────────── */
-.page-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.25rem;
-}
-
-.page-subtitle {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-}
-
 /* Eraldaja pealkiri + sisu vahel */
 .section-divider {
     border: none;
@@ -553,7 +444,6 @@ main {
 
 .bg-card { background-color: var(--bg-card) !important; }
 .border-custom { border-color: var(--border-color) !important; }
-
 
 /* ── SPECIFICATION TABLE (product details) ───────────────────────────────────
    Two columns, label left and value right. Reads far faster top-to-bottom than
@@ -601,12 +491,6 @@ main {
 }
 
 /* Large muted glyph used in empty states. */
-.empty-state-icon {
-    font-size: var(--text-2xl);
-    opacity: 0.3;
-    margin-bottom: var(--space-3);
-}
-
 /* Screen-reader-only text: present for assistive technology, invisible on screen.
    Used for the specification table's caption. */
 .visually-hidden {
@@ -643,7 +527,7 @@ main {
     /* Hide everything that cannot be used on paper. */
     header, nav, .navbar, footer, .footer,
     form, .btn, button,
-    .hero-section, .trust-strip,
+    .hero, .stat-strip, .trust-strip,
     .alert-dismissible .btn-close {
         display: none !important;
     }
@@ -829,7 +713,6 @@ main {
     margin-bottom: var(--space-3);
 }
 
-
 /* ── THEME TOGGLE ────────────────────────────────────────────────────────────
    Deliberately understated: it is a preference, not an action anyone came here
    to perform, so it must not compete with the primary button. */
@@ -874,5 +757,549 @@ main {
     align-items: center;
     justify-content: center;
     font-size: 1.25rem;
+    line-height: 1;
+}
+
+/* =============================================================================
+   REDESIGN LAYER (2026-08-14)
+   =============================================================================
+   Components added after studying how trade and marketing sites in this
+   industry are actually built. Two clearly different genres showed up, and the
+   difference matters more than any single colour choice:
+
+     MARKETING pages (Nesta Sites) sell one idea. Dark, enormous headline,
+     one accent, a lot of empty space, three or four things on the screen.
+
+     CATALOGUE pages (SupplyHouse, Electrical2Go, AutomationDirect, Proelectro)
+     help someone find a part. Light, dense, photo-led category grids,
+     everything scannable, very little empty space.
+
+   This project is both: the home page sells the calculator, the catalogue
+   serves someone who already knows what a B16 is. Copying one genre onto the
+   other is what makes a site feel wrong - a dense grid on a landing page looks
+   cluttered, and a huge airy hero on a parts list wastes the screen.
+
+   So: home page follows the marketing genre, catalogue follows the trade
+   genre, and they share the palette, the type scale and the buttons.
+
+   Everything here uses tokens from theme.css. No literal colours.
+   ============================================================================= */
+
+/* Vertical rhythm between the big blocks of a page. */
+.section { margin-bottom: var(--space-6); }
+
+/* -- HERO ---------------------------------------------------------------------
+   Two columns on a desktop, stacked on a phone. The headline is deliberately
+   much larger than anything else on the page: on a landing page the single
+   most common mistake is making the headline only slightly bigger than the
+   body, which leaves nothing for the eye to land on first. */
+.hero {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--space-6);
+    align-items: center;
+    padding: var(--space-5) 0 var(--space-6);
+}
+
+.hero-display {
+    font-size: var(--text-display);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    color: var(--text-strong);
+    margin: 0 0 var(--space-3);
+}
+
+/* The accent-coloured second line. It carries the promise, so it is large and
+   coloured, but it is NOT the same size as the headline - two competing
+   headlines read as no headline. */
+.hero-lede {
+    font-size: var(--text-lede);
+    line-height: 1.25;
+    font-weight: 600;
+    color: var(--accent-amber-ink);
+    margin: 0 0 var(--space-4);
+}
+
+/* A short rule under the lede. Purely a pause - it separates the promise from
+   the explanation without needing a blank gap big enough to break the group. */
+.hero-rule {
+    width: 72px;
+    height: 3px;
+    background: var(--accent-amber);
+    border: 0;
+    border-radius: var(--radius-pill);
+    opacity: 1;
+    margin: 0 0 var(--space-4);
+}
+
+.hero-body {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    color: var(--text-primary);
+    max-width: 52ch;   /* long lines are hard to track back from; 50-60 is the readable range */
+    margin: 0 0 var(--space-4);
+}
+
+/* The reassurance directly under the button, where hesitation actually
+   happens. Green because it is a trust signal, not an action. */
+.hero-trust {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--accent-green);
+}
+
+.hero-media { position: relative; }
+
+.hero-figure {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    background-size: cover;
+    background-position: center;
+    box-shadow: var(--shadow-float);
+}
+
+/* A small card overlapping the photo, showing real output. Every reference
+   site does some version of this, and the reason it works is that it shows
+   the product instead of describing it. */
+.proof-card {
+    position: absolute;
+    left: calc(-1 * var(--space-4));
+    bottom: calc(-1 * var(--space-4));
+    width: min(19rem, 78%);
+    background: var(--bg-card-raised);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-float);
+    padding: var(--space-3) var(--space-4);
+}
+
+.proof-card-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.proof-line {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-1) 0;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+.proof-line:last-of-type { border-bottom: 0; }
+.proof-line span:first-child { font-variant-numeric: tabular-nums; color: var(--text-strong); font-weight: 600; }
+
+/* -- STAT STRIP ---------------------------------------------------------------
+   Borrowed from the marketplace sites, which all put a row of hard numbers
+   directly under the hero. The 1px gap trick draws the dividers: the grid
+   background shows through between the cells, so there are no border
+   double-ups at the joins. */
+.stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1px;
+    background: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.stat { background: var(--bg-card); padding: var(--space-4) var(--space-3); text-align: center; }
+
+.stat-value {
+    display: block;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--text-strong);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+}
+
+/* -- FEATURE CARDS ------------------------------------------------------------
+   Thin accent border rather than a filled panel. A filled accent block at this
+   size shouts; a 1px accent edge marks the card as ours while leaving the text
+   to do the work. auto-fit means the row reflows on a phone with no media
+   query - the columns simply become fewer. */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-4);
+}
+
+.feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--accent-amber);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-card-icon { font-size: 1.75rem; line-height: 1; margin-bottom: var(--space-3); }
+
+.feature-card h3 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--accent-amber-ink);
+    margin: 0 0 var(--space-2);
+}
+
+.feature-card p {
+    font-size: var(--text-base);
+    line-height: 1.55;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* -- THE CONTRAST BAND --------------------------------------------------------
+   One section painted the opposite value to the rest of the page. See the long
+   note in theme.css for why this matters so much.
+
+   It is a large rounded card rather than a full-bleed strip on purpose: a true
+   edge-to-edge band needs 100vw tricks that cause a horizontal scrollbar on
+   Windows, where the scrollbar takes real width. A rounded card inside the
+   container gets the same effect with none of that risk.
+
+   Everything inside MUST use the --band-* tokens. --text-primary in here is
+   invisible in one of the two themes. */
+.band {
+    background: var(--bg-band);
+    border-radius: var(--radius-band);
+    padding: clamp(2rem, 5vw, 3.75rem) clamp(1.25rem, 4vw, 3.25rem);
+}
+
+.band-title {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--band-ink);
+    text-align: center;
+    margin: 0 0 var(--space-2);
+}
+
+.band-sub {
+    text-align: center;
+    color: var(--band-muted);
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-5);
+}
+
+.step-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-5);
+}
+
+.step { text-align: center; }
+
+/* A numbered circle rather than an icon: the number says "this is step 2 of 3",
+   which an icon cannot. */
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent-amber);
+    color: var(--on-accent);
+    font-weight: 800;
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+}
+
+.step h3 { font-size: var(--text-lg); font-weight: 700; color: var(--band-ink); margin: 0 0 var(--space-2); }
+.step p  { font-size: var(--text-base); line-height: 1.55; color: var(--band-muted); margin: 0; }
+
+/* -- CATALOGUE CATEGORY GRID --------------------------------------------------
+   The trade-site pattern: a photo, a name, a count. Nothing else. The photo is
+   what people actually scan by - a list of category names in text takes far
+   longer to search than a grid of recognisable parts. */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: var(--space-4);
+}
+
+.category-card {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.category-card:hover,
+.category-card:focus-visible {
+    border-color: var(--accent-amber);
+    transform: translateY(-2px);
+}
+
+.category-card-figure {
+    aspect-ratio: 4 / 3;
+    background: var(--bg-subtle);
+    background-size: cover;
+    background-position: center;
+}
+
+.category-card-body { padding: var(--space-3); }
+.category-card-name { font-weight: 700; color: var(--text-strong); font-size: var(--text-base); }
+.category-card-count { display: block; margin-top: 2px; font-size: var(--text-sm); color: var(--text-muted); }
+
+/* -- BUTTONS: pill shape ------------------------------------------------------
+   Every reference site uses a fully rounded primary button. It reads as a
+   deliberate control rather than a default rectangle, and the extra horizontal
+   padding makes the label the widest thing on the row, which is what draws the
+   eye to it. */
+.btn-amber,
+.btn-outline-amber {
+    border-radius: var(--radius-pill);
+    padding: 0.8rem 1.85rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.btn-amber.btn-lg,
+.btn-outline-amber.btn-lg { padding: 1rem 2.35rem; font-size: var(--text-lg); }
+
+/* -- RESPONSIVE ---------------------------------------------------------------
+   One breakpoint. The grids above already reflow on their own via auto-fit, so
+   the only thing that genuinely needs a query is the hero, which must stop
+   being two columns before the headline gets squeezed. */
+@media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: var(--space-5); padding-top: var(--space-4); }
+
+    /* The photo comes second on a phone: the headline and the button should be
+       reachable without scrolling past a decorative image. */
+    .hero-media { order: 2; }
+
+    /* Overlapping the photo needs room that a narrow screen does not have. */
+    .proof-card { position: static; width: 100%; margin-top: var(--space-3); }
+}
+
+/* -- CATALOGUE (trade genre) --------------------------------------------------
+   Dense, photo-led and scannable. The opposite of the landing page on purpose -
+   see the note at the top of the redesign layer. */
+
+.catalogue-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+}
+
+/* One row on a desktop, wrapping to two on a tablet, stacked on a phone. The
+   search field grows because it is the control people reach for first; the
+   selects stay at their natural width so the row does not look ragged. */
+.catalogue-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: flex-end;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.catalogue-field { flex: 0 0 12rem; }
+.catalogue-field-grow { flex: 1 1 18rem; }
+.catalogue-field-action { flex: 0 0 8rem; }
+.catalogue-field .form-label { margin-bottom: var(--space-1); }
+
+.catalogue-count {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+}
+
+/* auto-fill rather than auto-fit: with auto-fit a single remaining result
+   stretches to the full page width, which looks broken. auto-fill keeps the
+   empty columns, so one result stays card-sized. */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--space-3);
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color var(--transition), transform var(--transition);
+}
+
+.product-card:hover { border-color: var(--accent-amber); transform: translateY(-2px); }
+
+/* The photograph is the largest thing on the card because it is what people
+   actually scan by. A wall of part numbers takes far longer to search. */
+.product-card-media {
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--bg-subtle);
+    padding: var(--space-3);
+}
+
+.product-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   /* contain, not cover: never crop a part photo */
+}
+
+.product-card-img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 2rem;
+    opacity: 0.35;
+}
+
+.product-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-top: 1px solid var(--border-color);
+    flex: 1;
+}
+
+.product-card-brand {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+}
+
+.product-card-name {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: var(--text-strong);
+    text-decoration: none;
+}
+.product-card-name:hover { color: var(--accent-amber-ink); }
+
+.product-card-specs { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+
+.badge-category {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.product-card-stock { font-size: var(--text-xs); }
+
+/* margin-top:auto pins the price row to the bottom, so prices line up across
+   the row even when names wrap to different numbers of lines. */
+.product-card-foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-color);
+}
+
+/* The catalogue button is small and appears once per card, so it keeps a modest
+   radius rather than the full pill used for page-level primary actions. */
+.product-card-foot .btn-amber { padding: 0.4rem 0.9rem; font-size: var(--text-xs); border-radius: var(--radius); }
+
+@media (max-width: 640px) {
+    .catalogue-field,
+    .catalogue-field-grow,
+    .catalogue-field-action { flex: 1 1 100%; }
+}
+
+/* -- NAVIGATION AND FOOTER ----------------------------------------------------
+   Both are on every page, so they set the tone before any content is read. */
+
+.navbar { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+
+.nav-link {
+    font-weight: 500;
+    font-size: var(--text-sm);
+}
+
+/* The signed-in name is not a link and must not pretend to be one. */
+.navbar .nav-link[style],
+.navbar span.nav-link { font-weight: 400; }
+
+/* The nav sign-up button keeps the pill shape but not the page-level padding -
+   a button the size of a hero CTA sitting in a navigation bar looks wrong. */
+.navbar .btn-amber,
+.navbar .btn-secondary {
+    padding: 0.4rem 1.1rem;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-pill);
+}
+
+.footer {
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-nav);
+    padding: var(--space-4) 0;
+}
+
+.footer-line {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+}
+
+/* Saying out loud that this is an estimate rather than a design. Admitting the
+   limit increases trust rather than reducing it, and it happens to be true.
+   max-width keeps it to a readable measure when centred on a wide screen. */
+.footer-note {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    max-width: 60ch;
+    margin-inline: auto;
+}
+
+/* -- SHARED PAGE HEADINGS -----------------------------------------------------
+   page-title was previously sized ad hoc per page. Pulling it onto the type
+   scale is what makes separate pages read as one site. */
+.page-title {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--text-strong);
+    margin-bottom: var(--space-1);
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    font-size: var(--text-lg);
+    margin-bottom: 0;
+}
+
+.empty-state-icon {
+    font-size: 3.5rem;
+    opacity: 0.28;
+    margin-bottom: var(--space-3);
     line-height: 1;
 }

@@ -34,7 +34,9 @@ namespace ElektriKalkulaator.Tests.Integration
             var cartAfterLogout = await client.GetStringAsync("/Cart");
 
             Assert.DoesNotContain("3 tk", cartAfterLogout);
-            Assert.Contains("Ostukorv on tühi", cartAfterLogout);
+            // Assert on the marker, not on the wording. This test is about the session
+            // being cleared; it should not fail because someone improved a sentence.
+            Assert.Contains("data-cart-state=\"empty\"", cartAfterLogout);
         }
 
         [Fact]

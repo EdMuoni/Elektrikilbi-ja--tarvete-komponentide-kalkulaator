@@ -48,6 +48,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         public async Task<IEnumerable<Product>> Search(
             Guid? categoryId,
             string? searchTerm,
+            string? brand = null,
             ProductSortOrder sort = ProductSortOrder.CategoryThenName)
         {
             var query = _context.Products
@@ -64,6 +65,14 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                 // case-insensitive, so no ToLower() is needed — and leaving it out lets the
                 // database use an index instead of transforming every row first.
                 query = query.Where(p => p.Name.Contains(term) || p.Brand.Contains(term));
+            }
+
+            // Exact match, unlike searchTerm above. Browsing "Schneider" must not also return a
+            // product from some other brand whose name merely contains the word.
+            if (!string.IsNullOrWhiteSpace(brand))
+            {
+                var exact = brand.Trim();
+                query = query.Where(p => p.Brand == exact);
             }
 
             // Sorting is applied to the query, not to the results, so it becomes a SQL ORDER BY.
@@ -92,6 +101,19 @@ namespace ElektriKalkulaator.ApplicationServices.Services
             };
 
             return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetBrands()
+        {
+            // Distinct brands taken from the products themselves rather than from a fixed list.
+            // A hard-coded list drifts: it would keep offering a brand after its last product was
+            // deleted, and silently miss a brand that a new product introduced.
+            return await _context.Products
+                .Select(p => p.Brand)
+                .Where(b => b != null && b != "")
+                .Distinct()
+                .OrderBy(b => b)
+                .ToListAsync();
         }
 
         // Returns null if not found — the controller checks and returns NotFound().

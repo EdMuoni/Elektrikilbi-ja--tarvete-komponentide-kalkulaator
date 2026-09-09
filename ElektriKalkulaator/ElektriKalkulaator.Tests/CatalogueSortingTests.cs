@@ -11,12 +11,12 @@ namespace ElektriKalkulaator.Tests
     public class CatalogueSortingTests : TestBase
     {
         private async Task<List<string>> SortedNames(ProductSortOrder sort) =>
-            (await Svc<IProductServices>().Search(null, null, sort))
+            (await Svc<IProductServices>().Search(null, null, sort: sort))
                 .Select(p => p.Name)
                 .ToList();
 
         private async Task<List<decimal>> SortedPrices(ProductSortOrder sort) =>
-            (await Svc<IProductServices>().Search(null, null, sort))
+            (await Svc<IProductServices>().Search(null, null, sort: sort))
                 .Select(p => p.Price)
                 .ToList();
 
@@ -57,7 +57,7 @@ namespace ElektriKalkulaator.Tests
         [Fact]
         public async Task StockHighToLow_PutsTheMostPlentifulFirst()
         {
-            var stock = (await Svc<IProductServices>().Search(null, null, ProductSortOrder.StockHighToLow))
+            var stock = (await Svc<IProductServices>().Search(null, null, sort: ProductSortOrder.StockHighToLow))
                 .Select(p => p.StockQuantity)
                 .ToList();
 
@@ -88,7 +88,7 @@ namespace ElektriKalkulaator.Tests
             var breakers = Guid.Parse("11111111-0000-0000-0000-000000000001");
 
             var results = (await Svc<IProductServices>()
-                .Search(breakers, null, ProductSortOrder.PriceLowToHigh)).ToList();
+                .Search(breakers, null, sort: ProductSortOrder.PriceLowToHigh)).ToList();
 
             Assert.Equal(5, results.Count);                                   // still filtered
             Assert.All(results, p => Assert.Equal(breakers, p.CategoryId));
@@ -100,7 +100,7 @@ namespace ElektriKalkulaator.Tests
         public async Task SortingCombinesWithASearchTerm()
         {
             var results = (await Svc<IProductServices>()
-                .Search(null, "ABB", ProductSortOrder.PriceHighToLow)).ToList();
+                .Search(null, "ABB", sort: ProductSortOrder.PriceHighToLow)).ToList();
 
             Assert.Equal(5, results.Count);
             Assert.All(results, p => Assert.Equal("ABB", p.Brand));
@@ -113,8 +113,8 @@ namespace ElektriKalkulaator.Tests
             // Two seeded products cost 8.50 € (ABB S201-B10 and Schneider Easy9 B16A). Without a
             // tiebreaker they could swap places between requests for no visible reason, which
             // looks like a glitch to a user comparing two page loads.
-            var first  = (await Svc<IProductServices>().Search(null, null, ProductSortOrder.PriceLowToHigh)).Select(p => p.Id).ToList();
-            var second = (await Svc<IProductServices>().Search(null, null, ProductSortOrder.PriceLowToHigh)).Select(p => p.Id).ToList();
+            var first  = (await Svc<IProductServices>().Search(null, null, sort: ProductSortOrder.PriceLowToHigh)).Select(p => p.Id).ToList();
+            var second = (await Svc<IProductServices>().Search(null, null, sort: ProductSortOrder.PriceLowToHigh)).Select(p => p.Id).ToList();
 
             Assert.Equal(first, second);
         }

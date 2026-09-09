@@ -44,6 +44,54 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-09 — Brand filtering, breadcrumbs and filter chips, from studying electromaterial.com
+
+**Type:** feature + bugfix + test
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- **Brand filtering**, new through the whole stack: `IProductServices.Search` gained a `brand`
+  argument and a `GetBrands()` companion; the controller accepts `?brand=`; the catalogue shows a
+  brand chip row.
+- **Breadcrumbs** on the catalogue (`Avaleht › Tooted › <filter>`).
+- **Filter chips** replace the category dropdown. Category and brand are now both visible rows.
+- The page subtitle is now **generated from the brands that exist** rather than typed by hand.
+
+**Why**
+- Studying electromaterial.com showed the one navigation pattern we were missing: their category
+  pages are browsed **by brand**, not just by category. That is how the trade actually shops — an
+  electrician often knows they want Schneider before they know which category the part is filed
+  under, because the brand is what is already installed in the building. We stored `Brand` on every
+  product and offered no way to filter by it.
+- `brand` is an **exact** match while the existing `searchTerm` stays partial. A partial brand
+  filter still returns plausible-looking results with other brands mixed in, and nobody notices
+  until someone orders the wrong part.
+- Chips over a dropdown: a closed `<select>` hides both what is available and what is selected.
+- What was deliberately **not** copied from them: prices are shown at every level here, where they
+  make you click twice more; and their long unstructured sidebar suits ~1,900 categories, not 5.
+
+**Bug found and fixed**
+- The catalogue subtitle and a home page feature card both advertised **"ABB, Schneider ja Hager"**.
+  The seeded catalogue contains **ABB, Draka and Schneider** — there is no Hager product, and Draka,
+  which supplies every cable, went unmentioned. Same class of error as the 160 m cable figure: copy
+  that contradicts the data. The catalogue subtitle is now generated from `GetBrands()` so it cannot
+  drift again; the home page card was corrected by hand.
+
+**How it was verified**
+- 7 new tests in `CatalogueBrandFilterTests`, **mutation-tested**: turning the exact match into
+  `Contains`, ignoring the brand filter entirely, and removing `Distinct()` from `GetBrands()` each
+  turned the matching test red, and all passed again after reverting.
+- Exercised against the running app: `brand=ABB` → 5, `Draka` → 3, `Schneider` → 2, unfiltered → 10
+  (they add up), and `brand=AB` → 0, confirming the exact match live rather than only in a test.
+- Seen rendered. Build clean with `-warnaserror`; **210/210 tests pass.**
+
+**Follow-ups or known limitations**
+- Product photos have white backgrounds and letterbox against the dark card. Known tradeoff from
+  the `object-fit: contain` decision; real product photography would fix it properly.
+- `Views/Products/Details.cshtml` still has no breadcrumb.
+- No test asserts the home page names only brands that exist — the catalogue subtitle is now
+  generated, but that one card is still hand-written.
+
 ## 2026-09-09 — Warm palette in both themes, and the theme generator moved into the repo
 
 **Type:** feature + chore

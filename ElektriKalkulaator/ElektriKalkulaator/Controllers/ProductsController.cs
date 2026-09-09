@@ -34,21 +34,30 @@ namespace ElektriKalkulaator.Controllers
             _env = env;
         }
 
-        // GET /Products — catalogue with optional category filter and name search
+        // GET /Products — catalogue with optional category, brand, text search and ordering
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index(
             Guid? categoryId,
             string? searchTerm,
+            string? brand = null,
             ProductSortOrder sort = ProductSortOrder.CategoryThenName)
         {
             var categories = await _categoryServices.GetAll();
 
-            // One call does the category filter, the text search AND the ordering, all in the
-            // database rather than in memory here. See ProductServices.Search.
-            var products = await _productServices.Search(categoryId, searchTerm, sort);
+            // One call does the category filter, the brand filter, the text search AND the
+            // ordering, all in the database rather than in memory here. See ProductServices.Search.
+            var products = await _productServices.Search(categoryId, searchTerm, brand, sort);
+
+            // The brand list comes from the products themselves, so the filter can never offer a
+            // brand that would return an empty page. Trade catalogues are browsed by brand at
+            // least as often as by category — an electrician frequently knows they want Schneider
+            // before they know which category the part is filed under.
+            ViewBag.Brands           = await _productServices.GetBrands();
+            ViewBag.SelectedBrand    = brand;
 
             ViewBag.Categories       = new SelectList(categories, "Id", "Name", categoryId);
+            ViewBag.AllCategories    = categories;
             ViewBag.SelectedCategory = categoryId;
             ViewBag.SearchTerm       = searchTerm;
             ViewBag.Sort             = sort;

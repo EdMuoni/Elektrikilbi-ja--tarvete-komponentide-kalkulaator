@@ -18,16 +18,43 @@
                       ?? ElektriKalkulaator.Core.ServiceInterface.ProductSortOrder.CategoryThenName;
     var searchTerm = ViewBag.SearchTerm as string;
 
+    var allCategories = ViewBag.AllCategories as IEnumerable<ElektriKalkulaator.Core.Domain.ProductCategory>
+                        ?? Enumerable.Empty<ElektriKalkulaator.Core.Domain.ProductCategory>();
+    var selectedCategory = ViewBag.SelectedCategory as Guid?;
+    var brands = ViewBag.Brands as IEnumerable<string> ?? Enumerable.Empty<string>();
+    var selectedBrand = ViewBag.SelectedBrand as string;
+    var selectedCategoryName = allCategories.FirstOrDefault(c => c.Id == selectedCategory)?.Name;
+
     // Hiding an admin control is presentation, not security - the real protection is
     // [Authorize(Roles = "Admin")] on the controller. But showing a button that sends
     // an anonymous visitor to a login page is a dead end, so the check belongs here too.
     var isAdmin = User.IsInRole(ElektriKalkulaator.Core.Domain.UserRoles.Admin);
 }
 
+@* Breadcrumbs. Every wholesaler catalogue has these and ours did not: once a filter
+   is applied the page looks the same as any other, with nothing saying what is being
+   shown or offering a way back out. *@
+<nav class="breadcrumb-trail" aria-label="Asukoht">
+    <a asp-controller="Home" asp-action="Index">Avaleht</a>
+    <span aria-hidden="true">›</span>
+    @if (selectedCategoryName == null && string.IsNullOrWhiteSpace(selectedBrand))
+    {
+        <span aria-current="page">Tooted</span>
+    }
+    else
+    {
+        <a asp-action="Index">Tooted</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">
+            @(selectedCategoryName ?? selectedBrand)
+        </span>
+    }
+</nav>
+
 <div class="catalogue-head">
     <div>
         <h1 class="page-title">Toodete kataloog</h1>
-        <p class="page-subtitle mb-0">ABB, Schneider ja Hager elektrikomponendid</p>
+        <p class="page-subtitle mb-0">@string.Join(", ", brands) — elektrikomponendid</p>
     </div>
     @if (isAdmin)
     {
@@ -45,14 +72,12 @@
         <input id="searchTerm" type="text" name="searchTerm" value="@searchTerm"
                class="form-control" placeholder="nt ABB, NYM, kaitselüliti..." />
     </div>
-    <div class="catalogue-field">
-        <label for="categoryId" class="form-label">Kategooria</label>
-        @* asp-items turns a SelectList into <option> elements automatically *@
-        <select id="categoryId" name="categoryId" class="form-select"
-                asp-items="@(ViewBag.Categories as Microsoft.AspNetCore.Mvc.Rendering.SelectList)">
-            <option value="">Kõik kategooriad</option>
-        </select>
-    </div>
+    @* The category and brand filters are chips below rather than selects here: a chip row
+       shows what is available AND what is currently chosen at a glance, where a closed
+       dropdown hides both. These two are carried through the form as hidden fields so that
+       searching or re-sorting does not silently drop them. *@
+    <input type="hidden" name="categoryId" value="@(selectedCategory?.ToString())" />
+    <input type="hidden" name="brand" value="@selectedBrand" />
     <div class="catalogue-field">
         <label for="sort" class="form-label">Järjesta</label>
         @* The value posted is the enum name, e.g. "PriceLowToHigh", which ASP.NET
@@ -69,6 +94,41 @@
         <button type="submit" class="btn btn-primary w-100">Otsi</button>
     </div>
 </form>
+
+@* Category and brand, the two ways a trade catalogue is actually browsed. Brand matters
+   more than it looks: an electrician often knows they want Schneider before they know which
+   category the part is filed under, because the brand is what is already in the building.
+   Each chip is a plain link that keeps the OTHER filters, so they narrow together. *@
+<div class="filter-rows">
+    <div class="filter-row">
+        <span class="filter-row-label">Kategooria</span>
+        <a class="chip @(selectedCategory == null ? "chip-on" : "")"
+           asp-action="Index" asp-route-brand="@selectedBrand"
+           asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">Kõik</a>
+        @foreach (var c in allCategories)
+        {
+            <a class="chip @(selectedCategory == c.Id ? "chip-on" : "")"
+               asp-action="Index" asp-route-categoryId="@c.Id" asp-route-brand="@selectedBrand"
+               asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">@c.Name</a>
+        }
+    </div>
+
+    @if (brands.Any())
+    {
+        <div class="filter-row">
+            <span class="filter-row-label">Tootja</span>
+            <a class="chip @(string.IsNullOrWhiteSpace(selectedBrand) ? "chip-on" : "")"
+               asp-action="Index" asp-route-categoryId="@selectedCategory"
+               asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">Kõik</a>
+            @foreach (var b in brands)
+            {
+                <a class="chip @(selectedBrand == b ? "chip-on" : "")"
+                   asp-action="Index" asp-route-categoryId="@selectedCategory" asp-route-brand="@b"
+                   asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">@b</a>
+            }
+        </div>
+    }
+</div>
 
 @if (!Model.Any())
 {

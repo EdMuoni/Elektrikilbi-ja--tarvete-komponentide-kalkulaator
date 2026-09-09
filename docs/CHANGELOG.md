@@ -44,6 +44,54 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-09 — Warm palette in both themes, and the theme generator moved into the repo
+
+**Type:** feature + chore
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- Both palettes are now **warm neutrals** instead of cool greys. Surfaces share one hue (~20–30°,
+  a warm taupe) and lose saturation as they get lighter. Light mode went from a cool grey-green
+  `#F2F5F3` to a warm bone `#F2EEE8`; dark went from green-charcoal to a warm charcoal `#141210`.
+- Dark-mode accents are **lighter and less saturated** than their light-mode counterparts
+  (`#F79A76` vs `#A8481D` for accent text), and neither theme uses pure black or pure white.
+- Elevation restored after the hue change: dark card/page **1.44**, light **1.14**.
+- `scripts/generate-theme.py` — **the generator now lives in the repo.** The previous entry claimed
+  theme.css was "generated from one source", but that generator sat in a temp folder and was gone
+  by the next session, which made the claim false and the file hand-editable again. It now refuses
+  to run if the two palette tables disagree on token names.
+- `scripts/check-contrast.py` — measures every text/background pairing and exits non-zero below AA.
+- Feature cards: a full accent border on all four sides became **one accent edge along the top**.
+
+**Why**
+- Edgar asked for both modes to feel warm and inviting rather than cold, and specifically for it
+  not to feel overwhelming.
+- **Warm vs cool** is the difference between reading as paper and linen versus screens and
+  hospitals. Current practice has moved the same way — bone and sand replacing pure white and cool
+  grey. For a tool used while planning work in a building, warm is the right register.
+- **Dark mode** follows established accessibility guidance rather than taste: pure black against
+  light text causes halation and hides elevation (you cannot see a shadow on black), and fully
+  saturated accents visibly vibrate on dark backgrounds.
+- **The accent reduction** applies the 60-30-10 guideline (~10% accent). Four outlined cards put
+  roughly four times that on screen, and the row competed with the primary button — which is
+  supposed to be the only thing shouting. That is the concrete cause of "overwhelming".
+
+**How it was verified**
+- `scripts/check-contrast.py`: 34 pairings across both themes, **0 below WCAG AA**; lowest 4.55.
+- Both palettes byte-identical to their explicit-choice duplicates; same 36 token names.
+- **Seen rendered this time.** Screenshots worked in this session (they did not previously), so
+  both themes were viewed in a browser rather than only measured. The toggle was clicked and
+  verified: `data-theme="dark"`, `localStorage` = `dark`, band computed as `rgb(243,238,231)` —
+  warm cream on a dark page, so the inversion works.
+- Build clean with `-warnaserror`; **203/203 tests pass.**
+
+**Follow-ups or known limitations**
+- Light-mode card/page separation is 1.14, relying on the shadow. Normal for a light theme.
+- The browser pane could not screenshot scrolled content, so the band and lower sections were
+  confirmed by computed style rather than by eye.
+- `docs/DESIGN_GUIDE.md` Part 2's reference palette lists the previous green values and is now
+  stale again. It points at theme.css as the source, so it misleads rather than breaks.
+
 ## 2026-08-14 — Full redesign against real industry references, and a false figure on the landing page
 
 **Type:** feature + bugfix + test

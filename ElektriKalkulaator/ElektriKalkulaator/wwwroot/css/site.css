@@ -933,10 +933,17 @@ main {
 }
 
 /* -- FEATURE CARDS ------------------------------------------------------------
-   Thin accent border rather than a filled panel. A filled accent block at this
-   size shouts; a 1px accent edge marks the card as ours while leaving the text
-   to do the work. auto-fit means the row reflows on a phone with no media
-   query - the columns simply become fewer. */
+   A neutral card with ONE accent edge along the top.
+
+   It was originally a full accent border on all four sides, copying the
+   reference site. Four outlined cards side by side put roughly four times the
+   accent colour on screen that the 60-30-10 guideline allows (~10% accent), and
+   the row read as loud rather than inviting - the cards competed with the
+   primary button, which is supposed to be the only thing shouting on the page.
+   A single top edge keeps the cards recognisably ours and lets the text work.
+
+   auto-fit means the row reflows on a phone with no media query - the columns
+   simply become fewer. */
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
@@ -945,7 +952,8 @@ main {
 
 .feature-card {
     background: var(--bg-card);
-    border: 1px solid var(--accent-amber);
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--accent-amber);   /* one accent edge, not four */
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     display: flex;

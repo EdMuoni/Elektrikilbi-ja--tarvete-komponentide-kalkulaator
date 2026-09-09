@@ -478,6 +478,26 @@ muutmiseks ei ole vaja rakendust uuesti ehitada.
 | Pistikud | 1 ahel / 6 pistikut | 2,5 mm² | 16 A |
 | Elektripliit | eraldi ahel | 6,0 mm² | 32 A |
 
+### Mis tuleneb standardist ja mis mitte
+
+Siin tuleb teha vahet, mida kaitsmisel kindlasti küsitakse.
+
+**Standardi põhimõtetest tulenev:** kaabli ristlõike ja kaitselüliti nimivoolu
+paar (1,5 mm² → 10 A, 2,5 mm² → 16 A, 6,0 mm² → 32 A). Alus on liigvoolukaitse
+põhimõte — kaitseseade peab rakenduma enne, kui juht üle kuumeneb — mida
+käsitlevad EVS-HD 60364 osad **4-43** (kaitse liigvoolu eest) ja **5-52**
+(juhistikud). Rikkevoolukaitsme vajadus tuleneb osast **4-41**.
+
+**Projekteerimistava, mitte standardi nõue:** ahelate jaotus, st „üks ahel
+kaheksa valgusti kohta“ ja „üks ahel kuue pistiku kohta“. Standard **ei sätesta**
+punktide arvu ahelas. Standard nõuab, et ahela koormus mahuks kaabli ja kaitse
+piiridesse; mitu punkti see tähendab, sõltub punktide võimsusest — kümme
+5 W LED-valgustit ja kümme 150 W valgustit on täiesti erinev koormus.
+
+Seetõttu hoitakse neid arve **andmebaasis, mitte koodis**: need on eeldused,
+mida saab muuta ilma rakendust uuesti ehitamata. Täielik allikaanalüüs on failis
+`docs/EVS_ALLIKAD.md`.
+
 `CalculationRule` olemil on väli `EvsReference`, mis on **teadlikult tühi**.
 Sinna kuuluvad standardi punktinumbrid, kuid neid ei tohi sisestada enne, kui
 need on standardist endast üle kontrollitud.
@@ -836,11 +856,11 @@ ASP.NET Core, EVS-HD 60364, web application
 
 | Nr | Joonis | Kust saada |
 |---|---|---|
-| 1 | Arhitektuuriskeem (4 kihti) | Joonista draw.io-s; struktuur on peatükis 1.4.1 |
+| 1 | Arhitektuuriskeem (4 kihti) | **VALMIS:** `docs/joonised/joonis-1-arhitektuur.svg` |
 | 2 | Andmemudeli ERD | **Sul on olemas:** `Elektrikilbi ja -tarvete kalk draft/Elektrikilbi ja -tarvete komponentide kalkulaator .svg` |
 | 3 | Kasutusjuhtude diagramm | Joonista draw.io-s |
 | 4 | GitHubi pull request'ide vaade | Kuvatõmmis GitHubist |
-| 5 | Kalkulaatori vooskeem | Joonista draw.io-s; sammud on peatükis 2.2 |
+| 5 | Kalkulaatori vooskeem | **VALMIS:** `docs/joonised/joonis-5-arvutuse-vooskeem.svg` |
 | 6 | Avaleht | Kuvatõmmis rakendusest |
 | 7 | Tootekataloog | Kuvatõmmis rakendusest |
 | 8 | Hele ja tume režiim kõrvuti | Kaks kuvatõmmist |

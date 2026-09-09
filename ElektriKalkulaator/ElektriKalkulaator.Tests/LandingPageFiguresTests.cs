@@ -75,20 +75,34 @@ namespace ElektriKalkulaator.Tests
         }
 
         [Fact]
-        public async Task TheWorkedExampleCableLength_MatchesWhatTheCalculatorActuallyReturns()
+        public async Task EveryCableLengthOnThePage_MatchesWhatTheCalculatorActuallyReturns()
         {
             var bom = await Svc<ICalculatorServices>().Calculate(WorkedExampleInput());
 
             // Cable is the line measured in metres; everything else is counted in pieces.
-            // This is the figure that was wrong (160 m advertised, 120 m produced).
-            var totalMetres = bom.Where(line => line.Unit == "m").Sum(line => line.Quantity);
+            // This is the family of figures that was wrong once already: the page advertised
+            // 160 m where the calculator produced 120 m.
+            //
+            // The hero used to carry a combined "120 m", but that card was removed, so the
+            // remaining figures are the three per-circuit lengths in the worked example.
+            // Checking each one is a stronger guarantee than checking their sum: a total can
+            // still be right while the individual lines are wrong.
+            var cableLengths = bom.Where(line => line.Unit == "m")
+                                  .Select(line => line.Quantity)
+                                  .ToList();
+
+            Assert.NotEmpty(cableLengths);
+
             var html = VisibleMarkup();
+            var missing = cableLengths
+                .Where(m => !html.Contains($"{m} m", StringComparison.Ordinal))
+                .ToList();
 
             Assert.True(
-                html.Contains($"{totalMetres} m", StringComparison.Ordinal),
-                $"The hero proof card must show the cable length the calculator produces.\n" +
-                $"  calculator returns : {totalMetres} m\n" +
-                $"  not found in       : Views/Home/Index.cshtml");
+                missing.Count == 0,
+                "The worked example must show every cable length the calculator produces." + "\n" +
+                $"  calculator returns : {string.Join(", ", cableLengths.Select(m => m + " m"))}" + "\n" +
+                $"  not found on page  : {string.Join(", ", missing.Select(m => m + " m"))}");
         }
 
         [Fact]

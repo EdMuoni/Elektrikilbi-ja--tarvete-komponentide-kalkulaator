@@ -46,37 +46,13 @@
                 Sirvi tooteid
             </a>
         </div>
-
-        @* Honesty directly under the button, where hesitation actually happens.
-           Admitting the limit increases trust rather than reducing it, and it
-           is also simply true - see VOICE_AND_PERSONALITY.md part 3. *@
-        <p class="hero-trust mb-0">
-            🛡️ Hinnang EVS-HD 60364 järgi — mitte valmis projekt
-        </p>
     </div>
 
-    @* The photograph shows the work this tool is for. The card overlapping it
-       shows the one thing no competitor does: the reasoning behind a quantity.
+    @* The photograph shows the work this tool is for.
        Licence details are in docs/IMAGE_CREDITS.md. *@
     <div class="hero-media">
         <div class="hero-figure" style="background-image: url('/images/hero/panel.jpg');"
              role="img" aria-label="Elektrikilp kaitselülitite ja juhtmetega"></div>
-
-        <div class="proof-card">
-            <span class="proof-card-label">Näidis · 3-toaline korter</span>
-            <div class="proof-line">
-                <span>2 × B10</span>
-                <span class="text-muted-custom">12 valgustit ÷ 8 = 2 ahelat</span>
-            </div>
-            <div class="proof-line">
-                <span>2 × B16</span>
-                <span class="text-muted-custom">10 pistikut ÷ 6 = 2 ahelat</span>
-            </div>
-            <div class="proof-line">
-                <span>120 m</span>
-                <span class="text-muted-custom">kaablit, 5 ahelat × 24 m</span>
-            </div>
-        </div>
     </div>
 </section>
 
@@ -209,15 +185,20 @@
 
 <div class="card p-4">
     <div class="row align-items-center">
-        <div class="col-md-8">
-            <h6 class="fw-bold text-strong-custom mb-1">🏛️ EVS-HD 60364 standard</h6>
+        <div class="col-12">
+            <h6 class="fw-bold text-strong-custom mb-1">🏛️ Arvutuse alused</h6>
+            @* The green "Standardi järgi" badge that used to sit here was removed along
+               with the claim beside it. Research recorded in docs/EVS_ALLIKAD.md found
+               that only PART of the calculation derives from EVS-HD 60364: the cable and
+               breaker pairings follow its overcurrent principle, but the circuit divisors
+               (8 lights, 6 sockets) are a design convention the standard does not set.
+               A badge asserting blanket compliance was therefore a claim the application
+               could not support. *@
             <p class="text-muted-custom small mb-0">
-                Kõik arvutused põhinevad Eesti elektripaigaldiste standardil EVS-HD 60364.
-                Valgustusahelad: 1.5 mm² / 10A · Pistikuahelad: 2.5 mm² / 16A · Elektripliit: 6.0 mm² / 32A
+                Kaabli ristlõike ja kaitselüliti valik lähtub EVS-HD 60364 põhimõtetest:
+                valgustusahelad 1.5 mm² / 10A · pistikuahelad 2.5 mm² / 16A ·
+                elektripliit 6.0 mm² / 32A. Ahelate jaotus põhineb projekteerimistaval.
             </p>
-        </div>
-        <div class="col-md-4 text-md-end mt-2 mt-md-0">
-            <span class="badge bg-success px-3 py-2">✅ Standardi järgi</span>
         </div>
     </div>
 </div>

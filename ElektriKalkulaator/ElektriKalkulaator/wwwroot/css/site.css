@@ -859,18 +859,6 @@ main {
     margin: 0 0 var(--space-4);
 }
 
-/* The reassurance directly under the button, where hesitation actually
-   happens. Green because it is a trust signal, not an action. */
-.hero-trust {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-top: var(--space-3);
-    font-weight: 600;
-    font-size: var(--text-sm);
-    color: var(--accent-green);
-}
-
 .hero-media { position: relative; }
 
 .hero-figure {
@@ -880,40 +868,6 @@ main {
     background-position: center;
     box-shadow: var(--shadow-float);
 }
-
-/* A small card overlapping the photo, showing real output. Every reference
-   site does some version of this, and the reason it works is that it shows
-   the product instead of describing it. */
-.proof-card {
-    position: absolute;
-    left: calc(-1 * var(--space-4));
-    bottom: calc(-1 * var(--space-4));
-    width: min(19rem, 78%);
-    background: var(--bg-card-raised);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-float);
-    padding: var(--space-3) var(--space-4);
-}
-
-.proof-card-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-}
-
-.proof-line {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--space-3);
-    padding: var(--space-1) 0;
-    font-size: var(--text-sm);
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
-}
-.proof-line:last-of-type { border-bottom: 0; }
-.proof-line span:first-child { font-variant-numeric: tabular-nums; color: var(--text-strong); font-weight: 600; }
 
 /* -- STAT STRIP ---------------------------------------------------------------
    Borrowed from the marketplace sites, which all put a row of hard numbers
@@ -1117,8 +1071,6 @@ main {
        reachable without scrolling past a decorative image. */
     .hero-media { order: 2; }
 
-    /* Overlapping the photo needs room that a narrow screen does not have. */
-    .proof-card { position: static; width: 100%; margin-top: var(--space-3); }
 }
 
 /* -- CATALOGUE (trade genre) --------------------------------------------------

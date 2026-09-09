@@ -232,6 +232,22 @@ main {
 
 /* ── TABELID ──────────────────────────────────────────────────────── */
 .table {
+    /* Bootstrap's .table sets --bs-table-bg to var(--bs-body-bg) - BOOTSTRAP's body
+       background, which is white and knows nothing about our theme. Bootstrap then
+       paints every cell with it, so the whole BOM table rendered as a white block on
+       top of our dark card. It looked correct in light mode purely by coincidence.
+
+       Making it transparent lets the card behind show through, so the table follows
+       whichever theme is active instead of carrying its own. Every other table
+       variable is pointed at our tokens for the same reason. */
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-primary);
+    --bs-table-border-color: var(--border-color);
+    --bs-table-hover-bg: var(--bg-subtle);
+    --bs-table-hover-color: var(--text-strong);
+    --bs-table-striped-bg: var(--bg-subtle);
+    --bs-table-striped-color: var(--text-primary);
+
     color: var(--text-primary);
     border-color: var(--border-color);
 }
@@ -253,10 +269,6 @@ main {
 
 .table tbody tr:hover {
     background-color: var(--bg-subtle);
-}
-
-.table-dark {
-    --bs-table-bg: var(--bg-card);
 }
 
 /* ── TOOTEKAARDID ─────────────────────────────────────────────────────────────
@@ -338,7 +350,13 @@ main {
 /* ── AVALEHE KANGELASPILT ─────────────────────────────────────────────────
    A real photograph instead of a decorative emoji. The dark overlay keeps
 
-.bom-total-row {
+/* The highlight goes on the CELLS, not on the <tr>.
+   Bootstrap paints every table cell itself - background-color from --bs-table-bg
+   plus its own border-bottom - so anything set on the row is drawn over and lost.
+   The total row was silently rendering as a plain row: no tint, and its accent
+   top border replaced by Bootstrap's ordinary cell border. */
+.bom-total-row > td,
+.bom-total-row > th {
     background-color: var(--tint-amber);
     font-weight: 700;
     font-size: 1.05rem;
@@ -1375,4 +1393,34 @@ main {
 
 @media (max-width: 640px) {
     .filter-row-label { min-width: 100%; }
+}
+
+/* -- BOM COMPONENT CELL -------------------------------------------------------
+   Photograph beside the part name in the calculator results. The catalogue is
+   photo-led for the same reason: a part number is only meaningful to someone who
+   already knows the part. */
+.bom-component { display: flex; align-items: center; gap: var(--space-3); }
+
+.bom-thumb {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    background: var(--bg-subtle);
+    object-fit: contain;   /* contain, never cover: cropping a part photo hides the rating label */
+    padding: 2px;
+}
+
+.bom-thumb-empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    opacity: 0.35;
+}
+
+@media (max-width: 640px) {
+    /* On a phone the row is already tight; the name matters more than the picture. */
+    .bom-thumb { width: 36px; height: 36px; }
 }

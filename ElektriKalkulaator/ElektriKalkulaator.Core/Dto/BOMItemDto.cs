@@ -6,6 +6,12 @@ namespace ElektriKalkulaator.Core.Dto
         public Guid ProductId { get; set; }
         public string ProductName { get; set; } = "";
         public string Brand { get; set; } = "";
+
+        // Path to the product photograph, or null when the product has no image.
+        // Carried on the BOM row so the results table can show what each part LOOKS like.
+        // A row reading "ABB S201-B32" means nothing to someone who is not an electrician;
+        // a picture of a breaker does. It is the same reason the catalogue is photo-led.
+        public string? ImagePath { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice { get; set; }

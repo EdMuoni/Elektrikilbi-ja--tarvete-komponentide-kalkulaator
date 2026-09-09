@@ -44,6 +44,59 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-09 — Fixed the white BOM table, added component photos, centred the navigation
+
+**Type:** bugfix + feature
+**Author:** Claude (Opus 5) + Edgar
+
+**Bugs fixed**
+1. **The calculator's results table rendered as a white block in dark mode.** Bootstrap's `.table`
+   sets `--bs-table-bg` to `var(--bs-body-bg)` — *Bootstrap's* body background, which is white and
+   knows nothing about our theme — and then paints every cell with it. It looked right in light
+   mode purely by coincidence. `.table` now points every `--bs-table-*` variable at our tokens and
+   makes the cell background transparent so the card behind shows through.
+2. **The BOM total row had silently lost its highlight.** Its tint and accent top border were set
+   on the `<tr>`, but Bootstrap paints the **cells**, so both were drawn over. Verified in the
+   browser: the row computed as fully transparent with an ordinary grey border. Moved to
+   `.bom-total-row > td`, which now computes as the amber tint with the orange border.
+3. **Number inputs began with "0" and typing appended to it,** so entering 2 gave "02" — easy to
+   submit without noticing. `site.js` clears a value of exactly `0` on focus and restores the
+   field's own `min` on blur if it was left empty. Only `0` is cleared, so correcting 12 to 13
+   still works normally.
+
+**What changed**
+- **Component photographs in the BOM.** `BOMItemDto` carries `ImagePath` and the results table
+  shows a thumbnail beside each part. "ABB S201-B32" means nothing to a non-electrician; a picture
+  of a breaker does, and it lets a professional confirm at a glance that the right kind of part was
+  chosen. All 8 rows of the standard example resolve to a real photo.
+- **Navigation restructured into three groups:** brand left, page links **centred** via `mx-auto`,
+  account controls and the theme switch right. The switch is now last, at the far right edge — it
+  is a setting, not a destination, so it does not belong among the page links.
+- **Dark surfaces returned to a deep green-charcoal** (~158°) at Edgar's request, keeping the
+  orange accent and promoting yellow to a real secondary accent. Light mode keeps its warm bone —
+  the two are deliberately different families, because a green-tinted *white* reads as clinical
+  rather than warm.
+- Removed the dead `.table-dark` rule; `ThemeTokenTests` forbids that class in views.
+
+**How it was verified**
+- All four fixes confirmed **in the browser against the running app**, not just in code: cell
+  background transparent, total-row cell `rgba(242,118,75,0.14)` with an orange top border, page
+  `rgb(15,21,19)`, 8 thumbnails present, nav toggle last inside the right-hand list.
+- The zero-clearing was exercised as a person would: focus emptied the field, typing produced "3"
+  rather than "03", and blurring an emptied field restored its `min`.
+- `scripts/check-contrast.py`: **0 below AA**, elevation 1.47 dark / 1.14 light.
+- Build clean with `-warnaserror`; **210/210 tests pass.**
+
+**Follow-ups or known limitations**
+- **No test covers any of the three bugs.** They were all visual or interaction defects, which is
+  the gap `docs/TESTING.md` Part 7 already names as the biggest one. A test asserting that no
+  Bootstrap component variable is left at its default would have caught bugs 1 and 2.
+- Product photos have white backgrounds, so the thumbnails read as bright squares on the dark
+  table. Real product photography on a transparent or neutral background would fix it.
+- **iStock images were requested and not used** — they are licensed stock, watermarked and sold
+  per image, so they cannot be downloaded and shipped. Free alternatives are noted in
+  `docs/IMAGE_CREDITS.md`.
+
 ## 2026-09-09 — Brand filtering, breadcrumbs and filter chips, from studying electromaterial.com
 
 **Type:** feature + bugfix + test

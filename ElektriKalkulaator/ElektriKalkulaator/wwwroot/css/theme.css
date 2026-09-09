@@ -50,11 +50,11 @@
    asks for light gets the light palette below; everyone else sees this. */
 :root {
     /* SURFACES, furthest back to nearest front */
-    --bg-primary:         #141210;                                                    /* page background */
-    --bg-card:            #36302B;                                                    /* cards and panels */
-    --bg-card-raised:     #453D38;                                                    /* a card sitting on top of another card */
-    --bg-input:           #3C3631;                                                    /* form fields */
-    --bg-nav:             #0D0B0A;                                                    /* navigation bar */
+    --bg-primary:         #0F1513;                                                    /* page background */
+    --bg-card:            #2B3632;                                                    /* cards and panels */
+    --bg-card-raised:     #35433E;                                                    /* a card sitting on top of another card */
+    --bg-input:           #313D38;                                                    /* form fields */
+    --bg-nav:             #090E0C;                                                    /* navigation bar */
     --bg-subtle:          rgba(255, 255, 255, 0.045);                                 /* table headers, hover fills */
 
     /* THE CONTRAST BAND - inverts between themes, see the module docstring */
@@ -72,16 +72,16 @@
     --accent-blue:        #7FB6EE;                                                    /* information, links, technical badges */
     --accent-green:       #62C79E;                                                    /* success, in stock, trust */
     --accent-red:         #F08E80;                                                    /* errors and destructive actions only */
-    --accent-warning:     #E9B96A;                                                    /* low stock */
+    --accent-warning:     #F2C14E;                                                    /* low stock */
 
     /* TEXT */
-    --text-strong:        #F6F4F1;                                                    /* headings and figures that must dominate */
-    --text-primary:       #DAD5D0;                                                    /* body text and prices */
-    --text-muted:         #ACA49D;                                                    /* secondary text */
+    --text-strong:        #F2F5F4;                                                    /* headings and figures that must dominate */
+    --text-primary:       #D4DBD8;                                                    /* body text and prices */
+    --text-muted:         #A4B0AA;                                                    /* secondary text */
 
     /* BORDERS */
-    --border-color:       #534C46;
-    --border-strong:      #696059;                                                    /* used when a border must actually be seen */
+    --border-color:       #44534D;
+    --border-strong:      #576862;                                                    /* used when a border must actually be seen */
 
     /* CIRCUIT TYPES in the BOM table */
     --circuit-lighting:   #7FB6EE;
@@ -138,7 +138,7 @@
         --accent-blue:        #1D5BB8;                                                    /* information, links, technical badges */
         --accent-green:       #0A6B4D;                                                    /* success, in stock, trust */
         --accent-red:         #A83226;                                                    /* errors and destructive actions only */
-        --accent-warning:     #85560C;                                                    /* low stock */
+        --accent-warning:     #7A5300;                                                    /* low stock */
 
         /* TEXT */
         --text-strong:        #1A1511;                                                    /* headings and figures that must dominate */
@@ -197,7 +197,7 @@
     --accent-blue:        #1D5BB8;                                                    /* information, links, technical badges */
     --accent-green:       #0A6B4D;                                                    /* success, in stock, trust */
     --accent-red:         #A83226;                                                    /* errors and destructive actions only */
-    --accent-warning:     #85560C;                                                    /* low stock */
+    --accent-warning:     #7A5300;                                                    /* low stock */
 
     /* TEXT */
     --text-strong:        #1A1511;                                                    /* headings and figures that must dominate */
@@ -233,11 +233,11 @@
    choosing dark on a light-preferring system works. */
 :root[data-theme="dark"] {
     /* SURFACES, furthest back to nearest front */
-    --bg-primary:         #141210;                                                    /* page background */
-    --bg-card:            #36302B;                                                    /* cards and panels */
-    --bg-card-raised:     #453D38;                                                    /* a card sitting on top of another card */
-    --bg-input:           #3C3631;                                                    /* form fields */
-    --bg-nav:             #0D0B0A;                                                    /* navigation bar */
+    --bg-primary:         #0F1513;                                                    /* page background */
+    --bg-card:            #2B3632;                                                    /* cards and panels */
+    --bg-card-raised:     #35433E;                                                    /* a card sitting on top of another card */
+    --bg-input:           #313D38;                                                    /* form fields */
+    --bg-nav:             #090E0C;                                                    /* navigation bar */
     --bg-subtle:          rgba(255, 255, 255, 0.045);                                 /* table headers, hover fills */
 
     /* THE CONTRAST BAND - inverts between themes, see the module docstring */
@@ -255,16 +255,16 @@
     --accent-blue:        #7FB6EE;                                                    /* information, links, technical badges */
     --accent-green:       #62C79E;                                                    /* success, in stock, trust */
     --accent-red:         #F08E80;                                                    /* errors and destructive actions only */
-    --accent-warning:     #E9B96A;                                                    /* low stock */
+    --accent-warning:     #F2C14E;                                                    /* low stock */
 
     /* TEXT */
-    --text-strong:        #F6F4F1;                                                    /* headings and figures that must dominate */
-    --text-primary:       #DAD5D0;                                                    /* body text and prices */
-    --text-muted:         #ACA49D;                                                    /* secondary text */
+    --text-strong:        #F2F5F4;                                                    /* headings and figures that must dominate */
+    --text-primary:       #D4DBD8;                                                    /* body text and prices */
+    --text-muted:         #A4B0AA;                                                    /* secondary text */
 
     /* BORDERS */
-    --border-color:       #534C46;
-    --border-strong:      #696059;                                                    /* used when a border must actually be seen */
+    --border-color:       #44534D;
+    --border-strong:      #576862;                                                    /* used when a border must actually be seen */
 
     /* CIRCUIT TYPES in the BOM table */
     --circuit-lighting:   #7FB6EE;

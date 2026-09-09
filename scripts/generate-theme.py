@@ -27,8 +27,16 @@ someone uses while planning work in a building, the first is the right feeling,
 and it is also the direction current design practice has moved - bone and sand
 replacing pure white and cool grey.
 
-Surfaces share one hue (~28 degrees, a warm taupe) and get LESS saturated as they
-get lighter, which is how real materials behave under light.
+The DARK surfaces are a deep green-charcoal (~158 degrees) and the LIGHT ones a
+warm bone. They are deliberately different families rather than one hue inverted:
+green-charcoal reads as workshop and industrial equipment, which suits the dark
+theme, while a green-tinted WHITE reads as clinical rather than warm. Within each
+theme the surfaces share one hue and get LESS saturated as they get lighter,
+which is how real materials behave under light.
+
+The accents are the same in both: orange for the next action, yellow for
+attention, off-white for text. Green base + orange + yellow is the palette Edgar
+asked for.
 
 Dark mode follows the established accessibility guidance:
   - never pure black - #000 against light text causes halation, and grey shows
@@ -54,11 +62,11 @@ import sys
 # ---------------------------------------------------------------------------
 GROUPS = [
     ("SURFACES, furthest back to nearest front", [
-        ("--bg-primary",     "#141210", "page background"),
-        ("--bg-card",        "#36302B", "cards and panels"),
-        ("--bg-card-raised", "#453D38", "a card sitting on top of another card"),
-        ("--bg-input",       "#3C3631", "form fields"),
-        ("--bg-nav",         "#0D0B0A", "navigation bar"),
+        ("--bg-primary",     "#0F1513", "page background"),
+        ("--bg-card",        "#2B3632", "cards and panels"),
+        ("--bg-card-raised", "#35433E", "a card sitting on top of another card"),
+        ("--bg-input",       "#313D38", "form fields"),
+        ("--bg-nav",         "#090E0C", "navigation bar"),
         ("--bg-subtle",      "rgba(255, 255, 255, 0.045)", "table headers, hover fills"),
     ]),
     ("THE CONTRAST BAND - inverts between themes, see the module docstring", [
@@ -76,16 +84,16 @@ GROUPS = [
         ("--accent-blue",        "#7FB6EE", "information, links, technical badges"),
         ("--accent-green",       "#62C79E", "success, in stock, trust"),
         ("--accent-red",         "#F08E80", "errors and destructive actions only"),
-        ("--accent-warning",     "#E9B96A", "low stock"),
+        ("--accent-warning",     "#F2C14E", "low stock"),
     ]),
     ("TEXT", [
-        ("--text-strong",  "#F6F4F1", "headings and figures that must dominate"),
-        ("--text-primary", "#DAD5D0", "body text and prices"),
-        ("--text-muted",   "#ACA49D", "secondary text"),
+        ("--text-strong",  "#F2F5F4", "headings and figures that must dominate"),
+        ("--text-primary", "#D4DBD8", "body text and prices"),
+        ("--text-muted",   "#A4B0AA", "secondary text"),
     ]),
     ("BORDERS", [
-        ("--border-color",  "#534C46", ""),
-        ("--border-strong", "#696059", "used when a border must actually be seen"),
+        ("--border-color",  "#44534D", ""),
+        ("--border-strong", "#576862", "used when a border must actually be seen"),
     ]),
     ("CIRCUIT TYPES in the BOM table", [
         ("--circuit-lighting", "#7FB6EE", ""),
@@ -128,7 +136,7 @@ LIGHT = {
     "--accent-amber": "#F2764B", "--accent-amber-ink": "#A8481D",
     "--accent-amber-hover": "#DC6135", "--on-accent": "#20100A",
     "--accent-blue": "#1D5BB8", "--accent-green": "#0A6B4D",
-    "--accent-red": "#A83226", "--accent-warning": "#85560C",
+    "--accent-red": "#A83226", "--accent-warning": "#7A5300",
 
     "--text-strong": "#1A1511", "--text-primary": "#3F362F", "--text-muted": "#756A61",
 

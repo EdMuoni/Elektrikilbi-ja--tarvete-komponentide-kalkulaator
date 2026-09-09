@@ -57,59 +57,46 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Navigatsiooni lingid -->
+                @* Three groups, not one list: the brand sits left, the page links are
+                   centred, and the account controls plus the theme switch sit right.
+
+                   mx-auto on the middle list is what centres it - with equal auto margins
+                   on both sides it takes the leftover space evenly, so the links stay
+                   centred in the bar regardless of how wide the brand or the account
+                   cluster happen to be. A single ms-auto list, which is what this was,
+                   can only push everything to one side. *@
                 <div class="collapse navbar-collapse" id="navMenu">
-                    <ul class="navbar-nav ms-auto gap-1">
+
+                    <ul class="navbar-nav mx-auto gap-1">
                         <li class="nav-item">
-                            <a class="nav-link px-3" asp-controller="Home" asp-action="Index">
-                                Avaleht
-                            </a>
+                            <a class="nav-link px-3" asp-controller="Home" asp-action="Index">Avaleht</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-3" asp-controller="Calculator" asp-action="Index">
-                                Kalkulaator
-                            </a>
+                            <a class="nav-link px-3" asp-controller="Calculator" asp-action="Index">Kalkulaator</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-3" asp-controller="Products" asp-action="Index">
-                                Tooted
-                            </a>
+                            <a class="nav-link px-3" asp-controller="Products" asp-action="Index">Tooted</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-3 cart-link" asp-controller="Cart" asp-action="Index">
-                                Ostukorv
-                            </a>
+                            <a class="nav-link px-3 cart-link" asp-controller="Cart" asp-action="Index">Ostukorv</a>
                         </li>
 
-                        @* Light/dark switch. A <button> rather than a link because it performs an
-                           action instead of navigating. theme.js fills in the icon and label, so
-                           it starts empty — that also means it does nothing visible if JavaScript
-                           is off, rather than showing a button that cannot work. *@
-                        <li class="nav-item d-flex align-items-center">
-                            <button id="themeToggle" type="button" class="theme-toggle"
-                                    aria-label="Vaheta tausta värvi"></button>
-                        </li>
+                        @* Hiding a link is presentation, not security - the real protection is
+                           [Authorize(Roles = "Admin")] on the controller. Someone typing the URL
+                           directly is still blocked. *@
+                        @if (User.Identity is { IsAuthenticated: true } && User.IsInRole(ElektriKalkulaator.Core.Domain.UserRoles.Admin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link px-3" asp-controller="Products" asp-action="Create">Halda</a>
+                            </li>
+                        }
+                    </ul>
 
-                        @* User.Identity.IsAuthenticated is true once someone has signed in.
-                           User.IsInRole("Admin") checks their role, so the admin link is only
-                           shown to administrators.
-                           NOTE: hiding a link is presentation, not security — the real protection
-                           is [Authorize(Roles = "Admin")] on the controller. Someone typing the
-                           URL directly is still blocked. *@
+                    <ul class="navbar-nav align-items-center gap-2 nav-actions">
                         @if (User.Identity is { IsAuthenticated: true })
                         {
-                            @if (User.IsInRole(ElektriKalkulaator.Core.Domain.UserRoles.Admin))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link px-3" asp-controller="Products" asp-action="Create">
-                                        Halda
-                                    </a>
-                                </li>
-                            }
                             <li class="nav-item d-flex align-items-center">
-                                <span class="nav-link px-3 text-muted-custom" style="cursor:default">
-                                    👤 @(User.Identity.Name)
-                                </span>
+                                <span class="nav-user">👤 @(User.Identity.Name)</span>
                             </li>
                             <li class="nav-item d-flex align-items-center">
                                 @* Logout is a POST so another site cannot sign our users out. *@
@@ -122,17 +109,26 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link px-3" asp-controller="Account" asp-action="Login">
-                                    Logi sisse
-                                </a>
+                                <a class="nav-link px-3" asp-controller="Account" asp-action="Login">Logi sisse</a>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                <a class="btn btn-sm btn-amber ms-2" asp-controller="Account" asp-action="Register">
-                                    Loo konto
-                                </a>
+                                <a class="btn btn-sm btn-amber" asp-controller="Account" asp-action="Register">Loo konto</a>
                             </li>
                         }
+
+                        @* The theme switch is LAST, at the far right edge. It is a setting rather
+                           than a destination, so it does not belong among the page links.
+
+                           A <button> rather than a link because it performs an action instead of
+                           navigating. theme.js fills in the icon and label, so it starts empty -
+                           which also means it stays invisible if JavaScript is off, rather than
+                           showing a control that cannot work. *@
+                        <li class="nav-item d-flex align-items-center">
+                            <button id="themeToggle" type="button" class="theme-toggle"
+                                    aria-label="Vaheta tausta värvi"></button>
+                        </li>
                     </ul>
+
                 </div>
             </div>
         </nav>

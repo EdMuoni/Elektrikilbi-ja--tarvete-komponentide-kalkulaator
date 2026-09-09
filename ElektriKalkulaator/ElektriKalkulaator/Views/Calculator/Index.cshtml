@@ -135,6 +135,23 @@
                                 <!-- Iga BOM rida -->
                                 <tr>
                                     <td>
+                                        @* Photograph beside the name. "ABB S201-B32" means nothing
+                                           to someone who is not an electrician; a picture of a
+                                           breaker does, and it lets a professional confirm at a
+                                           glance that the right kind of part was chosen.
+                                           loading="lazy" stops a long BOM fetching every image
+                                           before the page can be read. *@
+                                        <div class="bom-component">
+                                            @if (!string.IsNullOrEmpty(item.ImagePath))
+                                            {
+                                                <img class="bom-thumb" src="@item.ImagePath" alt="" loading="lazy" />
+                                            }
+                                            else
+                                            {
+                                                @* Keeps the text column aligned when a product has no photo. *@
+                                                <span class="bom-thumb bom-thumb-empty" aria-hidden="true">📦</span>
+                                            }
+                                            <div>
                                         <div class="fw-semibold text-strong-custom">@item.ProductName</div>
                                         <div class="small text-muted-custom">@item.Brand</div>
                                         @* Circuit type badge with colour coding *@
@@ -156,6 +173,8 @@
                                         {
                                             <span class="badge-wire ms-1">@item.WireCrossSectionMm2 mm²</span>
                                         }
+                                            </div>
+                                        </div>
                                     </td>
                                     @* item.Unit is "tk" for countable items and "m" for cable, so a
                                        40-metre cable run reads "40 m" instead of "40 tk". *@

@@ -74,6 +74,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                     {
                         ProductId           = breaker.Id,
                         ProductName         = breaker.Name,
+                        ImagePath           = breaker.ImagePath,
                         Brand               = breaker.Brand,
                         Quantity            = circuitCount,
                         UnitPrice           = breaker.Price,
@@ -103,6 +104,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                     {
                         ProductId           = wire.Id,
                         ProductName         = wire.Name,
+                        ImagePath           = wire.ImagePath,
                         Brand               = wire.Brand,
                         Quantity            = wireMeters,
                         UnitPrice           = wire.Price,
@@ -128,6 +130,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                 {
                     ProductId   = panelBox.Id,
                     ProductName = panelBox.Name,
+                        ImagePath           = panelBox.ImagePath,
                     Brand       = panelBox.Brand,
                     Quantity    = 1,
                     UnitPrice   = panelBox.Price,
@@ -150,6 +153,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                 {
                     ProductId   = rcd.Id,
                     ProductName = rcd.Name,
+                        ImagePath           = rcd.ImagePath,
                     Brand       = rcd.Brand,
                     Quantity    = 1,
                     UnitPrice   = rcd.Price,

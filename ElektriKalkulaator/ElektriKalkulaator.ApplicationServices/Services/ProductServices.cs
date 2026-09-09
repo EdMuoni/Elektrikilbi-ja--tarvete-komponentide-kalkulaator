@@ -103,6 +103,18 @@ namespace ElektriKalkulaator.ApplicationServices.Services
             return await query.ToListAsync();
         }
 
+        public async Task<IReadOnlyDictionary<Guid, int>> GetProductCountsByCategory()
+        {
+            // Grouped and counted in the database, so one small result comes back rather than
+            // every product row being fetched just to be counted here.
+            var counts = await _context.Products
+                .GroupBy(p => p.CategoryId)
+                .Select(g => new { CategoryId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            return counts.ToDictionary(x => x.CategoryId, x => x.Count);
+        }
+
         public async Task<IEnumerable<string>> GetBrands()
         {
             // Distinct brands taken from the products themselves rather than from a fixed list.

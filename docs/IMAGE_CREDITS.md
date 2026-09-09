@@ -7,6 +7,43 @@ attribution itself, and it must ship with the project.
 All product images are stored as **`.jpg`** in `ElektriKalkulaator/wwwroot/images/products/`.
 One format is used across the whole catalogue for consistency.
 
+## The two routes, and where each one stands (checked 2026-09-09)
+
+Edgar asked for manufacturer photography **and** free stock photography. They are at different
+stages, so this section records both honestly.
+
+### Route 1 — manufacturer media kits: NOT AVAILABLE YET
+
+ABB, Schneider Electric and Draka/Prysmian all publish product imagery, and manufacturers
+generally **want** their parts pictured by the people selling them. But their image libraries sit
+behind a **distributor or reseller agreement**, not a public licence. A search of their public
+material found distributor portals and contact routes, and no published terms that permit a third
+party to redistribute product photography.
+
+So this route is not blocked by principle — it is blocked by not having the agreement yet. What it
+needs, in order:
+
+1. Approach one supplier. `SUPPLIER_SYNC_SPEC.md` recommends **Onninen** first, because they are
+   already B2B-oriented and reseller-friendly.
+2. Ask specifically for a **reseller/dealer agreement including product media**. Media rights are
+   normally granted as part of it rather than separately.
+3. The same agreement is what unlocks phases 5–7 of `SUPPLIER_SYNC_SPEC.md` — real prices, real
+   stock data, and eventually automated ordering. **The photographs are a side benefit of the
+   agreement the shop needs anyway**, which is why it is worth doing properly rather than scraping.
+
+Until that exists, using their photographs would be a copyright violation in a document that is
+going to be publicly defended and archived.
+
+**iStock and similar paid libraries are not a shortcut.** Those images are licensed per-use and
+sold; the previews are watermarked. They are the one case where the question is not arguable.
+
+### Route 2 — free-licence photography: IN USE NOW
+
+Everything currently shipped comes from Wikimedia Commons, Unsplash and Pexels, all under licences
+that permit commercial use. Details in the tables below.
+
+---
+
 ## Why not manufacturer photos?
 
 ABB, Schneider Electric and Hager product photography is **copyrighted**. A real distributor gets
@@ -43,5 +80,16 @@ Stored in `ElektriKalkulaator/wwwroot/images/hero/`.
       corrected or files re-tagged after upload).
 - [ ] For the CC BY-SA image (`breaker.jpg`), keep this attribution visible or linked from the
       site itself, not only in the repository — that is what "BY" requires.
-- [ ] If real manufacturer photos are ever wanted, obtain them from the supplier feed described in
-      `PROJECT_ROADMAP.md` §D3, which comes with distribution rights attached.
+- [ ] If real manufacturer photos are ever wanted, obtain them through the reseller agreement
+      described above and in `SUPPLIER_SYNC_SPEC.md` — that agreement carries distribution rights
+      for the imagery as well as for the price and stock data.
+
+## A presentation note that matters more than the photographs
+
+Product photography is shot on **white**. Placing those cut-outs directly on a dark surface makes
+each one read as a glowing rectangle, because the photo carries its own background with it.
+
+The fix is not a better photograph — it is the `--product-tile` token, which is deliberately
+**white in both themes**. The photo sits on a white tile whatever the page around it is doing,
+because the tile belongs to the product rather than to the theme. Every trade catalogue in
+`RESEARCH_LOG.md` does exactly this.

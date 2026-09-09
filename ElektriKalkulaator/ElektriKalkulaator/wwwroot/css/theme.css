@@ -57,6 +57,10 @@
     --bg-nav:             #090E0C;                                                    /* navigation bar */
     --bg-subtle:          rgba(255, 255, 255, 0.045);                                 /* table headers, hover fills */
 
+    /* PRODUCT TILE - the same in BOTH themes, deliberately */
+    --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+    --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
     /* THE CONTRAST BAND - inverts between themes, see the module docstring */
     --bg-band:            #F3EEE7;                                                    /* the band surface */
     --band-ink:           #1A1511;                                                    /* headings inside the band */
@@ -123,6 +127,10 @@
         --bg-nav:             #FEFDFB;                                                    /* navigation bar */
         --bg-subtle:          rgba(26, 21, 17, 0.04);                                     /* table headers, hover fills */
 
+        /* PRODUCT TILE - the same in BOTH themes, deliberately */
+        --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+        --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
         /* THE CONTRAST BAND - inverts between themes, see the module docstring */
         --bg-band:            #1F1A16;                                                    /* the band surface */
         --band-ink:           #F6F4F1;                                                    /* headings inside the band */
@@ -182,6 +190,10 @@
     --bg-nav:             #FEFDFB;                                                    /* navigation bar */
     --bg-subtle:          rgba(26, 21, 17, 0.04);                                     /* table headers, hover fills */
 
+    /* PRODUCT TILE - the same in BOTH themes, deliberately */
+    --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+    --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
     /* THE CONTRAST BAND - inverts between themes, see the module docstring */
     --bg-band:            #1F1A16;                                                    /* the band surface */
     --band-ink:           #F6F4F1;                                                    /* headings inside the band */
@@ -239,6 +251,10 @@
     --bg-input:           #313D38;                                                    /* form fields */
     --bg-nav:             #090E0C;                                                    /* navigation bar */
     --bg-subtle:          rgba(255, 255, 255, 0.045);                                 /* table headers, hover fills */
+
+    /* PRODUCT TILE - the same in BOTH themes, deliberately */
+    --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+    --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
 
     /* THE CONTRAST BAND - inverts between themes, see the module docstring */
     --bg-band:            #F3EEE7;                                                    /* the band surface */

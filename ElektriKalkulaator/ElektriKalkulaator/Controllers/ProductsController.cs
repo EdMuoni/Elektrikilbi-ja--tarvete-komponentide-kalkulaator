@@ -54,6 +54,11 @@ namespace ElektriKalkulaator.Controllers
             // least as often as by category — an electrician frequently knows they want Schneider
             // before they know which category the part is filed under.
             ViewBag.Brands           = await _productServices.GetBrands();
+
+            // Counts drive two things in the view: a number beside each category filter, the way
+            // trade catalogues show them, and leaving out categories that hold nothing. The seeded
+            // "Klemmid" category has no products, so its filter used to open an empty page.
+            ViewBag.CategoryCounts   = await _productServices.GetProductCountsByCategory();
             ViewBag.SelectedBrand    = brand;
 
             ViewBag.Categories       = new SelectList(categories, "Id", "Name", categoryId);

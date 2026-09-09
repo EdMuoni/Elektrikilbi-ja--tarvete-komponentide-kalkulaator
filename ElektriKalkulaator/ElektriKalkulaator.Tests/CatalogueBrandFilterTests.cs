@@ -116,5 +116,49 @@ namespace ElektriKalkulaator.Tests
             Assert.NotEmpty(padded);
             Assert.All(padded, p => Assert.Equal(brand, p.Brand));
         }
+        [Fact]
+        public async Task CategoryCounts_MatchWhatTheCategoryFilterActuallyReturns()
+        {
+            // The catalogue prints these counts beside each filter, so a wrong number is a
+            // visible lie about the shop's contents.
+            var svc = Svc<IProductServices>();
+            var counts = await svc.GetProductCountsByCategory();
+
+            foreach (var (categoryId, claimed) in counts)
+            {
+                var actual = (await svc.Search(categoryId, null)).Count();
+                Assert.Equal(claimed, actual);
+            }
+        }
+
+        [Fact]
+        public async Task CategoryCounts_OmitCategoriesThatHoldNothing()
+        {
+            // THE REGRESSION GUARD. The seeded "Klemmid" category has no products, and the
+            // catalogue used to offer it as a filter anyway - clicking it opened an empty page,
+            // which reads as a broken site rather than an empty shelf.
+            //
+            // The view builds its category chips from the keys of this dictionary, so an empty
+            // category must never appear in it. The brand filter has always worked this way;
+            // categories did not, and nothing noticed until the chips were clicked one by one.
+            var svc = Svc<IProductServices>();
+            var counts = await svc.GetProductCountsByCategory();
+
+            Assert.All(counts, entry =>
+                Assert.True(entry.Value > 0,
+                    $"Category {entry.Key} is offered as a filter but holds no products."));
+
+            // And the ones that ARE listed must be the complete set of non-empty categories:
+            // silently dropping a category that has stock would hide products from the catalogue.
+            var everyProduct = await svc.Search(null, null);
+            var categoriesWithStock = everyProduct
+                .Select(p => p.CategoryId)
+                .Distinct()
+                .OrderBy(id => id)
+                .ToList();
+
+            Assert.Equal(categoriesWithStock, counts.Keys.OrderBy(id => id).ToList());
+        }
+
     }
 }

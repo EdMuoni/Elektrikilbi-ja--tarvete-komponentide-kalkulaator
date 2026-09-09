@@ -30,6 +30,14 @@ namespace ElektriKalkulaator.Core.ServiceInterface
         // Every brand that actually has a product, alphabetically. Used to build the brand
         // filter, so the list can never offer a brand that would return nothing.
         Task<IEnumerable<string>> GetBrands();
+
+        // How many products each category holds, keyed by category id. Categories with no
+        // products are simply absent from the dictionary.
+        //
+        // The catalogue uses this for two things: showing a count beside each filter, the way
+        // trade catalogues do, and leaving out categories that would open an empty page. The
+        // seeded "Klemmid" category had no products, so its filter was a dead end.
+        Task<IReadOnlyDictionary<Guid, int>> GetProductCountsByCategory();
         Task<Product?> GetById(Guid id);
         Task<Product> Create(ProductDto dto);
         Task<Product?> Update(ProductDto dto);

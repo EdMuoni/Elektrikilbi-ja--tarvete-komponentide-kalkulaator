@@ -1183,10 +1183,15 @@ main {
 
 /* The photograph is the largest thing on the card because it is what people
    actually scan by. A wall of part numbers takes far longer to search. */
+/* A white tile in BOTH themes - see the note in scripts/generate-theme.py.
+   Product photography is shot on white, so on a dark surface each cut-out reads
+   as a glowing rectangle. Every trade catalogue puts the photo on a white tile
+   whatever the page does, because the tile belongs to the product. */
 .product-card-media {
     display: block;
     aspect-ratio: 4 / 3;
-    background: var(--bg-subtle);
+    background: var(--product-tile);
+    border-bottom: 1px solid var(--product-tile-border);
     padding: var(--space-3);
 }
 
@@ -1406,8 +1411,8 @@ main {
     width: 48px;
     height: 48px;
     border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    background: var(--bg-subtle);
+    border: 1px solid var(--product-tile-border);
+    background: var(--product-tile);   /* white in both themes, as above */
     object-fit: contain;   /* contain, never cover: cropping a part photo hides the rating label */
     padding: 2px;
 }
@@ -1424,3 +1429,8 @@ main {
     /* On a phone the row is already tight; the name matters more than the picture. */
     .bom-thumb { width: 36px; height: 36px; }
 }
+
+/* The count beside a filter name. Dimmer than the label so the row still scans as
+   a list of names, with the number available when wanted rather than competing. */
+.chip-count { opacity: 0.65; font-variant-numeric: tabular-nums; }
+.chip-on .chip-count { opacity: 0.8; }

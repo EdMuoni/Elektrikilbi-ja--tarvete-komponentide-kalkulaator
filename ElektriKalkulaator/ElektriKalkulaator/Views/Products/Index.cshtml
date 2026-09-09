@@ -25,6 +25,14 @@
     var selectedBrand = ViewBag.SelectedBrand as string;
     var selectedCategoryName = allCategories.FirstOrDefault(c => c.Id == selectedCategory)?.Name;
 
+    var categoryCounts = ViewBag.CategoryCounts as IReadOnlyDictionary<Guid, int>
+                         ?? new Dictionary<Guid, int>();
+
+    // Only offer categories that actually hold something. A filter that opens an empty page is a
+    // dead end, and it reads as a broken site rather than as an empty shelf. The brand filter has
+    // worked this way from the start; categories did not, and "Klemmid" was the proof.
+    var visibleCategories = allCategories.Where(c => categoryCounts.ContainsKey(c.Id)).ToList();
+
     // Hiding an admin control is presentation, not security - the real protection is
     // [Authorize(Roles = "Admin")] on the controller. But showing a button that sends
     // an anonymous visitor to a login page is a dead end, so the check belongs here too.
@@ -105,11 +113,13 @@
         <a class="chip @(selectedCategory == null ? "chip-on" : "")"
            asp-action="Index" asp-route-brand="@selectedBrand"
            asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">Kõik</a>
-        @foreach (var c in allCategories)
+        @foreach (var c in visibleCategories)
         {
             <a class="chip @(selectedCategory == c.Id ? "chip-on" : "")"
                asp-action="Index" asp-route-categoryId="@c.Id" asp-route-brand="@selectedBrand"
-               asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">@c.Name</a>
+               asp-route-searchTerm="@searchTerm" asp-route-sort="@currentSort">
+                @c.Name <span class="chip-count">@categoryCounts[c.Id]</span>
+            </a>
         }
     </div>
 

@@ -45,8 +45,15 @@ Dark mode follows the established accessibility guidance:
   - accents are LIGHTER and LESS saturated than their light-mode counterparts;
     a fully saturated colour vibrates against a dark background
 
---bg-band is the one token that deliberately INVERTS between themes: warm cream
-on the dark theme, warm near-black on the light one. It paints a single section
+--product-tile is the one token that is IDENTICAL in both themes, which looks like
+a mistake and is not. Product photography is shot on white. Placing those cut-outs
+on a dark surface makes each one read as a glowing rectangle, because the photo
+brings its own background with it. Every trade catalogue solves this the same way:
+the photo sits on a white tile whatever the surrounding page does, so the tile is
+part of the product, not part of the theme.
+
+--bg-band is the opposite case - the one token that deliberately INVERTS between
+themes: warm cream on the dark theme, warm near-black on the light one. It paints a single section
 the opposite value to the rest of the page, which is what stops a long page
 reading as flat. Because it flips per theme, that rhythm survives the switch.
 """
@@ -68,6 +75,10 @@ GROUPS = [
         ("--bg-input",       "#313D38", "form fields"),
         ("--bg-nav",         "#090E0C", "navigation bar"),
         ("--bg-subtle",      "rgba(255, 255, 255, 0.045)", "table headers, hover fills"),
+    ]),
+    ("PRODUCT TILE - the same in BOTH themes, deliberately", [
+        ("--product-tile",        "#FFFFFF", "background behind a product photograph"),
+        ("--product-tile-border", "#E2E0DC", "its edge, so a white tile still has a shape"),
     ]),
     ("THE CONTRAST BAND - inverts between themes, see the module docstring", [
         ("--bg-band",     "#F3EEE7", "the band surface"),
@@ -129,6 +140,8 @@ LIGHT = {
     "--bg-primary": "#F2EEE8", "--bg-card": "#FEFDFB", "--bg-card-raised": "#FFFFFF",
     "--bg-input": "#FEFDFB", "--bg-nav": "#FEFDFB",
     "--bg-subtle": "rgba(26, 21, 17, 0.04)",
+
+    "--product-tile": "#FFFFFF", "--product-tile-border": "#E2E0DC",
 
     "--bg-band": "#1F1A16", "--band-ink": "#F6F4F1", "--band-muted": "#B3A99F",
     "--band-card": "#2C2723", "--band-border": "#3D352E",

@@ -31,6 +31,7 @@ this one because it is only loaded automatically from there.
 | `docs/TEST_ACCOUNTS.md` | Demo admin/customer logins and how they are kept out of production | When accounts change |
 | `docs/VOICE_AND_PERSONALITY.md` | How the site should sound; warmth without slowing it down | When writing user-facing copy |
 | `docs/SUPPLIER_SYNC_SPEC.md` | **Not built.** Plan for the dropshipping / price-sync model | Post-thesis only |
+| `docs/LOPUTOO_MUSTAND.md` | **The thesis itself, in Estonian.** Full draft following the TTHK template (TAR track), ~5 700 words. Marked `[EDGAR: ]` where Edgar's own decision is needed and `[KONTROLLI: ]` where a claim must be verified. | When the code changes in a way the thesis describes |
 
 ## Rules — follow these without being asked
 
@@ -44,7 +45,9 @@ this one because it is only loaded automatically from there.
    Start it with `dotnet run`, exercise the real HTTP endpoints, and say what you actually observed.
 6. **Clean up test data.** The dev database should end a session with 10 seeded products and only
    the seeded admin user.
-7. **Never invent EVS-HD 60364 clause numbers.** `CalculationRule.EvsReference` is deliberately
+7. **Never invent EVS-HD 60364 clause numbers.** This applies to
+   `docs/LOPUTOO_MUSTAND.md` as much as to the code — a fabricated standard
+   reference in the thesis is worse than a blank one. `CalculationRule.EvsReference` is deliberately
    empty until Edgar verifies them against the real standard. A fabricated citation in a thesis
    about standards compliance is worse than a blank field.
 8. **Never commit secrets.** Connection string and admin credentials live in User Secrets.

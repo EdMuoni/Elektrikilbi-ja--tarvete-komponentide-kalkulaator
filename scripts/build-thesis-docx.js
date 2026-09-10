@@ -290,10 +290,10 @@ add(
 
   h3("Ülevaade kasutatud tehnoloogiatest ja vahenditest"),
   p("Tehnoloogiate valikul eelistati õppekavas läbitud, hästi dokumenteeritud ja serveripoolseks renderdamiseks sobivaid vahendeid. Lõputöö riskikoht ei ole tehnoloogia uudsus, vaid see, kas töö saab tähtajaks valmis ja töötab."),
-  rich([{ t: "Kasutajaliides ja server: ASP.NET Core 9 MVC.", b: true }, { t: " Serveripoolne renderdamine sobib selle rakenduse iseloomuga — kalkulaator teeb ühe arvutuse ja kuvab tulemuse. Eraldi üheleherakendus ja JavaScripti raamistik lisaksid keerukust ilma kasuta. MVC eraldab andmed, kuvamise ja päringukäsitluse, mis on eeldus testitavusele (Microsoft, 2026a)." }], { bullet: { level: 0 } }),
+  rich([{ t: "Kasutajaliides ja server: ASP.NET Core 9 MVC.", b: true }, { t: " Serveripoolne renderdamine sobib selle rakenduse iseloomuga — kalkulaator teeb ühe arvutuse ja kuvab tulemuse. Eraldi üheleherakendus ja JavaScripti raamistik lisaksid keerukust ilma kasuta. MVC eraldab andmed, kuvamise ja päringukäsitluse, mis on eeldus testitavusele (Microsoft, n.d.-a)." }], { bullet: { level: 0 } }),
   rich([{ t: "Programmeerimiskeel: C#.", b: true }, { t: " Õppekavas läbitud keel, staatiliselt tüübitud, mis püüab suure osa vigadest kinni juba kompileerimisel." }], { bullet: { level: 0 } }),
   rich([{ t: "Andmebaas: Microsoft SQL Server.", b: true }, { t: " Relatsiooniline andmebaas, mis sobib andmemudelile, kus tooted, kategooriad ja arvutusreeglid on omavahel seotud." }], { bullet: { level: 0 } }),
-  rich([{ t: "ORM: Entity Framework Core 9.", b: true }, { t: " Vastendab C# klassid tabeliteks, mistõttu SQL-i ei kirjutata käsitsi. Filtreerimine ja sorteerimine rakendatakse päringule enne selle käivitamist, nii et need muutuvad SQL-päringu osaks (Microsoft, 2026b)." }], { bullet: { level: 0 } }),
+  rich([{ t: "ORM: Entity Framework Core 9.", b: true }, { t: " Vastendab C# klassid tabeliteks, mistõttu SQL-i ei kirjutata käsitsi. Filtreerimine ja sorteerimine rakendatakse päringule enne selle käivitamist, nii et need muutuvad SQL-päringu osaks (Microsoft, n.d.-b)." }], { bullet: { level: 0 } }),
   rich([{ t: "Migratsioonid: EF Core Migrations.", b: true }, { t: " Tagavad andmebaasi skeemi muudatuste versioonitud ja korratava rakendamise igas keskkonnas." }], { bullet: { level: 0 } }),
   rich([{ t: "Autentimine: ASP.NET Core Identity.", b: true }, { t: " Valmis lahendus kasutajate, paroolide räsimise ja rollide haldamiseks. Kaks rolli: administraator ja klient." }], { bullet: { level: 0 } }),
   rich([{ t: "Kujundus: Bootstrap 5 ja oma CSS-i muutujad.", b: true }, { t: " Bootstrap annab ruudustiku ja komponendid; kõik värvid on ühes failis muutujatena, mis teeb hele- ja tumeda režiimi võimalikuks." }], { bullet: { level: 0 } }),
@@ -324,7 +324,7 @@ add(
     ["August 2026", "Suurim arendusetapp: arvutusalgoritmi viimistlemine, turvalisus ja autentimine, automaattestid, kasutajaliidese \u00fcmberkujundamine.", "Aktiivsed commit'id alates 10.08.2026"],
     ["September 2026", "Kataloogi t\u00e4iendamine, standardi allikate uurimine, dokumentatsioon ja l\u00f5put\u00f6\u00f6 kirjutamine.", "Commit'id kuni 10.09.2026"],
   ], [1800, 4600, 2600]),
-  rich([{ t: "Kokku on versioonihalduses 44 commit\u2019it. Akt\u00e4ivse t\u00f6\u00f6 kestus oli " }, { t: "neli kuud", b: true }, { t: " \u2014 aprill ja mai 2026 ning august ja september 2026 \u2014 kokku 156 t\u00f6\u00f6tundi. Juuni ja juuli olid paus, mille p\u00f5hjustasid muud \u00f5ppet\u00f6\u00f6 kohustused." }]),
+  rich([{ t: "Kokku on versioonihalduses 44 commit\u2019it. Aktiivse t\u00f6\u00f6 kestus oli " }, { t: "neli kuud", b: true }, { t: " \u2014 aprill ja mai 2026 ning august ja september 2026 \u2014 kokku 156 t\u00f6\u00f6tundi. Juuni ja juuli olid paus, mille p\u00f5hjustasid muud \u00f5ppet\u00f6\u00f6 kohustused." }]),
   p("Kui arvestada ka kavandamise ja anal\u00fc\u00fcsi etappi veebruarist m\u00e4rtsini, h\u00f5lmab projekt kalendris veebruarist septembrini. T\u00f6\u00f6maht \u2014 156 tundi \u2014 tekkis siiski nende nelja aktiivse kuu jooksul, mist\u00f5ttu on korrektne rääkida neljakuulisest projektist."),
   rich([{ t: "Miks paus ei ole puudus. ", b: true }, { t: "Kahe etapi vahele j\u00e4\u00e4nud paus osutus kasulikuks: augustis projekti juurde naastes tuli lugeda oma enda koodi n\u00e4dalatepikkuse vahega, mis paljastas kohad, kus lahendus ei olnud ilma selgituseta arusaadav. Just sellest kogemusest kasvas v\u00e4lja dokumentatsioonikaust ja n\u00f5ue kirjutada iga muudatuse juurde selle p\u00f5hjus." }]),
   todo("Kuup\u00e4evad on \u00f5iged \u2014 v\u00f5etud git-ajaloost ja failide kuup\u00e4evadest. T\u00e4psusta tegevuste kirjeldusi oma m\u00e4lu j\u00e4rgi. KAITSMISEL: kui k\u00fcsitakse, miks kuup\u00e4evad ulatuvad veebruarist septembrini, aga t\u00f6\u00f6 kestis neli kuud, on vastus: kavandamine algas veebruaris, aktiivne arendus toimus neljal kuul kahes etapis, suvine paus vahel."),
@@ -374,10 +374,11 @@ add(
   p("Kasutajaliidese kavandamisel analüüsiti rahvusvahelisi erialaseid veebilehti. Analüüsist selgus, et need jagunevad kaheks vastandlikuks tüübiks: turunduslehed (tume taust, suur pealkiri, vähe elemente, eesmärk veenda) ja kataloogilehed (hele taust, tihe, fotopõhine, eesmärk aidata osa leida)."),
   p("Käesolev rakendus on mõlemat: avaleht peab veenma kalkulaatorit proovima, kataloog peab aitama leida konkreetse komponendi. Ühe tüübi rakendamine teisele on kõige levinum põhjus, miks veebileht „tundub vale“, kuigi iga üksik element on korras."),
   figure(String.raw`Website\1.PNG`, "Rakenduse avaleht. Ülal kangelasosa koos peamise tegevusnupuga, all mõõdetavad näitajad ja rakenduse põhiomadused."),
-  p("Kavandati kaks täielikku värvipaletti — hele ja tume — mille vahel kasutaja saab valida. Kõik värvid koondati ühte faili nimetatud muutujatena, nii et ükski vaade ei kirjuta värvi väärtust otse. Kontrastisuhted mõõdeti ja need vastavad WCAG AA nõudele (W3C, 2018)."),
+  todo("KUVAT\u00d5MMIST TULEB UUENDADA. Sellel pildil seisab veel vana tekst „Kogused tulevad EVS-HD 60364 n\u00f5uetest“. Rakenduses on see n\u00fc\u00fcdseks parandatud: „Kaabli ja kaitsel\u00fcliti valik l\u00e4htub EVS-HD 60364 p\u00f5him\u00f5tetest. Ahelate jaotus p\u00f5hineb projekteerimistaval.“ Tee avalehest ja ostukorvist uued kuvat\u00f5mmised ning asenda failid Pictures kaustas: Website 1.PNG ja 5.PNG. Muidu on joonisel kirjas v\u00e4ide, mille t\u00f6\u00f6 tekst ise \u00fcmber l\u00fckkab — seda k\u00fcsitakse kaitsmisel."),
+  p("Kavandati kaks täielikku värvipaletti — hele ja tume — mille vahel kasutaja saab valida. Kõik värvid koondati ühte faili nimetatud muutujatena, nii et ükski vaade ei kirjuta värvi väärtust otse. Kontrastisuhted mõõdeti ja need vastavad WCAG AA nõudele (W3C, 2025)."),
 
   h3("Turvalisuse kavandamine"),
-  p("Kuna rakendusel on administraatori funktsioonid ja kasutajate andmed, kavandati juba alguses rollipõhine ligipääs, CSRF-kaitse kõigil andmeid muutvatel vormidel, failiüleslaadimise kontroll ning sisendi valideerimine nii kliendi kui serveri poolel (OWASP, 2026)."),
+  p("Kuna rakendusel on administraatori funktsioonid ja kasutajate andmed, kavandati juba alguses rollipõhine ligipääs, CSRF-kaitse kõigil andmeid muutvatel vormidel, failiüleslaadimise kontroll ning sisendi valideerimine nii kliendi kui serveri poolel (OWASP, n.d.)."),
 );
 
 // ---- 1.4 ----------------------------------------------------------------
@@ -582,7 +583,7 @@ add(
   p("Turvakontrollide kordamiseks on skript, mis käivitab kõik rünnakukatsed töötava rakenduse vastu. Kõik 18 kontrolli läbivad. Lisaks kontrolliti käsitsi, et SQL-i süstimise ja XSS-i katsed ei anna tulemust ning kataloog jääb terveks."),
 
   h3("Ligipääsetavus"),
-  p("Kontrastisuhted mõõdeti skriptiga. Kõik teksti ja tausta paarid mõlemas režiimis ületavad WCAG AA nõude 4,5:1 (W3C, 2018). „Värvid valiti hoolikalt“ on arvamus; „mõõdeti 34 paari, madalaim 4,55, ükski ei jää alla nõude“ on kontrollitav fakt."),
+  p("Kontrastisuhted mõõdeti skriptiga. Kõik teksti ja tausta paarid mõlemas režiimis ületavad WCAG AA nõude 4,5:1 (W3C, 2025). „Värvid valiti hoolikalt“ on arvamus; „mõõdeti 34 paari, madalaim 4,55, ükski ei jää alla nõude“ on kontrollitav fakt."),
   new Paragraph({ children: [new PageBreak()] }),
 );
 
@@ -638,13 +639,14 @@ add(
   new Paragraph({ children: [new PageBreak()] }),
 
   h1("5. KASUTATUD ALLIKAD"),
-  p("Bootstrap. (2026). Bootstrap 5 documentation. Kättesaadav aadressil https://getbootstrap.com (vaadatud 09.09.2026)."),
-  p("Eesti Standardimis- ja Akrediteerimiskeskus. (2011). EVS-HD 60364-5-52:2011. Madalpingelised elektripaigaldised. Osa 5-52: Elektriseadmete valik ja paigaldamine. Juhistikud. Kättesaadav aadressil https://www.evs.ee (vaadatud 09.09.2026)."),
-  p("Microsoft. (2026a). ASP.NET Core documentation. Kättesaadav aadressil https://learn.microsoft.com/aspnet/core (vaadatud 09.09.2026)."),
-  p("Microsoft. (2026b). Entity Framework Core documentation. Kättesaadav aadressil https://learn.microsoft.com/ef/core (vaadatud 09.09.2026)."),
-  p("OWASP. (2026). Cross-Site Request Forgery Prevention Cheat Sheet. Kättesaadav aadressil https://cheatsheetseries.owasp.org (vaadatud 09.09.2026)."),
-  p("W3C. (2018). Web Content Accessibility Guidelines (WCAG) 2.1. Kättesaadav aadressil https://www.w3.org/TR/WCAG21/ (vaadatud 09.09.2026)."),
-  todo("Mall nõuab APA 7 viitamissüsteemi ja vähemalt 5 allikat — neid on kuus. Kontrolli vormistus üle malli LISA E järgi ja uuenda vaatamise kuupäevad. Lisa siia ka need allikad, mida sina ise kasutasid, eriti elektrotehnika-alased."),
+  p("Bootstrap. (n.d.). Bootstrap 5.3 documentation (v. 5.3.8). K\u00e4ttesaadav aadressil https://getbootstrap.com/docs/5.3/ (vaadatud 10.09.2026)."),
+  p("Eesti Standardimis- ja Akrediteerimiskeskus. (2011). EVS-HD 60364-5-52:2011. Madalpingelised elektripaigaldised. Osa 5-52: Elektriseadmete valik ja paigaldamine. Juhistikud. K\u00e4ttesaadav aadressil https://www.evs.ee/et/evs-hd-60364-5-52-2011-a1-2025 (vaadatud 10.09.2026)."),
+  p("Microsoft. (n.d.-a). ASP.NET Core documentation. K\u00e4ttesaadav aadressil https://learn.microsoft.com/aspnet/core (vaadatud 10.09.2026)."),
+  p("Microsoft. (n.d.-b). Entity Framework Core documentation. K\u00e4ttesaadav aadressil https://learn.microsoft.com/ef/core (vaadatud 10.09.2026)."),
+  p("OWASP. (n.d.). Cross-Site Request Forgery Prevention Cheat Sheet. K\u00e4ttesaadav aadressil https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html (vaadatud 10.09.2026)."),
+  p("W3C. (2025). Web Content Accessibility Guidelines (WCAG) 2.1. W3C Recommendation, 6. mai 2025. K\u00e4ttesaadav aadressil https://www.w3.org/TR/WCAG21/ (vaadatud 10.09.2026)."),
+  p("M\u00e4rkus allikate kohta: k\u00f5ik kuus URL-i kontrolliti 10.09.2026 ja need avanevad. Tehnilise dokumentatsiooni puhul, millel avaldamisaastat m\u00e4rgitud ei ole, kasutatakse APA 7 j\u00e4rgi t\u00e4hist (n.d.) ja lisatakse vaatamise kuup\u00e4ev.", { italics: true }),
+  todo("Allikaid on kuus, mall n\u00f5uab v\u00e4hemalt viit. K\u00f5ik URL-id on kontrollitud ja avanevad. Aastaarvud on parandatud: varem seisis siin mitu v\u00e4lja m\u00f5eldud aastat. Kui lisad omalt poolt allikaid \u2014 eriti elektrotehnika-alaseid \u2014 vormista need samas stiilis ja kontrolli malli LISA E n\u00e4idete j\u00e4rgi."),
   new Paragraph({ children: [new PageBreak()] }),
 
   h1("LISAD"),

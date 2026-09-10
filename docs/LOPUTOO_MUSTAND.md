@@ -846,17 +846,33 @@ lisamine on esimene edasiarenduse samm.
 > vaatamise kuupäevad. Kalle kasutab allviiteid (footnote) — kontrolli, kas
 > juhendaja eelistab seda või lõpuloetelu.]`
 
-1. Eesti Standardimis- ja Akrediteerimiskeskus. EVS-HD 60364 standardikogum.
-   <https://www.evs.ee>
-2. EVS-HD 60364-5-52. Madalpingelised elektripaigaldised. Osa 5-52:
-   Elektriseadmete valik ja paigaldamine. Juhistikud.
-3. Microsoft. ASP.NET Core dokumentatsioon. <https://learn.microsoft.com/aspnet/core>
-4. Microsoft. Entity Framework Core dokumentatsioon. <https://learn.microsoft.com/ef/core>
-5. Bootstrap 5 dokumentatsioon. <https://getbootstrap.com>
-6. xUnit.net dokumentatsioon. <https://xunit.net>
-7. W3C. Web Content Accessibility Guidelines (WCAG) 2.1. <https://www.w3.org/TR/WCAG21/>
-8. OWASP. Cross-Site Request Forgery Prevention Cheat Sheet.
-   <https://cheatsheetseries.owasp.org>
+1. Bootstrap. (n.d.). *Bootstrap 5.3 documentation* (v. 5.3.8). Kättesaadav aadressil
+   <https://getbootstrap.com/docs/5.3/> (vaadatud 10.09.2026).
+2. Eesti Standardimis- ja Akrediteerimiskeskus. (2011). *EVS-HD 60364-5-52:2011.
+   Madalpingelised elektripaigaldised. Osa 5-52: Elektriseadmete valik ja paigaldamine.
+   Juhistikud.* Kättesaadav aadressil
+   <https://www.evs.ee/et/evs-hd-60364-5-52-2011-a1-2025> (vaadatud 10.09.2026).
+3. Microsoft. (n.d.-a). *ASP.NET Core documentation.* Kättesaadav aadressil
+   <https://learn.microsoft.com/aspnet/core> (vaadatud 10.09.2026).
+4. Microsoft. (n.d.-b). *Entity Framework Core documentation.* Kättesaadav aadressil
+   <https://learn.microsoft.com/ef/core> (vaadatud 10.09.2026).
+5. OWASP. (n.d.). *Cross-Site Request Forgery Prevention Cheat Sheet.* Kättesaadav
+   aadressil <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
+   (vaadatud 10.09.2026).
+6. W3C. (2025). *Web Content Accessibility Guidelines (WCAG) 2.1.* W3C Recommendation,
+   6. mai 2025. Kättesaadav aadressil <https://www.w3.org/TR/WCAG21/> (vaadatud 10.09.2026).
+7. xUnit.net. (n.d.). *xUnit.net documentation.* Kättesaadav aadressil
+   <https://xunit.net> (vaadatud 10.09.2026).
+
+> **Kontrollitud 10.09.2026.** Kõik seitse URL-i avanevad. Aastaarvud on võetud allika
+> enda juurest, mitte oletatud:
+>
+> - **WCAG 2.1** sellel aadressil on **W3C Recommendation 6. mai 2025**, mitte 2018. WCAG 2.1
+>   avaldati esmakordselt 2018, kuid viidatav versioon on uuem — APA järgi viidatakse sellele
+>   versioonile, mida tegelikult loeti.
+> - **Microsoft, OWASP, Bootstrap ja xUnit** on pidevalt uuendatav dokumentatsioon ilma
+>   avaldamisaastata, mistõttu APA 7 näeb ette tähise **(n.d.)** koos vaatamise kuupäevaga.
+> - **EVS-HD 60364-5-52:2011** — aastaarv 2011 on standardi enda tähis ja on korrektne.
 
 ---
 

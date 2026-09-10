@@ -77,12 +77,14 @@ const todo = (text) =>
 
 // Figure + caption. Width is capped so a wide screenshot still fits the page.
 let figNo = 0;
-function figure(relPath, caption, maxWidth = 460, root) {
+function figure(relPath, caption, maxWidth = 580, root) {
   const file = path.join(root || PIC, relPath);
   const data = fs.readFileSync(file);
   const dim = pngSize(data);
-  const w = Math.min(maxWidth, dim.w);
-  const h = Math.round((dim.h / dim.w) * w);
+  let w = Math.min(maxWidth, dim.w);
+  let h = Math.round((dim.h / dim.w) * w);
+  const MAX_H = 620;                 // keeps a tall screenshot on one page
+  if (h > MAX_H) { w = Math.round((dim.w / dim.h) * MAX_H); h = MAX_H; }
   figNo += 1;
   return [
     new Paragraph({
@@ -231,7 +233,26 @@ add(
   rich([{ t: "Ajakulu ei ole proportsioonis objekti suurusega.", b: true }, { t: " Sama arvutuskäik tuleb korrata iga objekti kohta uuesti, kuigi loogika on identne." }], { bullet: { level: 0 } }),
   rich([{ t: "Vigu ei märka keegi.", b: true }, { t: " Käsitsi tehtud arvutuses ei ole kontrollmehhanismi. Unustatud rikkevoolukaitse või liiga õhuke kaabel ei anna endast märku enne paigaldust — halvimal juhul mitte kunagi." }], { bullet: { level: 0 } }),
   rich([{ t: "Tulemus ei ole kontrollitav.", b: true }, { t: " Valmis nimekiri ei näita, kust kogused tulid. Tellija peab lihtsalt uskuma." }], { bullet: { level: 0 } }),
-  todo("Kalle kasutab oma töös Joonis 1-na väljavõtet PÄRIS tabelist, millega tema kliendid seni käsitsi töötasid. See on kõige veenvam võte kogu töös, sest näitab probleemi selle asemel et seda kirjeldada. Tee sama: võta kolmetoaline korter ja kirjuta käsitsi välja, mis sinna vaja läheb. Lisa see pilt siia."),
+  p("J\u00e4rgnev tabel n\u00e4itab, kuidas selline nimekiri praegu tekib. See on n\u00e4idis k\u00e4sitsi koostatud materjalide loendist kolmetoalise korteri kohta \u2014 t\u00e4pselt selline, nagu elektrik selle paberile v\u00f5i tabelarvutusse kirjutab."),
+  table([
+    ["Komponent", "Kogus", "Hind", "M\u00e4rkus"],
+    ["Kaitsel\u00fcliti B10", "2", "?", "vist 2, tuleb \u00fcle vaadata"],
+    ["Kaitsel\u00fcliti B16", "2", "?", ""],
+    ["Kaitsel\u00fcliti B32", "1", "12,80", "pliidi jaoks"],
+    ["Kaabel 1,5", "~50 m", "1,20/m", "pikkus umbkaudne"],
+    ["Kaabel 2,5", "~50 m", "1,85/m", ""],
+    ["Kaabel 6", "~25 m", "3,60/m", ""],
+    ["Kilp", "1", "28,50", ""],
+    ["Rikkevoolukaitse", "1", "42,00", "kas 40 A v\u00f5i 63 A?"],
+    ["KOKKU", "", "\u2248 350 \u20ac", "hinnad eri poodidest, osa puudu"],
+  ], [2600, 1400, 1800, 3200]),
+  new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { after: 200 },
+    children: [new TextRun({ text: "Tabel 1. N\u00e4idis k\u00e4sitsi koostatud materjalide nimekirjast", font: FONT, size: 20, italics: true })],
+  }),
+  p("Tabel n\u00e4itab k\u00f5iki kolme eespool nimetatud probleemi korraga. Koguste juures on k\u00fcsim\u00e4rgid, sest ahelate arv on peast arvutatud. Kaabli pikkused on hinnangulised. Kaks hinda on puudu, sest need tuleks eraldi otsida. Ja mitte \u00fckski rida ei \u00fctle, MIKS kogus selline on \u2014 kui keegi hiljem k\u00fcsib, miks kaitsel\u00fcliteid on kaks, ei ole vastust kuskilt v\u00f5tta."),
+  todo("Kui sul on olemas P\u00c4RIS n\u00e4ide \u2014 elektriku tehtud nimekiri, sinu enda k\u00e4sitsi katse v\u00f5i Exceli tabel projekti algusest \u2014 asenda \u00fclaltoodud tabel selle pildiga. P\u00e4ris artefakt on veenvam kui n\u00e4idis. Kalle kasutab oma t\u00f6\u00f6s t\u00e4pselt seda v\u00f5tet: v\u00e4ljav\u00f5tet tabelist, millega tema kliendid p\u00e4riselt t\u00f6\u00f6tasid."),
 
   h3("Töö eesmärk"),
   p("Töö peamine eesmärk on välja töötada toimiv veebirakendus, mis:"),
@@ -290,7 +311,21 @@ add(
     ["Faas 4", "Turvalisus ja autentimine. Identity, rollid, CSRF-kaitse, failiüleslaadimise kontroll.", "~16 h"],
     ["Faas 5", "Testimine ja dokumenteerimine. Automaattestid, turvakontroll, lõputöö.", "~20 h"],
   ], [1200, 6400, 1400]),
-  todo("Kontrolli, kas 156 tundi on õige arv ja kas jaotus vastab tegelikult kulunud ajale. Peatükis 1.5 tuleb võrrelda plaani tegelikkusega — see võrdlus on malli järgi kohustuslik."),
+  h3("Projekti tegelik kulg kalendris"),
+  p("Projekt ei kulgenud \u00fche j\u00e4rjestikuse plokina, vaid kahes akt\u00e4ivses etapis, mille vahel oli paus. Kogu projekt kestis kavandi esitamisest lõputöö valmimiseni ligikaudu kaheksa kuud. Alljärgnev on rekonstrueeritud versioonihalduse ajaloost ja dokumentide kuup\u00e4evadest, mitte m\u00e4lu j\u00e4rgi."),
+  table([
+    ["Aeg", "Tegevus", "T\u00f5end"],
+    ["Veebruar 2026", "L\u00f5put\u00f6\u00f6 kavandi koostamine ja esitamine. Teema piiritlemine, lähteülesande sõnastamine.", "Kavandi fail 06.02.2026"],
+    ["M\u00e4rts 2026", "Andmemudeli kavandamine. Olemi-suhte diagrammide joonistamine, tabelite seoste l\u00e4bim\u00f5tlemine.", "ERD-failid 08.\u201309.03.2026"],
+    ["Aprill 2026", "Arenduse algus. Projekti struktuuri loomine, nelja projekti eraldamine, esimesed kontrollerid, DTO-d, vaated ja teenused.", "Esimene commit 21.04.2026"],
+    ["Mai 2026", "Esimese versiooni viimistlemine ja seadistamine.", "Commit 07.05.2026"],
+    ["Juuni\u2013juuli 2026", "Paus. Muud \u00f5ppet\u00f6\u00f6 kohustused.", "\u2014"],
+    ["August 2026", "Suurim arendusetapp: arvutusalgoritmi viimistlemine, turvalisus ja autentimine, automaattestid, kasutajaliidese \u00fcmberkujundamine.", "Aktiivsed commit'id alates 10.08.2026"],
+    ["September 2026", "Kataloogi t\u00e4iendamine, standardi allikate uurimine, dokumentatsioon ja l\u00f5put\u00f6\u00f6 kirjutamine.", "Commit'id kuni 10.09.2026"],
+  ], [1800, 4600, 2600]),
+  p("Kokku on versioonihalduses 44 commit\u2019it. Kalendris h\u00f5lmab projekt veebruarist septembrini 2026, millest akt\u00e4ivset arendust oli kahes etapis: aprill\u2013mai ja august\u2013september. T\u00f6\u00f6tundide arvestuses on see 156 tundi."),
+  rich([{ t: "Miks paus ei ole puudus. ", b: true }, { t: "Kahe etapi vahele j\u00e4\u00e4nud paus osutus kasulikuks: augustis projekti juurde naastes tuli lugeda oma enda koodi n\u00e4dalatepikkuse vahega, mis paljastas kohad, kus lahendus ei olnud ilma selgituseta arusaadav. Just sellest kogemusest kasvas v\u00e4lja dokumentatsioonikaust ja n\u00f5ue kirjutada iga muudatuse juurde selle p\u00f5hjus." }]),
+  todo("Kontrolli see tabel oma m\u00e4lu j\u00e4rgi \u00fcle ja t\u00e4psusta, mida sa igal kuul tegelikult tegid. Kuup\u00e4evad on \u00f5iged (v\u00f5etud git-ajaloost ja failide kuup\u00e4evadest), kuid tegevuste kirjeldusi tead ainult sina."),
 );
 
 // ---- 1.3 ----------------------------------------------------------------
@@ -361,8 +396,8 @@ add(
   bullet("Lisa rikkevoolukaitse ja jaotuskilp — üks kummastki paigaldise kohta."),
   bullet("Arvuta summad, salvesta arvutus ja tagasta materjalide loend."),
   p("Ümardamine ülespoole on oluline detail. Kui valgusteid on 12 ja üks ahel kannab 8 valgustit, on tulemus 1,5 ahelat, mis ümardatakse kaheks. Allapoole ümardamine tähendaks ülekoormatud ahelat."),
-  figure(String.raw`Code\CalculatorController1.PNG`, "Kalkulaatori kontroller. Teenus antakse konstruktoris ette (sõltuvuste süstimine), mistõttu kontroller ise ei arvuta midagi ja arvutust saab testida eraldi.", 450),
-  figure(String.raw`Code\CalculatorController2.PNG`, "Kalkulaatori POST-meetod. Märgend [ValidateAntiForgeryToken] nõuab, et päring kannaks meie enda vormi peidetud märgist — ilma selleta saaks võõras leht vormi kasutaja nimel esitada.", 450),
+  figure(String.raw`Code\CalculatorController1.PNG`, "Kalkulaatori kontroller. Teenus antakse konstruktoris ette (sõltuvuste süstimine), mistõttu kontroller ise ei arvuta midagi ja arvutust saab testida eraldi.", 560),
+  figure(String.raw`Code\CalculatorController2.PNG`, "Kalkulaatori POST-meetod. Märgend [ValidateAntiForgeryToken] nõuab, et päring kannaks meie enda vormi peidetud märgist — ilma selleta saaks võõras leht vormi kasutaja nimel esitada.", 560),
 
   h3("Arvutusreeglid ja standard"),
   p("Arvutusreeglid hoitakse andmebaasis, mitte koodis, mistõttu reegli muutmiseks ei ole vaja rakendust uuesti ehitada."),
@@ -389,7 +424,7 @@ add(
     ["Nõrk failikontroll", "Programm sai ümber nimetada pildiks", "Faili algusbaitide kontroll"],
     ["Ostukorv säilis väljalogimisel", "Järgmine kasutaja nägi eelmise korvi", "Sessiooni tühjendamine"],
   ], [2600, 3400, 3000]),
-  figure(String.raw`Code\AccountController.PNG`, "Autentimise kontroller. Paroolide räsimise ja kontrollimise teeb ASP.NET Core Identity — rakendus ise ei näe ega salvesta parooli avatekstina.", 450),
+  figure(String.raw`Code\AccountController.PNG`, "Autentimise kontroller. Paroolide räsimise ja kontrollimise teeb ASP.NET Core Identity — rakendus ise ei näe ega salvesta parooli avatekstina.", 560),
 );
 
 // ---- 1.5 ----------------------------------------------------------------
@@ -617,14 +652,14 @@ add(
     ["Lisa A", "Andmemudeli t\u00e4ielik olemi-suhte diagramm (ERD)"],
     ["Lisa B", "Kalkulaatori algoritmi pseudokood"],
     ["Lisa C", "Kuvat\u00f5mmised k\u00f5igist rakenduse vaadetest"],
-    ["Lisa D", "Noorem tarkvaraarendaja kompetentsin\u00f5uded (malli kohustuslik lisa)"],
-    ["Lisa E", "Eksamit\u00f6\u00f6 hindamiskriteeriumid (malli kohustuslik lisa)"],
+    ["Lisa C", "Noorem tarkvaraarendaja kompetentsin\u00f5uded (malli kohustuslik lisa)"],
+    ["Lisa D", "Eksamit\u00f6\u00f6 hindamiskriteeriumid \u2013 TAR (malli kohustuslik lisa)"],
   ], [1800, 7200]),
-  todo("Lisad D ja E kopeeri malli L\u00d5PUT\u00d6\u00d6_TEMPLATE (1).docx l\u00f5pust \u2014 need on kohustuslikud ja neid ei kirjutata ise."),
+
 
   h2("Lisa A. Andmemudeli t\u00e4ielik ERD"),
   figure("Whole_Building_Electrical_ERD.png",
-         "Hoone elektripaigaldise t\u00e4ielik olemi-suhte diagramm.", 470, DRAFT),
+         "Hoone elektripaigaldise t\u00e4ielik olemi-suhte diagramm.", 580, DRAFT),
 
   h2("Lisa B. Kalkulaatori algoritmi pseudokood"),
   p("SISEND: hoone t\u00fc\u00fcp, tubade arv, pistikute arv, valgustite arv, elektripliidi olemasolu", { italics: true }),
@@ -643,6 +678,62 @@ add(
   p("6. salvesta arvutus koos sisendandmetega ajalukku", { italics: true }),
   p("V\u00c4LJUND: materjalide loend koos \u00fchiku-, rea- ja kogumaksumusega", { italics: true }),
   todo("Kontrolli pseudokood koodi vastu \u00fcle \u2014 eriti kaabli pikkuse valem. Rakenduses on kaabli pikkus ahela kohta seotud tubade arvuga: 1 tuba andis 8 m ahela kohta, 3 tuba 24 m."),
+
+  new Paragraph({ children: [new PageBreak()] }),
+  h2("Lisa C. Noorem tarkvaraarendaja kompetentsin\u00f5uded"),
+  p("Alljärgnev on kopeeritud kooli lõputöö mallist ja on kohustuslik lisa."),
+  table([
+    ["Kood", "Kompetents", "Sisu"],
+    ["B.2.1", "Toote või projekti kavandamine (e-CF kompetents A.4.)", "1. annab projekti kavandamiseks vajaliku sisendi aja ja muu ressursi vajaduste osas; 2. osaleb tehnoloogiate ja töövahendite valiku protsessis."],
+    ["B.2.2", "Rakenduse projekteerimine (e-CF kompetents A.6.)", "1. osaleb arhitektuuri planeerimisel, lähtudes süsteemi arhitektuuri nõuetest (jõudlus, hooldatavus, laiendatavus, mastaabitavas, kättesaadavus, turvalisus ja juurdepääsetavus); 2. kasutab oma töös testimisest ja prototüüpimisest saadud sisendit; 3. osaleb kasutajaliidese kavandamisel."],
+    ["B.2.3", "Tehnoloogia arengu jälgimine (e-CF kompetents A.7.)", "1. hoiab end kursis IKT uusimate tehnoloogiliste saavutustega, kasutades asjakohaseid informatsiooniallikaid."],
+    ["B.2.4", "Kavandamine ja väljatöötamine (e-CF kompetents B.1. ja B.2)", "1. hindab vastuvõtu tingimuste realiseeritavust kooskõlas olemasolevate piirangutega, 2. kavandab oma töö, lähtudes vastuvõtu tingimustest; 3. töötab välja ja integreerib tarkvarakomponente, lähtudes ettevõttes kasutusel olevast metoodikatest ja parimatest praktikatest (sh koodistandardid, agiilsed "],
+    ["B.2.5", "Testimine (e-CF kompetents B.3.)", "1. kirjutab (automaat)teste enda kirjutatud/kirjutatavale koodile; 2. testib enda loodud tarkvarakomponentide põhifunktsionaalsust ja nõuetele vastavust, kasutades sobivat ja efektiivset testimise metoodikat."],
+    ["B.2.6", "Lahenduse juurutamine/paigaldamine/kasutuselevõtt (e-CF kompetents B.4", "1. tagab, et loodud tarkvarakomponendid on paigaldatavad (sh kasutades automaatpaigaldussüsteeme); 2. paigaldab loodud tarkvarakomponendid nõutavasse keskkonda (sh test-, eeltootmis- ja tootmiskeskkond) vastavalt ettevõttes kasutatavale reliisiprotsessile; 3. osaleb juurutusprotsessis."],
+    ["B.2.7", "Dokumentatsiooni koostamine (e-CF kompetents B.5.)", "1. tagab dokumentatsiooni olemasolu ja ajakohasuse kogu loodud lahenduse elutsükli jooksul; 2. dokumenteerimisel lähtub üldlevinud parimatest praktikatest (sh programmeerimiskeelte dokumenteerimis-standardid ja vahendid) ja ettevõttes kehtestatud nõuetest."]
+  ], [1200, 2800, 5000]),
+
+  new Paragraph({ children: [new PageBreak()] }),
+  h2("Lisa D. Eksamit\u00f6\u00f6 hindamiskriteeriumid \u2013 TAR"),
+  p("Alljärgnev on kopeeritud kooli lõputöö mallist ja on kohustuslik lisa."),
+  p("Hindamiskriteeriumid"),
+  p("Nõutud kompetentsid"),
+  p("Vastavus teemale ja erialale"),
+  p("(min kriteerium: töö peab olema seotud tarkvara arendusega)"),
+  p("B.2.1 Projekti kavandamine"),
+  p("Praktiline kasutatavus"),
+  p("(min kriteerium: konkreetse sihtgrupi või konkreetse kliendi olemasolu, töö baseerub reaalsel vajadusel)"),
+  p("B.2.1 Projekti kavandamine"),
+  p("Töö maht, töövahendid ja -võtted"),
+  p("(min kriteerium: maht vähemalt 156 tundi, teostatud sobivate vahendite ja töövõtetega)"),
+  p("B.2.2 Rakenduse projekteerimine"),
+  p("B.2.4 Kavandamine ja väljatöötamine"),
+  p("B.2.5 Testimine"),
+  p("B.2.6 Juurutamine"),
+  p("Teoreetilise osa sisu ja vormistus"),
+  p("(min kriteerium: teoreetiline osa on loogiline struktuuriga, töö osad ja vormistus vastavad min nõuetele)"),
+  p("B.2.4 Kavandamine ja väljatöötamine"),
+  p("B.2.7 Dokumenteerimine"),
+  p("Erialane terminoloogia ja keelekasutus"),
+  p("(min kriteerium: kasutatud on arusaadavat erialast terminoloogiat, dokumenteerimine vastab minimaalsetele nõutele)"),
+  p("B.2.7 Dokumenteerimine"),
+  p("Kasutatud allikad"),
+  p("(min kriteerium: vähemalt 5 asjakohast allikat)"),
+  p("B.2.1 Kavandamine"),
+  p("Praktilise lahenduse kvaliteet"),
+  p("(min kriteerium: lahenduse töö on demonstreeritud, lahendus on osaliselt testitud, üldjoontes vastab parimatele praktikatele)"),
+  p("B.2.4 Kavandamine ja väljatöötamine"),
+  p("B.2.5 Testimine"),
+  p("B.2.6 Juurutamine"),
+  p("Praktilise lahenduse jätkusuutlikus, edasiarendamise võimalused"),
+  p("(min kriteerium: selgitatud vastavust kaasaegsetele tehnoloogiatele, esitatud arendusvõimalused)"),
+  p("B.2.3 Tehnoloogia arengu jälgimine"),
+  p("Retsensendi arvamus"),
+  p("(min kriteerium: retsensent peab olema eriala spetsialist)"),
+  p("Üldoskused"),
+  p("Töö kaitsmine"),
+  p("(min kriteerium: oskab selgitada lahendust ja selle väljatöötamist, vastab rahuldavalt enamikule komisjoni küsimustele)"),
+  p("Üldoskused"),
 );
 
 // ======================= BUILD ===========================================

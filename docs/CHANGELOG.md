@@ -44,6 +44,51 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-10 — Removed the school appendices, redrew the ERD from the real EF Core model
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `scripts/build-thesis-docx.js` — deleted the entire LISAD section (Lisa A–E, ~7 000 characters).
+- `scripts/generate-erd.py` — new. Generates the entity-relationship diagram as SVG from the
+  model declared in `ElektriKalkulaatorContext.cs`, then it is rendered to PNG at 3x
+  (`Pictures/Diagrams/ERD_ElektriKalkulaator.png`, also kept as `.svg`).
+- `scripts/build-thesis-docx.js` — chapter 1.3 now shows that generated ERD instead of the
+  draft screenshot; chapter 3 gained two new sections, "Kavandatud ja realiseeritud andmemudeli
+  vahe" (which is where the wide draft ERD now lives, correctly labelled as a planning artefact)
+  and "Soovitused sarnase töö tegijale".
+
+**Why**
+- Edgar asked whether the appendices were actually required by the school template. They are not.
+  The template's LISA A–E are the e-CF competency table the student is *assessed against*, the
+  assessment criteria, and a referencing guide — reference material inside the template, not
+  content to reproduce. Kalle Olumets' exam work, the model for this document, has no appendices;
+  his contents list ends at "5. KASUTATUD ALLIKAD". Lisa A also duplicated the ERD already shown
+  in 1.3 and Lisa B repeated the algorithm already described in 1.4. They were there to reach a
+  page count, which is the wrong reason to put anything in a thesis.
+- JÄRELDUSED JA SOOVITUSED, which Edgar questioned in the same breath, **is** required: it is a
+  Pealkiri1 heading in `LÕPUTÖÖ_TEMPLATE (1).docx` and appears in Kalle's contents as
+  section 3. It stays.
+- The old ERD was a screenshot from the pre-project React draft. It showed tables that were never
+  built (AI_SERVICE, PRODUCT_TRANSLATION, PRODUCT_SPEC, BRAND) and blurred at print size, so the
+  thesis was illustrating its own data model with a picture of a different data model. Generating
+  the figure from the context class means it cannot drift from the code the way a hand-drawn
+  diagram does.
+- The draft ERD was not discarded: shown against the built model it demonstrates the gap between
+  what was planned and what fitted into 156 hours, which is a genuine finding and belongs in the
+  conclusions chapter.
+
+**How it was verified**
+- Rebuilt the document; Word COM reports **36 pages, 5 970 words, 10 figures** (was 39 / 6 301 / 10
+  with the appendices).
+- Every figure measured through Word: all render at 420–435 pt against a 453 pt text column, so
+  none is cropped or shrunk. The new ERD occupies the full column at 435 × 318 pt on page 15.
+- The generated PNG was inspected directly; a first render had the dashed "no foreign key" line
+  running through its own label, which was fixed by breaking the path around the crossing.
+
+---
+
 ## 2026-09-09 — Fixed the white BOM table, added component photos, centred the navigation
 
 **Type:** bugfix + feature

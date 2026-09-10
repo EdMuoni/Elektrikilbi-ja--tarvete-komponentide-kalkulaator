@@ -44,6 +44,39 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-11 — Redrew the ERD in crow's foot notation
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `scripts/generate-erd.py` — rewritten. Each table now has a coloured header, a PK/FK gutter
+  with cell borders, the primary key underlined on a tinted first row, and `name (type)` fields.
+  Cardinality is carried by crow's foot connectors (`foot()`) instead of "1"/"N" text: bar for
+  exactly one, hollow circle for optional, crow's foot for many. A legend explains the notation.
+- Column gap widened from 15 pt to 35 pt and box width reduced 178 → 166 pt.
+
+**Why**
+- Edgar showed a reference ERD in the conventional crow's foot style and asked why the diagram
+  could not look like that. It could; the first version was simply drawn in a plainer style.
+  Crow's feet also carry more information than "1"/"N" labels — they distinguish *zero* or many
+  from *one* or many, which matters here because `PowerboxCalculation.UserId` is nullable and the
+  diagram should show that a calculation can exist with no user attached.
+- The 35 pt column gap is not cosmetic. Two cardinality symbols meet in every horizontal gap and
+  each needs about 15 pt of clear line; at the original 15 pt they overlapped into an unreadable
+  blob, which is what the first render showed.
+- The reference diagram Edgar supplied is the *planned* model — it has `name_et` / `name_en` /
+  `name_rus`, `rule_logic (json)` and `component_name_et`, none of which exist in the database.
+  The style was copied; the column names remain the real ones from the context class.
+
+**How it was verified**
+- Rendered and inspected at 1740 × 1248 px. The first render had the user–calculation symbols
+  colliding; fixed by widening the gap and re-rendered.
+- Rebuilt the document: **36 pages, 5 970 words, 10 figures**, unchanged by the swap.
+- Word reports the ERD at 435 × 312 pt on page 15, full text-column width (column is 453 pt).
+
+---
+
 ## 2026-09-10 — Removed the school appendices, redrew the ERD from the real EF Core model
 
 **Type:** docs

@@ -311,21 +311,23 @@ add(
     ["Faas 4", "Turvalisus ja autentimine. Identity, rollid, CSRF-kaitse, failiüleslaadimise kontroll.", "~16 h"],
     ["Faas 5", "Testimine ja dokumenteerimine. Automaattestid, turvakontroll, lõputöö.", "~20 h"],
   ], [1200, 6400, 1400]),
-  h3("Projekti tegelik kulg kalendris"),
-  p("Projekt ei kulgenud \u00fche j\u00e4rjestikuse plokina, vaid kahes akt\u00e4ivses etapis, mille vahel oli paus. Kogu projekt kestis kavandi esitamisest lõputöö valmimiseni ligikaudu kaheksa kuud. Alljärgnev on rekonstrueeritud versioonihalduse ajaloost ja dokumentide kuup\u00e4evadest, mitte m\u00e4lu j\u00e4rgi."),
+  h3("Projekti kestus: neli aktiivset t\u00f6\u00f6kuud"),
+  p("Projekti aktiivne t\u00f6\u00f6maht jaotus \u00fcle NELJA T\u00d6\u00d6KUU: aprill, mai, august ja september 2026. Need neli kuud jagunesid kahte etappi, mille vahele j\u00e4i suvine paus. Kavandamine ja anal\u00fc\u00fcs algasid varem, veebruaris, kuid programmeerimist nendel kuudel veel ei toimunud."),
+  p("Alljärgnev tabel on rekonstrueeritud versioonihalduse ajaloost ja dokumentide kuup\u00e4evadest, mitte m\u00e4lu j\u00e4rgi. Iga rea juures on n\u00e4idatud t\u00f5end, mille alusel see on kirja pandud."),
   table([
     ["Aeg", "Tegevus", "T\u00f5end"],
     ["Veebruar 2026", "L\u00f5put\u00f6\u00f6 kavandi koostamine ja esitamine. Teema piiritlemine, lähteülesande sõnastamine.", "Kavandi fail 06.02.2026"],
     ["M\u00e4rts 2026", "Andmemudeli kavandamine. Olemi-suhte diagrammide joonistamine, tabelite seoste l\u00e4bim\u00f5tlemine.", "ERD-failid 08.\u201309.03.2026"],
     ["Aprill 2026", "Arenduse algus. Projekti struktuuri loomine, nelja projekti eraldamine, esimesed kontrollerid, DTO-d, vaated ja teenused.", "Esimene commit 21.04.2026"],
     ["Mai 2026", "Esimese versiooni viimistlemine ja seadistamine.", "Commit 07.05.2026"],
-    ["Juuni\u2013juuli 2026", "Paus. Muud \u00f5ppet\u00f6\u00f6 kohustused.", "\u2014"],
+    ["Juuni\u2013juuli 2026", "PAUS \u2014 muud \u00f5ppet\u00f6\u00f6 kohustused. Neid kuid ei arvestata t\u00f6\u00f6mahu sisse.", "commit\u2019e ei ole"],
     ["August 2026", "Suurim arendusetapp: arvutusalgoritmi viimistlemine, turvalisus ja autentimine, automaattestid, kasutajaliidese \u00fcmberkujundamine.", "Aktiivsed commit'id alates 10.08.2026"],
     ["September 2026", "Kataloogi t\u00e4iendamine, standardi allikate uurimine, dokumentatsioon ja l\u00f5put\u00f6\u00f6 kirjutamine.", "Commit'id kuni 10.09.2026"],
   ], [1800, 4600, 2600]),
-  p("Kokku on versioonihalduses 44 commit\u2019it. Kalendris h\u00f5lmab projekt veebruarist septembrini 2026, millest akt\u00e4ivset arendust oli kahes etapis: aprill\u2013mai ja august\u2013september. T\u00f6\u00f6tundide arvestuses on see 156 tundi."),
+  rich([{ t: "Kokku on versioonihalduses 44 commit\u2019it. Akt\u00e4ivse t\u00f6\u00f6 kestus oli " }, { t: "neli kuud", b: true }, { t: " \u2014 aprill ja mai 2026 ning august ja september 2026 \u2014 kokku 156 t\u00f6\u00f6tundi. Juuni ja juuli olid paus, mille p\u00f5hjustasid muud \u00f5ppet\u00f6\u00f6 kohustused." }]),
+  p("Kui arvestada ka kavandamise ja anal\u00fc\u00fcsi etappi veebruarist m\u00e4rtsini, h\u00f5lmab projekt kalendris veebruarist septembrini. T\u00f6\u00f6maht \u2014 156 tundi \u2014 tekkis siiski nende nelja aktiivse kuu jooksul, mist\u00f5ttu on korrektne rääkida neljakuulisest projektist."),
   rich([{ t: "Miks paus ei ole puudus. ", b: true }, { t: "Kahe etapi vahele j\u00e4\u00e4nud paus osutus kasulikuks: augustis projekti juurde naastes tuli lugeda oma enda koodi n\u00e4dalatepikkuse vahega, mis paljastas kohad, kus lahendus ei olnud ilma selgituseta arusaadav. Just sellest kogemusest kasvas v\u00e4lja dokumentatsioonikaust ja n\u00f5ue kirjutada iga muudatuse juurde selle p\u00f5hjus." }]),
-  todo("Kontrolli see tabel oma m\u00e4lu j\u00e4rgi \u00fcle ja t\u00e4psusta, mida sa igal kuul tegelikult tegid. Kuup\u00e4evad on \u00f5iged (v\u00f5etud git-ajaloost ja failide kuup\u00e4evadest), kuid tegevuste kirjeldusi tead ainult sina."),
+  todo("Kuup\u00e4evad on \u00f5iged \u2014 v\u00f5etud git-ajaloost ja failide kuup\u00e4evadest. T\u00e4psusta tegevuste kirjeldusi oma m\u00e4lu j\u00e4rgi. KAITSMISEL: kui k\u00fcsitakse, miks kuup\u00e4evad ulatuvad veebruarist septembrini, aga t\u00f6\u00f6 kestis neli kuud, on vastus: kavandamine algas veebruaris, aktiivne arendus toimus neljal kuul kahes etapis, suvine paus vahel."),
 );
 
 // ---- 1.3 ----------------------------------------------------------------

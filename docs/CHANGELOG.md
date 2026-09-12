@@ -44,6 +44,39 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-12 — One generator for both ERDs; removed the in-figure source note
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `scripts/generate-erd.py` — restructured into shared drawing routines that emit **two**
+  diagrams: `ERD_ElektriKalkulaator` (7 tables, the built model) and `ERD_Kavandatud`
+  (12 tables, the planning-stage model).
+- Removed the grey two-line source note from the figure footer. The notation key stays.
+- Thesis `Elektrikilbi_v8.docx`: both figures replaced, Joonis 1 at 435×300 pt and
+  Joonis 10 at 435×442 pt.
+
+**Why**
+- Joonis 10 had been drawn by a different session and merely resembled Joonis 1. Two diagrams
+  of the same subject in one document that only nearly match look like an oversight. Generating
+  both from the same routines means they cannot diverge again.
+- The in-figure note said which file the diagram came from and that CreatedAt/ModifiedAt were
+  omitted. The caption underneath already identifies the figure, so it was duplication printed
+  inside the image, where a reader cannot skip it.
+- The designed model shows field names **without types** while the built one shows types. Not an
+  inconsistency: 12 tables share the same 435 pt page width, and adding types pushes the text
+  below legible size on paper. Names alone carry what that figure exists to show.
+
+**How it was verified**
+- Both PNGs inspected at full render size. The first pass had the PRODUCT/PRODUCT_SPEC
+  cardinality reversed — a product has zero or one spec, a spec belongs to exactly one product
+  — and 70 pt of dead vertical space between rows. Both fixed and re-rendered.
+- v8 measured through Word: **37 pages, 6 223 words, 10 figures, 16 tables, zero stranded
+  headings, no blank pages.**
+
+---
+
 ## 2026-09-11 — Redrew the ERD in crow's foot notation
 
 **Type:** docs

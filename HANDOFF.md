@@ -29,7 +29,7 @@ date with today. If the gap is more than a few days, say so and ask Edgar to pus
 been the single costliest mistake on this project.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
-The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx`.
+The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v8.docx`.
 Earlier versions are kept untouched as fallbacks.
 **Never draft thesis text before reading the actual document.** It already contains most of
 what you would be tempted to write, and your draft will contradict it. This happened on
@@ -56,8 +56,9 @@ All under `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\`.
 | `LÕPUTÖÖ_TEMPLATE (1).docx` | **The school's official template.** Its rules live in six instruction IMAGES (`word/media/image1–6.png`), not in its text | Reference only — never edit |
 | `Lõputöö kavand_VORM.docx` | **The submitted proposal.** The authority on what the work promised | Reference only — never edit |
 | `Näited/Eksamitöö_Kalle_Olumets_Cyber_Plan (1).docx` | **The supervisor's own thesis**, the worked example | Reference only — never edit |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx` | **THE CURRENT THESIS.** 17 of Kalle's 18 review comments applied — see §5. 37 pages, 6 224 words | **This is the one to edit** |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7_KALLELE.pdf` | The same document as PDF. **Send this to Kalle**, not the .docx — he reviews in Google Docs, which paginates differently | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v8.docx` | **THE CURRENT THESIS.** v7 plus both ERDs regenerated in one matching design. 37 pages, 6 223 words | **This is the one to edit** |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v8_KALLELE.pdf` | The same document as PDF. **Send this to Kalle**, not the .docx — he reviews in Google Docs, which paginates differently | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx` | v7 — Kalle's comments, old figures | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | Intermediate step (pagination + language only) | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v5.docx` | 35 pages, 5 885 words, mina-vorm. Superseded by v6 but kept as the fallback | Do not edit |
 | `Elektrikilbi ja -tarvete komponentide kalkulaator_v2_UUS.docx` | Generator output, 36 pages. **Superseded** | Do not edit |
@@ -258,6 +259,29 @@ Two headings ("Kasutajaliidese kavandamine", "Turvalisuse testimine") kept being
 **Kalle reviewed the thesis in Google Docs, not Word** (his comment sidebar in the screenshots is the Google Docs one). Our files are all `<Application>Microsoft Office Word</Application>` — nothing was round-tripped and no formatting was damaged. The page numbers he cited (6, 9, 12, 15, 18) match exactly what Word reports for v5, so the layout defects he saw were real, not rendering artefacts. **Send Kalle the PDF** (`Elektrikilbi_v7_KALLELE.pdf`) for the next review — a PDF paginates identically everywhere, which no .docx can guarantee across Word and Google Docs.
 
 Two things fixed that Kalle did not flag: **"ehitati" and "analüüsiti"** were impersonal forms surviving in a mina-vorm document, which breaks the template's *kogu tööd läbivalt* rule. Both now read "ehitasin" / "analüüsisin".
+
+### Figures — 2026-09-12, v8
+
+`scripts/generate-erd.py` now draws **both** ERDs from one set of routines, so they cannot
+drift apart in style. Run it, then use the two msedge commands it prints.
+
+| | Source | In the thesis |
+|---|---|---|
+| `ERD_ElektriKalkulaator.png` | 7 tables, read from `ElektriKalkulaatorContext.cs` | Joonis 1, lk 14, 435×300 pt |
+| `ERD_Kavandatud.png` | 12 tables, the planning-stage model | Joonis 10, lk 33, 435×442 pt |
+
+Two things Edgar asked for and why:
+
+- **The grey source note in the figure footer is gone.** It said which file the diagram was
+  generated from and that the timestamp columns were omitted. The caption underneath already
+  identifies the figure, so it was duplication inside the image. Only the notation key remains.
+- **Joonis 10 was redrawn in Joonis 1's design.** It had been produced by a different session
+  and only resembled it. Both now come from the same code.
+
+The designed model lists **field names without types**, the built one lists types. That is
+deliberate: 12 tables share the same 435 pt page width, and the types would push the text
+below legible size on paper. A product has zero or one spec, not one — that pair of symbols
+was the wrong way round in the first render and is fixed.
 
 **Comments 1, 5, 11, 14 and 16 are one bug, not five:** no heading in the document carries
 `pageBreakBefore` or `keepWithNext`. One pass over the heading styles closes all five.

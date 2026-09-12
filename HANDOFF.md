@@ -29,7 +29,7 @@ date with today. If the gap is more than a few days, say so and ask Edgar to pus
 been the single costliest mistake on this project.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
-The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v8.docx`.
+The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v9.docx`.
 Earlier versions are kept untouched as fallbacks.
 **Never draft thesis text before reading the actual document.** It already contains most of
 what you would be tempted to write, and your draft will contradict it. This happened on
@@ -56,8 +56,9 @@ All under `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\`.
 | `LÕPUTÖÖ_TEMPLATE (1).docx` | **The school's official template.** Its rules live in six instruction IMAGES (`word/media/image1–6.png`), not in its text | Reference only — never edit |
 | `Lõputöö kavand_VORM.docx` | **The submitted proposal.** The authority on what the work promised | Reference only — never edit |
 | `Näited/Eksamitöö_Kalle_Olumets_Cyber_Plan (1).docx` | **The supervisor's own thesis**, the worked example | Reference only — never edit |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v8.docx` | **THE CURRENT THESIS.** v7 plus both ERDs regenerated in one matching design. 37 pages, 6 223 words | **This is the one to edit** |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v8_KALLELE.pdf` | The same document as PDF. **Send this to Kalle**, not the .docx — he reviews in Google Docs, which paginates differently | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v9.docx` | **THE CURRENT THESIS.** 8 new figures (6 code, 2 diagrams). **41 pages, 6 503 words, 18 figures, 16 tables** | **This is the one to edit** |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v9_KALLELE.pdf` | The same document as PDF. **Send this to Kalle**, not the .docx — he reviews in Google Docs, which paginates differently | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v8.docx` | v8 — before the code figures | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx` | v7 — Kalle's comments, old figures | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | Intermediate step (pagination + language only) | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v5.docx` | 35 pages, 5 885 words, mina-vorm. Superseded by v6 but kept as the fallback | Do not edit |
@@ -259,6 +260,41 @@ Two headings ("Kasutajaliidese kavandamine", "Turvalisuse testimine") kept being
 **Kalle reviewed the thesis in Google Docs, not Word** (his comment sidebar in the screenshots is the Google Docs one). Our files are all `<Application>Microsoft Office Word</Application>` — nothing was round-tripped and no formatting was damaged. The page numbers he cited (6, 9, 12, 15, 18) match exactly what Word reports for v5, so the layout defects he saw were real, not rendering artefacts. **Send Kalle the PDF** (`Elektrikilbi_v7_KALLELE.pdf`) for the next review — a PDF paginates identically everywhere, which no .docx can guarantee across Word and Google Docs.
 
 Two things fixed that Kalle did not flag: **"ehitati" and "analüüsiti"** were impersonal forms surviving in a mina-vorm document, which breaks the template's *kogu tööd läbivalt* rule. Both now read "ehitasin" / "analüüsisin".
+
+### Density — why the thesis read as thin, and what closed the gap
+
+Edgar compared his work with Kalle's and said his felt thin. Measured, he was right, but not
+for the reason it looks like:
+
+| | Kalle | Edgar v8 | Edgar v9 |
+|---|---|---|---|
+| Pages | 41 | 37 | **41** |
+| Words | 6 115 | 6 224 | 6 503 |
+| **Figures** | **25** | **10** | **18** |
+| Tables | 8 | 16 | 16 |
+| Average figure height | 191 pt | 295 pt | 232 pt |
+
+Edgar already had **more** text and **twice** the tables. The gap was entirely figures: Kalle
+shows 25, mostly small and specific, interleaved through the practical chapters. And the worst
+of it was concentrated — **chapter 2 had six subsections, 1 146 words and zero figures.**
+
+`scripts/generate-code-figures.py` renders C# snippets straight from the source files:
+syntax-highlighted, line-numbered, file path in the header, soft-wrapped at 92 characters so
+the font size stays constant. Regenerate after the code changes; a Visual Studio screenshot
+cannot be.
+
+Added in v9: `kood-1` CalculationRule (§1.3) · `kood-2` the Calculate() core (§1.4) ·
+`kood-3` the cheapest-in-stock query (§1.4) · `kood-4` OnModelCreating (§2.3) ·
+`kood-5` middleware order (§2.6) · `kood-6` a test (§2.5) · plus the two SVGs that had been
+sitting unused in `docs/joonised/` since 2026-09-09 — the architecture diagram and the
+algorithm flowchart.
+
+All 18 figures are now referenced in the body text (19 references). Renumbering old captions
+and their references was done by tokenising the old numbers first — note that Word autocorrect
+turns `«` into `“`, which broke one anchor match on the first pass.
+
+**Still figure-free:** §1.1, §1.2, §1.6, §2.1, §2.2, §2.4 and chapter 3. Those need
+screenshots only Edgar can take — the list was given to him on 2026-09-12.
 
 ### Figures — 2026-09-12, v8
 

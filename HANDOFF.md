@@ -229,26 +229,31 @@ Status key: ☐ not started · ◐ in progress · ☑ done
 | 10 | lk 12 | neljakuulisest → **nelja kuulisest** | Do | ☑ |
 | 11 | lk 12, "1.3." | new page | Do (same fix as 1) | ☑ |
 | 12 | lk 13 | "Kaks teadlikku otsust väärivad selgitust." → **bold** | Do | ☑ |
-| 13 | lk 14 | **refer to figures in the body text** ("nagu on näha Jooniselt 1") | **Do — real gap.** 10 captions, 0 references | ☐ |
+| 13 | lk 14 | **refer to figures in the body text** ("nagu on näha Jooniselt 1") | **Do — real gap.** 10 captions, 0 references | ☑ |
 | 14 | lk 15, "1.4." | new page | Do (same fix as 1) | ☑ |
 | 15 | lk 16 | "Arendus jagunes kolme ossa…" → **numbered or bulleted list** | Do | ☑ |
 | 16 | lk 18, "Turvalisus" | orphan heading — new line/page | Do (same fix as 1) | ☑ |
-| 17 | lk 23, "Mis jäi tegemata" | if no OWASP ZAP or other security test was run, **write that it is planned** | **Do.** Kalle means OWASP **ZAP**. We have `security-check.sh` (18 checks) + integration tests, **no scanner** | ☐ |
-| 18 | lk 25, §1.6 | **"Kindlasti pange kirja AI ja agentraamistike kasutus"** | **The most important comment in the set.** §1.6 says "Meeskond: Edgar Muoni (üksinda)" — incomplete | ☐ |
+| 17 | lk 23, "Mis jäi tegemata" | if no OWASP ZAP or other security test was run, **write that it is planned** | **Do.** Kalle means OWASP **ZAP**. We have `security-check.sh` (18 checks) + integration tests, **no scanner** | ☑ |
+| 18 | lk 25, §1.6 | **"Kindlasti pange kirja AI ja agentraamistike kasutus"** | **The most important comment in the set.** §1.6 says "Meeskond: Edgar Muoni (üksinda)" — incomplete | ☑ |
 
-### Applied 2026-09-12 → `Elektrikilbi_v6_KALLE.docx`
+### Applied 2026-09-12 → `Elektrikilbi_v7.docx`
 
-15 of 18 done. Still open: **4a** (paigaldis — Edgar's call), **13** (figure references), **17** (security paragraph), **18** (AI section — scope not yet decided).
+**17 of 18 done.** Still open: **4a** only (paigaldis — Edgar's call).
 
-| Measured | v5 | v6 |
+Done in two passes: v6 carried the pagination and language fixes, v7 added the figure references (13), the security-testing statement (17) and the AI-usage section (18).
+
+| Measured | v5 | v7 |
 |---|---|---|
-| Headings left stranded at the foot of a page | 10 | **1** |
+| Headings left stranded at the foot of a page | 10 | **0** |
 | Numbered chapters starting at the top of a page | 0 of 5 | **5 of 5** |
 | Language items from Kalle's list still present | 6 | **0** |
 | Blank pages | none | none |
-| Pages / words / figures / tables | 35 / 5 885 / 10 / 16 | 35 / 5 897 / 10 / 16 |
+| In-text figure references | 0 | **8**, covering all 10 figures |
+| Pages / words / figures / tables | 35 / 5 885 / 10 / 16 | **37 / 6 224 / 10 / 16** |
 
-The one remaining stranded heading is "Kasutajaliidese kavandamine" (lk 14). `KeepWithNext` **is** set on it and no page break follows it — Word simply does not honour it there. Forcing `PageBreakBefore` would leave a visible gap on page 14, so it was left alone. Revisit if Kalle raises it.
+Two headings ("Kasutajaliidese kavandamine", "Turvalisuse testimine") kept being stranded even with `KeepWithNext` set and no page break after them — Word does not honour it there, cause not established. Both were given `PageBreakBefore` instead, which also survives conversion better. That is why the document grew 36 → 37 pages.
+
+**Kalle reviewed the thesis in Google Docs, not Word** (his comment sidebar in the screenshots is the Google Docs one). Our files are all `<Application>Microsoft Office Word</Application>` — nothing was round-tripped and no formatting was damaged. The page numbers he cited (6, 9, 12, 15, 18) match exactly what Word reports for v5, so the layout defects he saw were real, not rendering artefacts. **Send Kalle the PDF** (`Elektrikilbi_v7_KALLELE.pdf`) for the next review — a PDF paginates identically everywhere, which no .docx can guarantee across Word and Google Docs.
 
 Two things fixed that Kalle did not flag: **"ehitati" and "analüüsiti"** were impersonal forms surviving in a mina-vorm document, which breaks the template's *kogu tööd läbivalt* rule. Both now read "ehitasin" / "analüüsisin".
 

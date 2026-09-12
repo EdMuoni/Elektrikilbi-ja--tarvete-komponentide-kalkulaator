@@ -29,7 +29,8 @@ date with today. If the gap is more than a few days, say so and ask Edgar to pus
 been the single costliest mistake on this project.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
-The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v5.docx`.
+The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` (v5 plus
+Kalle's review corrections; v5 is kept untouched as the fallback).
 **Never draft thesis text before reading the actual document.** It already contains most of
 what you would be tempted to write, and your draft will contradict it. This happened on
 2026-09-11 and the draft was thrown away.
@@ -37,8 +38,8 @@ what you would be tempted to write, and your draft will contradict it. This happ
 **0.3 — `docs/LOPUTOO_MUSTAND.md` is NOT the thesis any more.**
 It is a stale markdown draft from before 2026-09-10: it still contains the LISAD section
 (29 references), lacks chapter 2.6, and lacks the chapter-3 sections added on 2026-09-11.
-`CLAUDE.md` still describes it as "the thesis itself" — that line is wrong and is scheduled
-for correction. **Read the .docx, never the markdown.**
+`CLAUDE.md` used to describe it as "the thesis itself"; that row was corrected on 2026-09-12
+to say so. **Read the .docx, never the markdown.**
 
 **0.4 — There is no memory between sessions.**
 Chat history does not travel between Claude Desktop, Claude Code, and any new chat. This
@@ -71,7 +72,8 @@ proposal's aim, 7 TÄITA notes removed, Joonis 10 replaced, 15 tables captioned.
 
 **None of those edits exist in the generator.** Running it overwrites nothing by itself, but
 treating its output as current silently discards all of them. The generator is kept for one
-purpose only: nothing. Use `scripts/generate-erd.py` for figures, and edit the .docx for text.
+purpose only: regenerating figures. Use `scripts/generate-erd.py` for those, and edit the
+.docx directly for text.
 
 ### 1b. Files an earlier handoff promised that DO NOT exist
 
@@ -214,25 +216,41 @@ Status key: ☐ not started · ◐ in progress · ☑ done
 
 | # | Where | Kalle's comment | Verdict | Status |
 |---|---|---|---|---|
-| 1 | lk 6, "1. TEOREETILINE TAUST" | numbered chapters always start on a new page | Do | ☐ |
-| 2 | lk 7 | elektrikomponentide → **elektri komponentide** | Do | ☐ |
-| 3 | lk 8 | veebirünnete → **veebi rünnakute** | Do | ☐ |
+| 1 | lk 6, "1. TEOREETILINE TAUST" | numbered chapters always start on a new page | Do | ☑ |
+| 2 | lk 7 | elektrikomponentide → **elektri komponentide** | Do | ☑ |
+| 3 | lk 8 | veebirünnete → **veebi rünnakute** | Do | ☑ |
 | 4a | lk 9, Tabel 2 | paigaldist → **paigaldus** | **Push back.** The standard's own title is "Madalpingelised elektripaigaldised". *Paigaldis* = the installation; *paigaldus* = the act of installing. Edgar's call | ☐ |
-| 4b | lk 9, Tabel 2 | valikutööriistad → **valiktööriistad** / valiku tööriistad | Do | ☐ |
-| 5 | lk 9, "Teema olulisus" | orphan heading at page foot — start a new page | Do (same fix as 1) | ☐ |
-| 6 | lk 10 | üheleherakendus → **üheleheline veebirakendus (SPA)** | Do, good point | ☐ |
-| 7 | lk 10 | kompileerimisel → **koodi kompileerimisel** | Do | ☐ |
-| 8 | lk 11 | versioonitud → versioniseeritud | **Rewrite the sentence instead** — both are clumsy | ☐ |
-| 9 | lk 12, Tabel 4 | commit'id → kommitmendid **or** sisestused koodi repositooriumisse | **Take the second option.** "Kommitment" in Estonian reads as *pühendumus* | ☐ |
-| 10 | lk 12 | neljakuulisest → **nelja kuulisest** | Do | ☐ |
-| 11 | lk 12, "1.3." | new page | Do (same fix as 1) | ☐ |
-| 12 | lk 13 | "Kaks teadlikku otsust väärivad selgitust." → **bold** | Do | ☐ |
+| 4b | lk 9, Tabel 2 | valikutööriistad → **valiktööriistad** / valiku tööriistad | Do | ☑ |
+| 5 | lk 9, "Teema olulisus" | orphan heading at page foot — start a new page | Do (same fix as 1) | ☑ |
+| 6 | lk 10 | üheleherakendus → **üheleheline veebirakendus (SPA)** | Do, good point | ☑ |
+| 7 | lk 10 | kompileerimisel → **koodi kompileerimisel** | Do | ☑ |
+| 8 | lk 11 | versioonitud → versioniseeritud | **Rewrite the sentence instead** — both are clumsy | ☑ |
+| 9 | lk 12, Tabel 4 | commit'id → kommitmendid **or** sisestused koodi repositooriumisse | **Take the second option.** "Kommitment" in Estonian reads as *pühendumus* | ☑ |
+| 10 | lk 12 | neljakuulisest → **nelja kuulisest** | Do | ☑ |
+| 11 | lk 12, "1.3." | new page | Do (same fix as 1) | ☑ |
+| 12 | lk 13 | "Kaks teadlikku otsust väärivad selgitust." → **bold** | Do | ☑ |
 | 13 | lk 14 | **refer to figures in the body text** ("nagu on näha Jooniselt 1") | **Do — real gap.** 10 captions, 0 references | ☐ |
-| 14 | lk 15, "1.4." | new page | Do (same fix as 1) | ☐ |
-| 15 | lk 16 | "Arendus jagunes kolme ossa…" → **numbered or bulleted list** | Do | ☐ |
-| 16 | lk 18, "Turvalisus" | orphan heading — new line/page | Do (same fix as 1) | ☐ |
+| 14 | lk 15, "1.4." | new page | Do (same fix as 1) | ☑ |
+| 15 | lk 16 | "Arendus jagunes kolme ossa…" → **numbered or bulleted list** | Do | ☑ |
+| 16 | lk 18, "Turvalisus" | orphan heading — new line/page | Do (same fix as 1) | ☑ |
 | 17 | lk 23, "Mis jäi tegemata" | if no OWASP ZAP or other security test was run, **write that it is planned** | **Do.** Kalle means OWASP **ZAP**. We have `security-check.sh` (18 checks) + integration tests, **no scanner** | ☐ |
 | 18 | lk 25, §1.6 | **"Kindlasti pange kirja AI ja agentraamistike kasutus"** | **The most important comment in the set.** §1.6 says "Meeskond: Edgar Muoni (üksinda)" — incomplete | ☐ |
+
+### Applied 2026-09-12 → `Elektrikilbi_v6_KALLE.docx`
+
+15 of 18 done. Still open: **4a** (paigaldis — Edgar's call), **13** (figure references), **17** (security paragraph), **18** (AI section — scope not yet decided).
+
+| Measured | v5 | v6 |
+|---|---|---|
+| Headings left stranded at the foot of a page | 10 | **1** |
+| Numbered chapters starting at the top of a page | 0 of 5 | **5 of 5** |
+| Language items from Kalle's list still present | 6 | **0** |
+| Blank pages | none | none |
+| Pages / words / figures / tables | 35 / 5 885 / 10 / 16 | 35 / 5 897 / 10 / 16 |
+
+The one remaining stranded heading is "Kasutajaliidese kavandamine" (lk 14). `KeepWithNext` **is** set on it and no page break follows it — Word simply does not honour it there. Forcing `PageBreakBefore` would leave a visible gap on page 14, so it was left alone. Revisit if Kalle raises it.
+
+Two things fixed that Kalle did not flag: **"ehitati" and "analüüsiti"** were impersonal forms surviving in a mina-vorm document, which breaks the template's *kogu tööd läbivalt* rule. Both now read "ehitasin" / "analüüsisin".
 
 **Comments 1, 5, 11, 14 and 16 are one bug, not five:** no heading in the document carries
 `pageBreakBefore` or `keepWithNext`. One pass over the heading styles closes all five.

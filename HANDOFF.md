@@ -38,7 +38,7 @@ the GitHub web UI — in order #1→#4, with **"Create a merge commit"** (squash
 deleting each merged branch so GitHub retargets the next PR to `main`.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
-The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v10.docx` (36 pages; same text as v9 — verified paragraph by paragraph — with layout fixed).
+The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v11.docx` (39 pages, 7 085 words, 12 sources). See §4d for what changed from v10.
 Earlier versions are kept untouched as fallbacks.
 **Never draft thesis text before reading the actual document.** It already contains most of
 what you would be tempted to write, and your draft will contradict it. This happened on
@@ -65,8 +65,10 @@ All under `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\`.
 | `LÕPUTÖÖ_TEMPLATE (1).docx` | **The school's official template.** Its rules live in six instruction IMAGES (`word/media/image1–6.png`), not in its text | Reference only — never edit |
 | `Lõputöö kavand_VORM.docx` | **The submitted proposal.** The authority on what the work promised | Reference only — never edit |
 | `Näited/Eksamitöö_Kalle_Olumets_Cyber_Plan (1).docx` | **The supervisor's own thesis**, the worked example | Reference only — never edit |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v9.docx` | **THE CURRENT THESIS.** 8 new figures (6 code, 2 diagrams). **41 pages, 6 503 words, 18 figures, 16 tables** | **This is the one to edit** |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v9_KALLELE.pdf` | The same document as PDF. **Send this to Kalle**, not the .docx — he reviews in Google Docs, which paginates differently | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v11.docx` | **THE CURRENT THESIS.** 39 pages, 7 085 words, 18 figures, 16 tables, 12 sources | **This is the one to edit** |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v11_KALLELE.pdf` | The same as PDF. **Send this to Kalle** | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v10.docx` | Layout-only pass over v9 | Do not edit |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v9.docx` | 41 pages, before the layout and text passes | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v8.docx` | v8 — before the code figures | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx` | v7 — Kalle's comments, old figures | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | Intermediate step (pagination + language only) | Do not edit |
@@ -308,6 +310,66 @@ Changes in v10, all layout — body text is identical to v9 (641 paragraphs, 6 2
 
 Remaining partly empty pages are chapter ends forced by Kalle's "numbered chapters on a new page"
 rule, the declaration page, the TOC page and the last page.
+
+---
+
+## 4d. v11 — the critical-analysis fixes, 2026-09-13
+
+Built by `apply_v11.ps1` from a JSON spec (session scratchpad) onto a verified fresh copy of v10.
+**94 paragraph rewrites, 36 new paragraphs, 3 section moves, 4 figure replacements.**
+
+**Content fixes**
+- Joonis 4 retaken from the running app (dark theme, no browser chrome). The old one showed
+  "Kogused tulevad EVS-HD 60364 nõuetest", contradicting the thesis's own EVS scope.
+- The introduction also claimed "Kogused arvutan … EVS-HD 60364 alusel" — same overclaim, fixed.
+- §1.3 said security was planned from the start; §1.4, §2.4 and §2.6 say authentication was
+  missing in the first version. Rewritten to match: security was a planned phase *after* the UI
+  (Tabel 3), and that order was the mistake.
+- Commit count now "seisuga 13.09.2026 üle 55" — robust to further commits. The AI section no
+  longer quotes a changelog count.
+- The sentence that mentioned the defence ("mida kaitsmisel kindlasti küsitakse") is gone.
+- New Heading 3 "Paigaldamine" in §2.4: runs locally, migrations, User Secrets, CI builds and tests
+  but does not deploy, deployment is next. Covers criterion B.2.6 honestly.
+- The empty heading "Võrdlus esialgse tegevus- ja ajakavaga" now has a paragraph.
+- §2.1 gained measured volume figures (code lines, controllers, 5 migrations, 22 test files).
+- §2.2 gained the Python sentence (listed in the proposal, not needed; prototype was TypeScript).
+- §2.5 no longer repeats §2.6's two failed-test stories; it points to them.
+- §3 numbered 3.1–3.4 and reordered (conclusions, planned-vs-built, recommendations, advice).
+  §3.1 maps results to the six tasks. §3.3 adds deployment, a scanner, .NET 10, and Edgar's
+  portfolio / reseller e-shop vision with a 25% fee.
+- Kokkuvõte rewritten to about a page.
+
+**Sources: 6 → 12**, all verified by fetching on 2026-09-13 and all cited in the text:
+EVS-HD 60364-4-41:2017, EVS-HD 60364-4-43:2023 (the text already named both parts, only 5-52 was
+listed), OWASP Top 10:2025, Microsoft Identity and EF Core migrations docs, GitHub Actions docs.
+The "Eesti ehitusturul igal aastal…" claim was rewritten so it no longer needs a statistic.
+
+**Structure**
+- MÕISTED JA LÜHENDID moved to the front, after SISUKORD. Neither the template nor Kalle's thesis
+  has a glossary; at the end it broke the chapter numbering 4 → unnumbered → 5.
+- The aim/tasks list moved from under the "1." heading into §1.1 "Töö eesmärk".
+- Joonis 8–10 regenerated as light code figures (see CHANGELOG).
+
+**Mina-vorm and readability**
+- Impersonal forms the earlier verb scan had missed: kaardistati, eelistati, kavandati ×2, tabati,
+  sõnastati — plus "meie teemast", "meie enda vormi", "mida autor oleks tahtnud". All fixed.
+  **Lesson: a fixed verb list is not a proof. Read the text.**
+- Em dashes 57 → 0; "Õppetund:" 4 → 0; slogan sentences removed; "Käesolev" 5 → 0 in the body.
+
+**Correction to the 2026-09-12 analysis:** it said the eramu extension was not justified. It was:
+§1.2 already says "väike ja põhjendatud laiendus". That item was wrong.
+
+**AI section:** rewritten code-first, as Edgar asked, but it still says AI was also used "dokumentatsiooni
+ja lõputöö teksti koostamisel". Edgar asked a second time for that to be removed; it was not. See §4b.
+
+**Verified:** 39 pages, 7 085 words, 18 figures, 16 tables; 0 stranded headings; 0 figures split
+from captions; numbering 1–18 in order; every figure referenced in the text; no blank pages; page
+thumbnails inspected. Remaining partly empty pages are chapter ends (Kalle's new-page rule), the
+declaration, TOC, glossary and Kokkuvõte pages.
+
+**Still open:** comment 4a (paigaldis); retake of any other screenshot is not needed; the homepage
+headline "Elektrikilp, arvutatud standardi järgi" still slightly overstates — changing it is a
+code change nobody has asked for yet.
 
 ---
 

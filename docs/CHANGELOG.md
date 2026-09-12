@@ -44,6 +44,30 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-13 — Light code figures for the three controller screenshots
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `scripts/generate-code-figures.py` — three more figures: `kood-7-kontroller`
+  (`CalculatorController.cs` 8–22), `kood-8-post` (24–40) and `kood-9-login`
+  (`AccountController.cs` 39–68). They replace Joonis 8–10 in thesis v11.
+
+**Why**
+- Joonis 8–10 were dark-theme Visual Studio screenshots. Printed next to the six light
+  generated code figures they read as heavy black blocks, and a reviewer flagged the
+  inconsistency. Generating them from the files also means they show the code as it is now.
+- The line ranges were chosen to match each caption: the constructor for dependency injection,
+  the `[ValidateAntiForgeryToken]` POST, and `PasswordSignInAsync` with lockout and the
+  deliberately vague error message.
+
+**How it was verified**
+- Rendered and inspected. A first render wrote all three to one literal file named `$spec.png`
+  (an escaped `$` in the shell loop) and was redone with correct paths.
+
+---
+
 ## 2026-09-12 — Removed a committed admin session cookie
 
 **Type:** security

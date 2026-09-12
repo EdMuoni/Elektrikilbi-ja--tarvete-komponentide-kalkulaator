@@ -176,6 +176,17 @@ jobs = [
     figure("kood-6-test",
            "ElektriKalkulaator.Tests/CalculatorServicesTests.cs", 59, 73,
            "Arrange / Act / Assert"),
+    # The three controller figures below replace dark-theme Visual Studio screenshots,
+    # which printed as heavy black blocks next to the light figures above.
+    figure("kood-7-kontroller",
+           "ElektriKalkulaator/Controllers/CalculatorController.cs", 8, 22,
+           "teenus konstruktoris"),
+    figure("kood-8-post",
+           "ElektriKalkulaator/Controllers/CalculatorController.cs", 24, 40,
+           "CSRF-kaitsega POST"),
+    figure("kood-9-login",
+           "ElektriKalkulaator/Controllers/AccountController.cs", 39, 68,
+           "sisselogimine"),
 ]
 
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"

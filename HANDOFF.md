@@ -29,8 +29,8 @@ date with today. If the gap is more than a few days, say so and ask Edgar to pus
 been the single costliest mistake on this project.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
-The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` (v5 plus
-Kalle's review corrections; v5 is kept untouched as the fallback).
+The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx`.
+Earlier versions are kept untouched as fallbacks.
 **Never draft thesis text before reading the actual document.** It already contains most of
 what you would be tempted to write, and your draft will contradict it. This happened on
 2026-09-11 and the draft was thrown away.
@@ -56,7 +56,9 @@ All under `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\`.
 | `LÕPUTÖÖ_TEMPLATE (1).docx` | **The school's official template.** Its rules live in six instruction IMAGES (`word/media/image1–6.png`), not in its text | Reference only — never edit |
 | `Lõputöö kavand_VORM.docx` | **The submitted proposal.** The authority on what the work promised | Reference only — never edit |
 | `Näited/Eksamitöö_Kalle_Olumets_Cyber_Plan (1).docx` | **The supervisor's own thesis**, the worked example | Reference only — never edit |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | **THE CURRENT THESIS.** v5 plus 15 of Kalle's 18 review comments — see §5. 35 pages, 5 897 words | **This is the one to edit** |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7.docx` | **THE CURRENT THESIS.** 17 of Kalle's 18 review comments applied — see §5. 37 pages, 6 224 words | **This is the one to edit** |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v7_KALLELE.pdf` | The same document as PDF. **Send this to Kalle**, not the .docx — he reviews in Google Docs, which paginates differently | Regenerate after every change |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | Intermediate step (pagination + language only) | Do not edit |
 | `Lõputöö_Dokumendi_variandid/Elektrikilbi_v5.docx` | 35 pages, 5 885 words, mina-vorm. Superseded by v6 but kept as the fallback | Do not edit |
 | `Elektrikilbi ja -tarvete komponentide kalkulaator_v2_UUS.docx` | Generator output, 36 pages. **Superseded** | Do not edit |
 | `Pictures/Lõputöö_märkused/1–14.PNG` | **Kalle's review**, 18 comments as screenshots | The work list |

@@ -22,53 +22,66 @@
                 <span class="text-muted-custom small">@Model.Brand</span>
             </div>
 
-            <h2 class="text-white fw-bold mb-3">@Model.Name</h2>
+            <h2 class="text-strong-custom fw-bold mb-3">@Model.Name</h2>
 
-            <!-- Tehnilised andmed -->
-            <div class="row g-3 mb-4">
-                @if (Model.RatedCurrent > 0)
-                {
-                    <div class="col-6">
-                        <div class="card bg-card p-3">
-                            <div class="text-muted-custom small">Nimivool</div>
-                            <div class="text-amber fw-bold fs-5">@Model.RatedCurrent A</div>
-                        </div>
-                    </div>
-                }
-                @if (Model.Voltage > 0)
-                {
-                    <div class="col-6">
-                        <div class="card bg-card p-3">
-                            <div class="text-muted-custom small">Nimipinge</div>
-                            <div class="text-white fw-bold fs-5">@Model.Voltage V</div>
-                        </div>
-                    </div>
-                }
-                @if (Model.WireCrossSectionMm2.HasValue)
-                {
-                    <div class="col-6">
-                        <div class="card bg-card p-3">
-                            <div class="text-muted-custom small">Juhtme ristlõige</div>
-                            <div class="text-white fw-bold fs-5">@Model.WireCrossSectionMm2 mm²</div>
-                        </div>
-                    </div>
-                }
-                <div class="col-6">
-                    <div class="card bg-card p-3">
-                        <div class="text-muted-custom small">Laoseis</div>
-                        <div class="fw-bold fs-5">
-                            @if (Model.StockQuantity > 0)
+            @* ── SPECIFICATION TABLE ────────────────────────────────────────────
+               A table, not a grid of cards. Technical buyers compare specifications
+               between products, and a two-column table is far faster to read down
+               than boxes scattered across a grid — this is the pattern every serious
+               components supplier uses (see docs/DESIGN_GUIDE.md §3.2).
+               Rows render only when the product has that value, so a cable does not
+               show an empty "rated current" row. *@
+            <table class="spec-table mb-4">
+                <caption class="visually-hidden">Toote tehnilised andmed</caption>
+                <tbody>
+                    @if (Model.RatedCurrent > 0)
+                    {
+                        <tr>
+                            <th scope="row">Nimivool</th>
+                            <td>@Model.RatedCurrent.ToString("0.##") A</td>
+                        </tr>
+                    }
+                    @if (Model.Voltage > 0)
+                    {
+                        <tr>
+                            <th scope="row">Nimipinge</th>
+                            <td>@Model.Voltage.ToString("0.##") V</td>
+                        </tr>
+                    }
+                    @if (Model.WireCrossSectionMm2.HasValue)
+                    {
+                        <tr>
+                            <th scope="row">Juhtme ristlõige</th>
+                            <td>@Model.WireCrossSectionMm2 mm²</td>
+                        </tr>
+                    }
+                    <tr>
+                        <th scope="row">Tootja</th>
+                        <td>@Model.Brand</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Kategooria</th>
+                        <td>@Model.Category?.Name</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Laoseis</th>
+                        <td>
+                            @if (Model.StockQuantity > 10)
                             {
-                                <span class="text-success">@Model.StockQuantity tk</span>
+                                <span class="text-success fw-semibold">@Model.StockQuantity tk laos</span>
+                            }
+                            else if (Model.StockQuantity > 0)
+                            {
+                                <span class="text-warning fw-semibold">Ainult @Model.StockQuantity tk laos</span>
                             }
                             else
                             {
-                                <span class="text-danger">Otsas</span>
+                                <span class="text-danger fw-semibold">Otsas</span>
                             }
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
             @if (!string.IsNullOrEmpty(Model.Description))
             {

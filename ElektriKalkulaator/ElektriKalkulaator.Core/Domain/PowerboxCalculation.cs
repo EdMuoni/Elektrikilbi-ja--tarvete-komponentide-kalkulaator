@@ -22,7 +22,16 @@ namespace ElektriKalkulaator.Core.Domain
         // One-to-one: the input form data
         public PowerboxRequirements? Requirements { get; set; }
 
-        // One-to-many: the resulting BOM rows
-        public ICollection<PowerboxComponents>? Components { get; set; }
+        // One-to-many: the resulting BOM rows.
+        //
+        // Not nullable, and initialised to an empty list. A calculation always HAS components —
+        // possibly none, which an empty list expresses perfectly well. Declaring it nullable said
+        // "this list might not exist", which is a different and less useful idea, and it forced
+        // every caller to null-check something that is never really null.
+        //
+        // It also produced a real compiler warning: EF Core's ThenInclude expects a non-nullable
+        // collection, so `.Include(c => c.Components).ThenInclude(...)` in GetHistory raised
+        // CS8620 on every build. This matches how ProductCategory.Products is already declared.
+        public ICollection<PowerboxComponents> Components { get; set; } = new List<PowerboxComponents>();
     }
 }

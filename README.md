@@ -22,7 +22,7 @@ cd ElektriKalkulaator
 dotnet run --project ElektriKalkulaator
 ```
 
-Then open <http://localhost:5250>. The database is created and seeded automatically on first run,
+Then open <http://localhost:8080>. The database is created and seeded automatically on first run,
 with 10 demo products and the EVS-HD 60364 calculation rules.
 
 ### Optional configuration
@@ -79,6 +79,11 @@ Everything is in [`docs/`](docs/):
 | [CHANGELOG.md](docs/CHANGELOG.md) | Every code change and the reasoning behind it |
 | [RESEARCH_LOG.md](docs/RESEARCH_LOG.md) | Market prices, competitor analysis and UX research, with sources |
 | [IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md) | Licence and attribution for every image |
+| [DESIGN_GUIDE.md](docs/DESIGN_GUIDE.md) | Design system and page-by-page UI instructions |
+| [TESTING.md](docs/TESTING.md) | How the project is tested, and what to test |
+| [TEST_ACCOUNTS.md](docs/TEST_ACCOUNTS.md) | Demo admin and customer logins for trying the site |
+| [VOICE_AND_PERSONALITY.md](docs/VOICE_AND_PERSONALITY.md) | How the site should sound to a customer |
+| [SUPPLIER_SYNC_SPEC.md](docs/SUPPLIER_SYNC_SPEC.md) | Plan for the future supplier price-sync model (not built) |
 | [PROMPTS.md](docs/PROMPTS.md) | Prompts for working on this project with an AI assistant |
 
 [`CLAUDE.md`](CLAUDE.md) sits at the repo root because AI assistants load it automatically from

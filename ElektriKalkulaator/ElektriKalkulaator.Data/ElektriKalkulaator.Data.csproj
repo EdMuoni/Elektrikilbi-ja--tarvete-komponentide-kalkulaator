@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- EF Core SQL Server — andmebaasiga suhtlemiseks -->
+  <!-- EF Core for SQL Server — talking to the database -->
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
@@ -16,8 +16,8 @@
     </PackageReference>
   </ItemGroup>
 
-  <!-- Data vajab ainult Core projekti (Domain mudelid, interface-id) -->
-  <!-- Data EI viita ApplicationServices ega Web projektile -->
+  <!-- Data needs only the Core project (domain models and interfaces) -->
+  <!-- Data must NOT reference ApplicationServices or the web project -->
   <ItemGroup>
     <ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
   </ItemGroup>

@@ -14,7 +14,7 @@
     <!-- Lisa uus kategooria -->
     <div class="col-lg-4">
         <div class="card p-4">
-            <h5 class="text-white fw-bold mb-3">➕ Lisa uus kategooria</h5>
+            <h5 class="text-strong-custom fw-bold mb-3">➕ Lisa uus kategooria</h5>
             <form asp-action="CreateCategory" method="post">
                 @Html.AntiForgeryToken()
                 <div class="mb-3">
@@ -35,7 +35,7 @@
     <!-- Olemasolevad kategooriad -->
     <div class="col-lg-8">
         <div class="card p-4">
-            <h5 class="text-white fw-bold mb-3">📋 Kategooriad (@Model.Count())</h5>
+            <h5 class="text-strong-custom fw-bold mb-3">📋 Kategooriad (@Model.Count())</h5>
 
             @if (!Model.Any())
             {
@@ -56,7 +56,7 @@
                             @foreach (var cat in Model)
                             {
                                 <tr>
-                                    <td class="text-white fw-semibold">@cat.Name</td>
+                                    <td class="text-strong-custom fw-semibold">@cat.Name</td>
                                     <td class="text-muted-custom small">@cat.Description</td>
                                     <td>
                                         <a asp-action="Index" asp-route-categoryId="@cat.Id"

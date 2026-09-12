@@ -45,7 +45,11 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         //
         // The previous version fetched every product and then filtered the list in C#. That works
         // with ten products and wastes the whole table with ten thousand.
-        public async Task<IEnumerable<Product>> Search(Guid? categoryId, string? searchTerm)
+        public async Task<IEnumerable<Product>> Search(
+            Guid? categoryId,
+            string? searchTerm,
+            string? brand = null,
+            ProductSortOrder sort = ProductSortOrder.CategoryThenName)
         {
             var query = _context.Products
                 .Include(p => p.Category)
@@ -63,9 +67,64 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                 query = query.Where(p => p.Name.Contains(term) || p.Brand.Contains(term));
             }
 
-            return await query
-                .OrderBy(p => p.Category!.Name)
-                .ThenBy(p => p.Name)
+            // Exact match, unlike searchTerm above. Browsing "Schneider" must not also return a
+            // product from some other brand whose name merely contains the word.
+            if (!string.IsNullOrWhiteSpace(brand))
+            {
+                var exact = brand.Trim();
+                query = query.Where(p => p.Brand == exact);
+            }
+
+            // Sorting is applied to the query, not to the results, so it becomes a SQL ORDER BY.
+            // Sorting the list afterwards in C# would give the same answer here but would mean
+            // the database sending rows in an order we immediately throw away.
+            //
+            // Every branch ends with a name-based tiebreaker so that products with equal prices
+            // or equal stock always come back in the same order. Without that, two identically
+            // priced items could swap places between page loads for no visible reason.
+            query = sort switch
+            {
+                ProductSortOrder.NameAToZ =>
+                    query.OrderBy(p => p.Name),
+
+                ProductSortOrder.PriceLowToHigh =>
+                    query.OrderBy(p => p.Price).ThenBy(p => p.Name),
+
+                ProductSortOrder.PriceHighToLow =>
+                    query.OrderByDescending(p => p.Price).ThenBy(p => p.Name),
+
+                ProductSortOrder.StockHighToLow =>
+                    query.OrderByDescending(p => p.StockQuantity).ThenBy(p => p.Name),
+
+                // CategoryThenName, and anything unrecognised, falls back to the browsing default.
+                _ => query.OrderBy(p => p.Category!.Name).ThenBy(p => p.Name)
+            };
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IReadOnlyDictionary<Guid, int>> GetProductCountsByCategory()
+        {
+            // Grouped and counted in the database, so one small result comes back rather than
+            // every product row being fetched just to be counted here.
+            var counts = await _context.Products
+                .GroupBy(p => p.CategoryId)
+                .Select(g => new { CategoryId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            return counts.ToDictionary(x => x.CategoryId, x => x.Count);
+        }
+
+        public async Task<IEnumerable<string>> GetBrands()
+        {
+            // Distinct brands taken from the products themselves rather than from a fixed list.
+            // A hard-coded list drifts: it would keep offering a brand after its last product was
+            // deleted, and silently miss a brand that a new product introduced.
+            return await _context.Products
+                .Select(p => p.Brand)
+                .Where(b => b != null && b != "")
+                .Distinct()
+                .OrderBy(b => b)
                 .ToListAsync();
         }
 

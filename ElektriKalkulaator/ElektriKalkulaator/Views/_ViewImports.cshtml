@@ -1,6 +1,5 @@
-@* _ViewImports.cshtml — GLOBAALSED IMPORDID KÕIGILE VAADETELE *@
-@* Siin lisame namespace-id mida kasutame kõigis .cshtml failides *@
-@* Tänu sellele ei pea iga faili alguses kirjutama pikki using lauseid *@
+@* _ViewImports.cshtml — global imports applied to EVERY view.
+   Namespaces listed here do not need a using statement in individual .cshtml files. *@
 
 @using ElektriKalkulaator
 @using ElektriKalkulaator.Models
@@ -8,5 +7,9 @@
 @using ElektriKalkulaator.Core.Dto
 @using ElektriKalkulaator.Controllers
 
-@* TagHelpers — lubab asp-controller, asp-action, asp-for jne atribuute HTML-is *@
+@* Tag helpers — these enable the asp-controller, asp-action, asp-for attributes used in the HTML. *@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@* Lets any view read appsettings values, e.g. the VAT statement in VatNotice.
+   The ElektriKalkulaator namespace it lives in is already imported above. *@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration

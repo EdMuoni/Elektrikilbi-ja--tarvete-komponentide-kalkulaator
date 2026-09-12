@@ -1,0 +1,75 @@
+# Continuous Integration — builds the project and runs every automated test.
+#
+# WHAT THIS IS
+# GitHub runs this file automatically on a fresh machine every time code is pushed or a pull
+# request is opened. It is the safety net that stops a broken change reaching main: the 176 tests
+# only protect the project if something actually runs them, and relying on a person to remember
+# means they will eventually not be run at all.
+#
+# WHY IT NEEDS NO DATABASE
+# Every test uses an in-memory database (see docs/TESTING.md), including the integration tests that
+# boot the real application. So this workflow installs the .NET SDK and nothing else — no SQL
+# Server, no connection string, no secrets.
+name: CI
+
+on:
+  push:
+    branches: ['**']          # every branch, so problems are caught before a PR is opened
+  pull_request:
+    branches: [main]
+  workflow_dispatch:          # allows running it by hand from the Actions tab
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest    # the project is cross-platform; Linux runners are faster and free
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install the .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          # The projects target net9.0. The 9.0.x SDK is the matching one; patch updates are
+          # picked up automatically.
+          dotnet-version: '9.0.x'
+
+      # Restore, build and test are separate steps on purpose. When something fails, the step name
+      # in the GitHub UI immediately says which of the three it was, instead of one long log.
+      #
+      # Everything targets the TEST project rather than the .slnx solution file, because building
+      # the test project pulls in all four other projects through its references anyway, and this
+      # avoids depending on the newer .slnx solution format being supported by the runner's SDK.
+      - name: Restore NuGet packages
+        run: dotnet restore ElektriKalkulaator/ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj
+
+      - name: Build
+        # --no-restore because the previous step already did it; repeating it just wastes time.
+        #
+        # -warnaserror turns every compiler warning into a build failure. The project builds with
+        # zero warnings, so this is what keeps it that way: a warning is usually the compiler
+        # noticing something genuinely wrong, and once a few are tolerated they stop being read at
+        # all. The two that existed here were a real nullability mismatch and a duplicate using —
+        # small, but both worth knowing about.
+        #
+        # If a warning ever needs to be allowed deliberately, suppress that specific rule with a
+        # comment explaining why, rather than removing this flag.
+        run: dotnet build ElektriKalkulaator/ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj --no-restore --configuration Release -warnaserror
+
+      - name: Run tests
+        run: >
+          dotnet test ElektriKalkulaator/ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj
+          --no-build
+          --configuration Release
+          --verbosity normal
+          --logger "trx;LogFileName=test-results.trx"
+
+      # Uploads the results even when tests fail — that is exactly when they are worth reading.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/TestResults/*.trx'
+          if-no-files-found: warn

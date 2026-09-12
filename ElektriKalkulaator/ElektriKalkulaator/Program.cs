@@ -75,11 +75,30 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<ElektriKalkulaatorContext>();
     try
     {
-        await context.Database.MigrateAsync();
+        // Migrations only exist for a real database engine such as SQL Server. Automated tests
+        // swap in an in-memory database, which has no migration support at all — asking it to
+        // migrate throws. IsRelational() tells the two apart, so the same startup code works in
+        // both places instead of the test host needing a special copy of it.
+        if (context.Database.IsRelational())
+        {
+            await context.Database.MigrateAsync();
+        }
+        else
+        {
+            // In-memory: build the schema straight from the model, which also applies the seed
+            // data declared in OnModelCreating.
+            await context.Database.EnsureCreatedAsync();
+        }
 
         // Create the Admin and Customer roles and, if configured, the first admin account.
         // Runs after migrations so the Identity tables definitely exist.
-        await IdentitySeeder.SeedAsync(scope.ServiceProvider, builder.Configuration);
+        //
+        // The environment flag also enables the demo admin/customer accounts, which must NEVER be
+        // created on a real server — their passwords are in the source code. See IdentitySeeder.
+        await IdentitySeeder.SeedAsync(
+            scope.ServiceProvider,
+            builder.Configuration,
+            app.Environment.IsDevelopment());
     }
     catch (Exception ex)
     {
@@ -119,3 +138,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+// Program.cs uses "top-level statements", so the compiler generates the Program class for us and
+// makes it internal. WebApplicationFactory<Program> in the test project needs to refer to that
+// class by name, so we declare it here as public. It stays empty on purpose — this exists only to
+// change its visibility, not to add behaviour.
+public partial class Program { }

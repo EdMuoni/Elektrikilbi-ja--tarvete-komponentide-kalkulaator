@@ -1,4 +1,4 @@
-﻿using ElektriKalkulaator.Core.Domain;
+using ElektriKalkulaator.Core.Domain;
 using ElektriKalkulaator.Core.Dto;
 
 namespace ElektriKalkulaator.Core.ServiceInterface
@@ -8,12 +8,36 @@ namespace ElektriKalkulaator.Core.ServiceInterface
         Task<IEnumerable<Product>> GetAll();
         Task<IEnumerable<Product>> GetByCategory(Guid categoryId);
 
-        // Catalogue search. Both arguments are optional:
+        // Catalogue search. All arguments are optional:
         //   categoryId = null  -> all categories
-        //   searchTerm = null  -> no name/brand filter
-        // Filtering happens in the database rather than in C#, so only matching rows travel
-        // across the network.
-        Task<IEnumerable<Product>> Search(Guid? categoryId, string? searchTerm);
+        //   searchTerm = null  -> no name/brand text filter
+        //   brand      = null  -> all brands
+        //   sort               -> defaults to category then name
+        // Filtering AND sorting happen in the database rather than in C#, so only the rows that
+        // are wanted, already in the right order, travel across the network.
+        //
+        // searchTerm and brand look similar but are not the same thing. searchTerm is free text
+        // and matches a PART of a name or brand, so "ABB" also finds "ABB S201-B32". brand is an
+        // EXACT match chosen from a known list, which is what a "show me only Schneider" filter
+        // needs -- a partial match there would make one brand's filter include another whose name
+        // happens to contain it.
+        Task<IEnumerable<Product>> Search(
+            Guid? categoryId,
+            string? searchTerm,
+            string? brand = null,
+            ProductSortOrder sort = ProductSortOrder.CategoryThenName);
+
+        // Every brand that actually has a product, alphabetically. Used to build the brand
+        // filter, so the list can never offer a brand that would return nothing.
+        Task<IEnumerable<string>> GetBrands();
+
+        // How many products each category holds, keyed by category id. Categories with no
+        // products are simply absent from the dictionary.
+        //
+        // The catalogue uses this for two things: showing a count beside each filter, the way
+        // trade catalogues do, and leaving out categories that would open an empty page. The
+        // seeded "Klemmid" category had no products, so its filter was a dead end.
+        Task<IReadOnlyDictionary<Guid, int>> GetProductCountsByCategory();
         Task<Product?> GetById(Guid id);
         Task<Product> Create(ProductDto dto);
         Task<Product?> Update(ProductDto dto);

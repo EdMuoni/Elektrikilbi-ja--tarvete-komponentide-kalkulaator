@@ -8,24 +8,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Entity Framework Core SQL Server — andmebaas -->
+    <!-- Entity Framework Core for SQL Server — database access -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!-- JSON töötlemiseks (ostukorv Sessions) -->
+    <!-- JSON handling — used to store the shopping cart in the session -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <!-- Viited teistele projektidele meie lahenduses -->
-  <!-- Veebiprojekt vajab kõiki kolme projekti -->
+  <!-- References to the other projects in this solution -->
+  <!-- The web project depends on all three of the layers below -->
   <ItemGroup>
-    <!-- Domain mudelid, DTOd, interface'id -->
+    <!-- Domain models, DTOs and service interfaces -->
     <ProjectReference Include="..\ElektriKalkulaator.Core\ElektriKalkulaator.Core.csproj" />
-    <!-- DbContext ja andmebaasi loogika -->
+    <!-- DbContext, migrations and seed data -->
     <ProjectReference Include="..\ElektriKalkulaator.Data\ElektriKalkulaator.Data.csproj" />
-    <!-- Teenuste implementatsioonid (CalculatorServices jne) -->
+    <!-- Service implementations (CalculatorServices and friends) -->
     <ProjectReference Include="..\ElektriKalkulaator.ApplicationServices\ElektriKalkulaator.ApplicationServices.csproj" />
   </ItemGroup>
 

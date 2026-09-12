@@ -1,7 +1,9 @@
 # CLAUDE.md — instructions for AI assistants working on this project
 
 This file is loaded automatically at the start of every session. Read it, then read
-`docs/PROJECT_ROADMAP.md` before doing anything else.
+**`HANDOFF.md` in the repository root** — that is the file which carries state between
+sessions, including the current thesis version and the supervisor's open review comments.
+`docs/PROJECT_ROADMAP.md` is a month stale (revision 7, 2026-08-14) and is being refreshed.
 
 ---
 
@@ -31,7 +33,7 @@ this one because it is only loaded automatically from there.
 | `docs/TEST_ACCOUNTS.md` | Demo admin/customer logins and how they are kept out of production | When accounts change |
 | `docs/VOICE_AND_PERSONALITY.md` | How the site should sound; warmth without slowing it down | When writing user-facing copy |
 | `docs/SUPPLIER_SYNC_SPEC.md` | **Not built.** Plan for the dropshipping / price-sync model | Post-thesis only |
-| `docs/LOPUTOO_MUSTAND.md` | **The thesis itself, in Estonian.** Full draft following the TTHK template (TAR track), ~5 700 words. Marked `[EDGAR: ]` where Edgar's own decision is needed and `[KONTROLLI: ]` where a claim must be verified. | When the code changes in a way the thesis describes |
+| `docs/LOPUTOO_MUSTAND.md` | **STALE — not the thesis.** A markdown draft frozen before 2026-09-10: still has the LISAD section, lacks chapter 2.6 and the chapter-3 additions. The real thesis is a Word file; see `HANDOFF.md` §0.2. | Kept as history only — do not edit or quote |
 
 ## Rules — follow these without being asked
 

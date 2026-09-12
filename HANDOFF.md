@@ -20,13 +20,22 @@ moment the chat ends.
 
 | | GitHub (what a clone sees) | Edgar's desktop (the truth) |
 |---|---|---|
-| Commits | **10**, HEAD `46ebffa`, 2026-08-11 | **49**, HEAD `bda9089`, 2026-09-12 |
+| Commits on `main` | **10**, HEAD `46ebffa`, 2026-08-11 | — |
+| Commits on `feat/conversion-ux` | **pushed 2026-09-12** | **57** total |
 | `TESTING.md`, `DESIGN_GUIDE.md`, `EVS_ALLIKAD.md`, `KOODI_SELGITUS.md` | absent | exist |
 | ~218 automated tests, GitHub Actions CI, authentication | not present | exist |
 
 Before making ANY claim about the code, run `git log --oneline -3` and compare the top commit
 date with today. If the gap is more than a few days, say so and ask Edgar to push. This has
 been the single costliest mistake on this project.
+
+**Update 2026-09-12:** all work is now on GitHub, but on branch `feat/conversion-ux`, **not
+`main`**. Four pull requests form a linear stack, all open: #1 `main` ← `fix/track-seeded-product-images`,
+#2 ← `feat/upload-validation-messages`, #3 ← `fix/security-hardening`, #4 ← `feat/conversion-ux`.
+Each branch contains the one before it (verified with `git merge-base --is-ancestor`). A clone of
+`main` is still the August state. `gh` is not installed on Edgar's machine, so merging happens in
+the GitHub web UI — in order #1→#4, with **"Create a merge commit"** (squashing breaks the stack),
+deleting each merged branch so GitHub retargets the next PR to `main`.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
 The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v9.docx`.
@@ -206,6 +215,74 @@ From `Lõputöö kavand_VORM.docx`. The thesis must not drift from it.
 | "Five months of design, then a two-week build" | Contradicts the thesis's own four active months / 156 hours |
 | "Changing the Word theme will fix the blue headings" | The colours were hard-coded hex in `styles.xml`; already fixed to black |
 | Using an LLM at runtime to do the calculation | Edgar built it (Jan 2026 prototype, Gemini) and rejected it in writing 2026-02-03. **This is the project's strongest defence point.** Never suggest re-adding it |
+
+---
+
+## 4b. Full folder analysis — 2026-09-12
+
+Everything under `LÕPUTÖÖ/` was inventoried. What matters and was not known before:
+
+### The assessment criteria are in the template, not only in the PDF
+`LÕPUTÖÖ_TEMPLATE (1).docx` → **LISA A** (TAR competencies B.2.1–B.2.7) and **LISA B "Eksamitöö
+hindamiskriteeriumid – TAR"** — ten criteria with stated minimums. The separate
+`Hindamisstandard_noorem-tarkvaraarendaja-veeb 2025 (1).pdf` could not be read: no PDF text tool on
+the machine (no pip, no poppler) and Word's PDF import hung on a hidden dialog.
+
+Minimums worth knowing: at least **156 hours**; at least **5 sources** (the thesis has 6); the
+practical solution must be **demonstrated**; the defence must explain the solution and answer most
+questions.
+
+**Gap against the criteria: B.2.6 "Juurutamine" (deployment)** appears in two criteria. The app is
+**not deployed anywhere** — no Dockerfile, no publish profile, and `.github/workflows/ci.yml` only
+restores, builds with `-warnaserror`, tests and uploads results. This is the largest criteria risk.
+
+### The defence format
+`Lõputöö esitlusslaidid_NÄIDIS.pptx`, 8 slides: Teema · Eesmärgid · **Uurimisküsimused** · Teooria ·
+Praktiline väärtus · Kokkuvõte · **Retsensendi küsimustele vastamine** · Tänusõnad. There is a
+reviewer (retsensent). The thesis has no explicitly worded research questions.
+
+### Origin story — now Read-level, with file evidence
+| Date (file) | File | Shows |
+|---|---|---|
+| 2026-01-29 | `Elektrikilbi ja -tarvete kalk draft/elecpro-components-&-calculator/` | TypeScript + React prototype; `services/geminiService.ts` calls `@google/genai`, model `gemini-3-flash-preview`, to produce the component list |
+| 2026-02-03 | `…kalk draft/powerbox-no-ai-visual-explanation.html` | **The written decision** to move from AI to rules, with a comparison table: predictability, 2–5 s latency, per-call cost, provider dependence, offline use. It uses **US NEC and AWG/feet**, not EVS — the switch to EVS-HD 60364 and mm² came later |
+| 2026-02-06 | `Lõputöö kavand_VORM.asice` | Signed proposal |
+| 2026-03-08/09 | drawio files, `ERD_Loogiline_Seletus.docx` | Data-model planning. The .docx was meant as a thesis appendix but describes the **planned** model and claims blanket EVS compliance — do not use it as an appendix without revising |
+| 2026-04-21 | first commit | Build starts |
+| 2026-04-24 | `AIStudio_Prompt_ElektrikilbiKalkulaator.txt` | A prompt asking Google AI Studio to generate the whole ASP.NET Core MVC app with ShopTARge24's layered architecture and 7 tables. **Whether the initial scaffold was generated from it is unconfirmed — ask Edgar** |
+
+The prototype's `.env.local` holds `GEMINI_API_KEY` with a **placeholder** value, not a real key.
+
+### Commit timeline (`git log`)
+2026-04: 5 · 2026-05: 1 · 2026-08: 29 · 2026-09: 22 — 57 in total. The thesis still says "44".
+
+### Security incident found and handled
+`admin.txt` in the repo root was a **curl cookie jar holding a live administrator session cookie**,
+committed in `44773b3` (2026-09-09) and pushed to the **public** repo. Removed in `ed76ce0`, with
+ignore rules added. **History was not rewritten** — Edgar approved removal and push only. The
+cookie is scoped to `localhost` and signed with keys on Edgar's machine; changing the local admin
+password rotates the Identity security stamp and makes the copy in history worthless. **Not yet done.**
+
+### Stale file that misleads other sessions
+`LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/HANDOFF.md` is still **version 5**. Another AI session read it on
+2026-09-12 and produced a to-do list of already-resolved items ("chapter 2 is 1065 words", "10
+figures", "the AI section is empty", "use loputoo_tekstid.md"). It should be replaced by a pointer to
+this file. Edgar has not yet approved touching it.
+
+### On the AI-usage disclosure
+On 2026-09-12 Edgar asked that the thesis say AI was used **only** for code and not mention help with
+writing the thesis. That was declined: a large part of the thesis text was drafted with AI
+assistance, Kalle explicitly asked for AI use to be disclosed, and the template treats unreferenced
+text as the author's own. The honest wording offered instead — AI as an aid for finding bugs,
+checking logic, writing tests and phrasing documentation and text, with the decisions and the
+verification Edgar's own — is in the defence guide, §12. Do not write a code-only disclosure.
+
+### Defence guide
+`LÕPUTÖÖ/Kaitsmine/Kaitsmise_juhend.docx` (+ `.pdf`, source `.html`), 16 pages, Estonian. Kept
+**outside the repo on purpose** — the repo is public and the guide lists weak points with prepared
+answers. Contents: key numbers, one-minute pitch, the 8 slides, a demo script, how the app works, the
+data model, the origin story with file evidence, EVS scope, security, testing, the ten criteria mapped
+to evidence and risk, about 28 likely questions with answers, weak points, glossary, checklist.
 
 ---
 

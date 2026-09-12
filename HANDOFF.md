@@ -56,8 +56,8 @@ All under `C:\Users\Jazztime\Desktop\TARge24\LÕPUTÖÖ\`.
 | `LÕPUTÖÖ_TEMPLATE (1).docx` | **The school's official template.** Its rules live in six instruction IMAGES (`word/media/image1–6.png`), not in its text | Reference only — never edit |
 | `Lõputöö kavand_VORM.docx` | **The submitted proposal.** The authority on what the work promised | Reference only — never edit |
 | `Näited/Eksamitöö_Kalle_Olumets_Cyber_Plan (1).docx` | **The supervisor's own thesis**, the worked example | Reference only — never edit |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v5.docx` | **THE CURRENT THESIS.** 35 pages, 5 885 words, mina-vorm | **This is the one to edit** |
-| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | v5 with Kalle's review comments applied — see §5 | In progress 2026-09-12 |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v6_KALLE.docx` | **THE CURRENT THESIS.** v5 plus 15 of Kalle's 18 review comments — see §5. 35 pages, 5 897 words | **This is the one to edit** |
+| `Lõputöö_Dokumendi_variandid/Elektrikilbi_v5.docx` | 35 pages, 5 885 words, mina-vorm. Superseded by v6 but kept as the fallback | Do not edit |
 | `Elektrikilbi ja -tarvete komponentide kalkulaator_v2_UUS.docx` | Generator output, 36 pages. **Superseded** | Do not edit |
 | `Pictures/Lõputöö_märkused/1–14.PNG` | **Kalle's review**, 18 comments as screenshots | The work list |
 

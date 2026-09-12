@@ -423,3 +423,11 @@ FodyWeavers.xsd
 # with the seeded demo catalogue (wwwroot/images/products) stay tracked in git.
 ElektriKalkulaator/ElektriKalkulaator/wwwroot/images/uploads/*
 !ElektriKalkulaator/ElektriKalkulaator/wwwroot/images/uploads/.gitkeep
+
+# Cookie jars written by curl during login tests. They hold live session cookies and must
+# never be committed. admin.txt was committed by mistake on 2026-09-09 and removed on
+# 2026-09-12; security-check.sh writes its own jar to .security-check-cookies.tmp.
+admin.txt
+*.cookies
+cookies*.txt
+.security-check-cookies.tmp

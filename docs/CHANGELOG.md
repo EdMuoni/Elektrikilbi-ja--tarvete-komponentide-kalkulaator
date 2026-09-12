@@ -44,6 +44,42 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-12 — Removed a committed admin session cookie
+
+**Type:** security
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- Deleted `admin.txt` from the repository root.
+- `.gitignore` now excludes `admin.txt`, `*.cookies`, `cookies*.txt` and
+  `.security-check-cookies.tmp`.
+
+**Why**
+- `admin.txt` was not a note. It was a curl cookie jar holding a live
+  `.AspNetCore.Identity.Application` cookie — a logged-in **administrator** session — plus an
+  antiforgery cookie. It was committed in `44773b3` on 2026-09-09 and pushed to the public
+  GitHub repository on branch `feat/conversion-ux`.
+- The practical risk is low: the cookie is scoped to `localhost` and is signed with
+  data-protection keys that exist only on Edgar's machine, and there is no deployed server it
+  could be replayed against. It is still an authentication token in a public repository of a
+  thesis whose subject includes security, and a reviewer opening the repo would find it.
+- It did not come from `scripts/security-check.sh`, which writes its jar to
+  `.security-check-cookies.tmp`. It was most likely a manual `curl -c admin.txt` login. That jar
+  was not ignored either, hence the broader pattern.
+
+**Not done, deliberately**
+- **Git history was not rewritten.** The cookie remains readable in commit `44773b3` on GitHub.
+  Removing it from history means rewriting and force-pushing a branch that already has an open
+  pull request; Edgar approved removal and push, not a history rewrite. The cleaner fix is to
+  make the token worthless: changing the local admin password rotates the Identity security
+  stamp, which invalidates every cookie issued before it.
+
+**How it was verified**
+- `git ls-files admin.txt` returns nothing after the commit; `git check-ignore admin.txt`
+  confirms the new rule matches.
+
+---
+
 ## 2026-09-12 — One generator for both ERDs; removed the in-figure source note
 
 **Type:** docs

@@ -38,7 +38,7 @@ the GitHub web UI — in order #1→#4, with **"Create a merge commit"** (squash
 deleting each merged branch so GitHub retargets the next PR to `main`.
 
 **0.2 — The thesis is a Word document, not a file in this repo.**
-The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v9.docx`.
+The current thesis is `LÕPUTÖÖ/Lõputöö_Dokumendi_variandid/Elektrikilbi_v10.docx` (36 pages; same text as v9 — verified paragraph by paragraph — with layout fixed).
 Earlier versions are kept untouched as fallbacks.
 **Never draft thesis text before reading the actual document.** It already contains most of
 what you would be tempted to write, and your draft will contradict it. This happened on
@@ -283,6 +283,31 @@ verification Edgar's own — is in the defence guide, §12. Do not write a code-
 answers. Contents: key numbers, one-minute pitch, the 8 slides, a demo script, how the app works, the
 data model, the origin story with file evidence, EVS scope, security, testing, the ten criteria mapped
 to evidence and risk, about 28 likely questions with answers, weak points, glossary, checklist.
+
+---
+
+## 4c. v10 layout pass — 2026-09-12
+
+Edgar said v9 had too many half-empty pages. **An earlier coordinate-based measurement said only 6
+pages were under-filled; it was wrong** (it mis-measured inline image positions). Rendering every
+page to a thumbnail sheet (Word `Page.EnhMetaFileBits` → PNG, script in the session scratchpad
+`render_pages.ps1`) showed the real picture. Always judge page fill by rendering, never by coordinates.
+
+Changes in v10, all layout — body text is identical to v9 (641 paragraphs, 6 277 words, diffed):
+- Image paragraphs now `KeepWithNext` so no figure is separated from its caption (Joonis 2 was).
+- Joonis 5's image and caption had inherited list-bullet formatting from the inserted-after list item — fixed.
+- `PageBreakBefore` removed from two Heading 3s where it had been added as an orphan workaround.
+- Redundant empty paragraphs holding a manual page break (char 12) removed before every Heading 1 that
+  already has `PageBreakBefore` — belt-and-braces breaks risk blank pages in Google Docs.
+- The manual break before MÕISTED JA LÜHENDID removed, so the glossary follows Kokkuvõte; glossary
+  table font 10 → 9 pt so it fits one page.
+- Table of contents 3 → 2 levels, matching Kalle's own thesis; now one page.
+- Figures resized: J1 380 · J2 410 · J3 410 · J5 300 · J7 410 · J11–13 320 · J14 340 · J18 420 pt wide.
+- **Joonis 6 and 7 swapped** (product-selection query now before the Calculate() core) so the
+  shorter figure fills page 17; captions renumbered and the in-text sentence reordered.
+
+Remaining partly empty pages are chapter ends forced by Kalle's "numbered chapters on a new page"
+rule, the declaration page, the TOC page and the last page.
 
 ---
 

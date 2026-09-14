@@ -44,6 +44,76 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-14 — Personal working notes moved out of the repository
+
+**Type:** chore
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- Moved out of the repo into Edgar's local `LÕPUTÖÖ` folder (copies checked byte-identical first):
+  - `HANDOFF.md` → `LÕPUTÖÖ\HANDOFF.md`
+  - `docs/PROMPTS.md`, `docs/LOPUTOO_MUSTAND.md`, `scripts/build-thesis-docx.js` → `LÕPUTÖÖ\Tööriistad\`
+- `CLAUDE.md` now points at `../HANDOFF.md` and lists the moved files; its school name is updated.
+- Removed the `PROMPTS.md` row from the file table in `docs/PROJECT_ROADMAP.md`.
+
+**Why**
+- None of the four is part of the application, and the thesis cites none of them. `HANDOFF.md` is a
+  set of notes between working sessions with personal remarks that do not belong in a public repo.
+  `LOPUTOO_MUSTAND.md` is an out-of-date draft of the thesis; a public copy could be mistaken for
+  the thesis or match it in a plagiarism check. `build-thesis-docx.js` builds the thesis document,
+  not the app.
+- Everything the thesis *does* cite stays: the CI workflow (sections 2.2 and 2.4), the `docs/` files
+  in Tabel 14, this changelog with its per-entry *Author* field (section 1.6), the security script
+  (section 2.5) and the list of deliberate design choices in `CLAUDE.md` (section 2.4).
+- Git history is not rewritten. The files remain in earlier commits.
+
+**How it was verified**
+- `cmp` confirmed each copy matches the original before `git rm`.
+- Searched the repo for remaining references to the four files; only older changelog entries
+  mention them, and those are left as they were.
+
+**Follow-ups or known limitations**
+- none
+
+---
+
+## 2026-09-14 — README rewritten in Estonian, with an AI-use section
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `README.md` — the whole file rewritten in Estonian.
+- School name changed from "Tallinna Tööstushariduskeskus" to "Tallinna Tehnoloogiakolledž (Techno TLN)".
+- New section "Autor ja tehisintellekti kasutamine" explaining why `claude` appears among the
+  GitHub contributors. Its wording follows thesis section 1.6.
+- New section "Teadaolevad piirangud", taken from the limitations the thesis itself states.
+- Corrected facts that had gone stale: "48 automated tests" → 218; the claim that the calculation
+  simply "follows" EVS-HD 60364 now says the clause references are still missing.
+- Documentation table: added `KOODI_SELGITUS.md`, `EVS_ALLIKAD.md` and `joonised/`;
+  `PROJECT_ROADMAP.md` is no longer "start here" and shows its last-updated date.
+
+**Why**
+- The thesis reviewer (retsensent) asked for the repository link on 2026-09-14, so the README is
+  now the first thing an Estonian examiner reads. Edgar asked for it in Estonian.
+- Tallinna Tööstushariduskeskus merged into Tallinna Tehnoloogiakolledž (Techno TLN) on 01.07.2026.
+  The name was checked against the school's own email signature and news coverage of the merger.
+- The contributors list shows `claude` next to Edgar with no explanation. The thesis already
+  discloses AI use, so the README says the same thing in the place a reviewer sees the list.
+- A README that overstates standards compliance contradicts the thesis, which states the limitation.
+
+**How it was verified**
+- `dotnet test`: 218 passed, 0 failed (run today, before the edit).
+- Every file linked from the README exists in `docs/`; `appsettings.json` still defaults to
+  LocalDB and `launchSettings.json` still uses port 8080.
+
+**Follow-ups or known limitations**
+- `docs/PROJECT_ROADMAP.md` still names Tallinna Tööstushariduskeskus.
+- The school name in the thesis (Word file, outside the repo) is not yet settled.
+- `docs/TESTING.md` still says 203 tests.
+
+---
+
 ## 2026-09-13 — Algorithm flowchart (Joonis 5) redrawn in portrait with larger text
 
 **Type:** docs

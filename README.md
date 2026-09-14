@@ -127,9 +127,7 @@ Kõik dokumendid on kaustas [`docs/`](docs/). Enamik neist on inglise keeles.
 | [TEST_ACCOUNTS.md](docs/TEST_ACCOUNTS.md) | Näidiskontod (administraator ja klient) rakenduse proovimiseks |
 | [VOICE_AND_PERSONALITY.md](docs/VOICE_AND_PERSONALITY.md) | Kuidas veebileht kasutajaga räägib |
 | [SUPPLIER_SYNC_SPEC.md](docs/SUPPLIER_SYNC_SPEC.md) | Tulevase tarnijate hinnasünkrooni plaan (ei ole realiseeritud) |
-| [PROMPTS.md](docs/PROMPTS.md) | Juhised selle projekti kallal tehisintellektiga töötamiseks |
 | [joonised/](docs/joonised/) | Lõputöö arhitektuuri- ja vooskeemi joonise lähtefailid (SVG) |
-| [LOPUTOO_MUSTAND.md](docs/LOPUTOO_MUSTAND.md) | **Vana mustand, mitte lõputöö.** Lõplik töö on Wordi dokument |
 
 [`CLAUDE.md`](CLAUDE.md) asub repositooriumi juurkaustas, sest Claude Code loeb selle sealt
 automaatselt. See on juhend tehisintellektile ja viitab ülalolevatele dokumentidele.

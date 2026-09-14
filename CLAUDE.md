@@ -1,16 +1,18 @@
 # CLAUDE.md — instructions for AI assistants working on this project
 
 This file is loaded automatically at the start of every session. Read it, then read
-**`HANDOFF.md` in the repository root** — that is the file which carries state between
-sessions, including the current thesis version and the supervisor's open review comments.
+**`HANDOFF.md` in the `LÕPUTÖÖ` folder one level above this repository** (`../HANDOFF.md`) — that
+is the file which carries state between sessions, including the current thesis version and the
+supervisor's open review comments. It lives outside the repo on purpose: it holds personal working
+notes that do not belong in a public repository.
 `docs/PROJECT_ROADMAP.md` is a month stale (revision 7, 2026-08-14) and is being refreshed.
 
 ---
 
 ## What this project is
 
-**ElektriKalkulaator** — Edgar Muoni's diploma thesis (LÕPUTÖÖ) at Tallinna Tööstushariduskeskus,
-supervised by Kalle Olumets. An ASP.NET Core 9 MVC + EF Core 9 web app that calculates a **priced
+**ElektriKalkulaator** — Edgar Muoni's diploma thesis (LÕPUTÖÖ) at Tallinna Tehnoloogiakolledž
+(Techno TLN; Tallinna Tööstushariduskeskus merged into it on 2026-07-01), supervised by Kalle Olumets. An ASP.NET Core 9 MVC + EF Core 9 web app that calculates a **priced
 Bill of Materials** for an electrical panel from the Estonian standard **EVS-HD 60364**, using a
 real product catalogue.
 
@@ -27,13 +29,15 @@ this one because it is only loaded automatically from there.
 | `docs/CHANGELOG.md` | What changed in the code and **why** | **Every code change** |
 | `docs/RESEARCH_LOG.md` | Facts gathered from outside (prices, competitor design, UX research) | When you research something external |
 | `docs/IMAGE_CREDITS.md` | Licence and attribution for every image | When images change |
-| `docs/PROMPTS.md` | Ready-made prompts for future sessions | Rarely; when a new prompt proves useful |
 | `docs/DESIGN_GUIDE.md` | Design system, page-by-page UI instructions, what not to do | When a UI decision is made |
 | `docs/TESTING.md` | How this project is tested and what to test | When adding a kind of test |
 | `docs/TEST_ACCOUNTS.md` | Demo admin/customer logins and how they are kept out of production | When accounts change |
 | `docs/VOICE_AND_PERSONALITY.md` | How the site should sound; warmth without slowing it down | When writing user-facing copy |
 | `docs/SUPPLIER_SYNC_SPEC.md` | **Not built.** Plan for the dropshipping / price-sync model | Post-thesis only |
-| `docs/LOPUTOO_MUSTAND.md` | **STALE — not the thesis.** A markdown draft frozen before 2026-09-10: still has the LISAD section, lacks chapter 2.6 and the chapter-3 additions. The real thesis is a Word file; see `HANDOFF.md` §0.2. | Kept as history only — do not edit or quote |
+
+Kept outside the repo, in `LÕPUTÖÖ\Tööriistad\`: `PROMPTS.md` (prompts for future sessions),
+`LOPUTOO_MUSTAND.md` (a **stale** markdown thesis draft — never read it as the thesis) and
+`build-thesis-docx.js`. The real thesis is a Word file named in `HANDOFF.md` §0.
 
 ## Rules — follow these without being asked
 

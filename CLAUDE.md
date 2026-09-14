@@ -48,7 +48,7 @@ this one because it is only loaded automatically from there.
 6. **Clean up test data.** The dev database should end a session with 10 seeded products and only
    the seeded admin user.
 7. **Never invent EVS-HD 60364 clause numbers.** This applies to
-   `docs/LOPUTOO_MUSTAND.md` as much as to the code — a fabricated standard
+   the thesis (the Word file named in `HANDOFF.md` §0) as much as to the code — a fabricated standard
    reference in the thesis is worse than a blank one. `CalculationRule.EvsReference` is deliberately
    empty until Edgar verifies them against the real standard. A fabricated citation in a thesis
    about standards compliance is worse than a blank field.

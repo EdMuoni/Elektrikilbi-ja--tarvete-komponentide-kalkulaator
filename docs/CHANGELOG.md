@@ -44,6 +44,34 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-13 — Algorithm flowchart (Joonis 5) redrawn in portrait with larger text
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `docs/joonised/joonis-5-arvutuse-vooskeem.svg` — layout changed from 920 × 760 (landscape) to
+  600 × 800 (portrait); text 10.5–13 px → 14–17 px; steps numbered 1–6; the in-figure title removed;
+  the worked example moved from a side column into the loop box.
+- Rendered to `LÕPUTÖÖ/Pictures/Diagrams/skeem-vooskeem.png` (outside the repo) and placed in thesis V12.
+
+**Why**
+- Supervisor comment (Kalle Olumets, 13.09.2026): "liiga väike, tee pilt suuremaks, kogu lk võiks olla".
+  The figure was 300 pt wide in the thesis, so its smallest text printed at about 3.5 pt. Simply
+  scaling it would still give 5–6 pt and fill only half a page, because it was wider than tall.
+- In portrait at 440 pt wide the smallest text prints at about 10 pt and the figure fills most of the page.
+- The step numbers match the algorithm list in thesis section 1.4, which is now a numbered list.
+- The title was removed because the caption already names the figure (same reasoning as the ERD note
+  removed on 2026-09-12).
+
+**How it was verified**
+- Rendered with headless Edge at 3× and inspected; inspected again on page 17 of the thesis page render.
+
+**Follow-ups or known limitations**
+- None. The content of the steps is unchanged.
+
+---
+
 ## 2026-09-13 — Light code figures for the three controller screenshots
 
 **Type:** docs

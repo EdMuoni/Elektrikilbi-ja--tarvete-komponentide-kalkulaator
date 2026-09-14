@@ -24,7 +24,7 @@ is written the way it is. Copy a prompt, paste it, adjust the details in `<angle
 
 ## 1. Starting a new session
 
-> Read `CLAUDE.md` and `PROJECT_ROADMAP.md`, then give me a three-sentence summary of where the
+> Read `HANDOFF.md` (§0 and §1) and `CLAUDE.md`, then give me a three-sentence summary of where the
 > project stands and what the next planned task is. Do not change any code yet.
 
 **Why:** `CLAUDE.md` loads automatically, but explicitly asking for a summary proves the model has
@@ -94,9 +94,10 @@ undermine a project whose selling point is trustworthiness.
 
 ## 7. Writing thesis text
 
-> Using `PROJECT_ROADMAP.md`, `CHANGELOG.md` and `RESEARCH_LOG.md`, draft the `<section>` section
-> of my thesis in Estonian. Base every claim on what is actually in those documents. Where
-> something is uncertain or unverified, mark it clearly instead of writing around it.
+> Read the current thesis .docx named in `HANDOFF.md` §0 first — the section may already exist.
+> Then, using `CHANGELOG.md` and `RESEARCH_LOG.md`, revise the `<section>` section in Estonian,
+> mina-vorm, following the house style in `HANDOFF.md` §4. Base every claim on what is actually in
+> those documents. Where something is uncertain or unverified, mark it clearly instead of writing around it.
 
 **Why:** grounding the text in the project's own records stops invented detail. Marking gaps means
 you can see what still needs your input rather than discovering it during the defence.

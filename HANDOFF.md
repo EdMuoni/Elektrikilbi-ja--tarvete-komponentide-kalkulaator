@@ -27,7 +27,7 @@ rounds is fixed. The current version is **V13**. Edgar needs Kalle's signature (
 | Measured (V13) | 39 pages · 7 164 words · 18 figures · 16 tables (15 captioned + glossary) · 12 sources · 17 in-text citations · layout check: 0 problems |
 | Defence guide | `LÕPUTÖÖ\Kaitsmine\Kaitsmise_juhend.pdf` (+ `.docx`, source `.html`), 16 pages, Estonian. **Private — never copy it into this public repo** |
 | Thesis tools | `LÕPUTÖÖ\Tööriistad\` — Word automation scripts and the spec of every version (§8) |
-| Code | branch `feat/conversion-ux`, HEAD `c106e38`, pushed, CI green. **`main` is NOT up to date** (§1.1) |
+| Code | branch `feat/conversion-ux`, pushed, CI green on 2026-09-12. **`main` is NOT up to date** (§1.1) |
 | Tests | 218, all passing (last run 2026-09-13) |
 
 ### If Kalle sends more comments — the proven workflow
@@ -65,7 +65,7 @@ rounds is fixed. The current version is **V13**. Edgar needs Kalle's signature (
 | | commit | date |
 |---|---|---|
 | `origin/main` | `46ebffa` | 2026-08-11 |
-| `origin/feat/conversion-ux` | `c106e38` | 2026-09-13 — **50 commits ahead of main, 0 behind** |
+| `origin/feat/conversion-ux` | `af31456` (this handoff) | 2026-09-14 — **51 commits ahead of main, 0 behind** |
 
 Pull requests #1–#4 are a linear stack, all **open**: #1 `main` ← `fix/track-seeded-product-images`,
 #2 ← `feat/upload-validation-messages`, #3 ← `fix/security-hardening`, #4 ← `feat/conversion-ux`.
@@ -243,7 +243,7 @@ includes SQL injection and XSS). The thesis cites both.
 
 ## 7. Open items and known risks
 
-- **`main` behind by 50 commits** (§1.1).
+- **`main` behind by 51 commits** (§1.1).
 - **Security:** `admin.txt`, a curl cookie jar with a live localhost admin session cookie, was
   committed in `44773b3` and pushed to the public repo; removed in `ed76ce0`. History was not
   rewritten (not approved). Changing the local admin password makes the copy worthless. Not done yet.

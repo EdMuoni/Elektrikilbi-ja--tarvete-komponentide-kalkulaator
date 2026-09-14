@@ -1,0 +1,304 @@
+/* =============================================================================
+   theme.css - ALL COLOURS FOR THE WHOLE SITE
+   =============================================================================
+   GENERATED FILE. Do not edit by hand - your changes will be overwritten.
+       python scripts/generate-theme.py
+   The reasoning behind every value is in that script's docstring.
+
+   Every colour used anywhere lives in this file and nowhere else. site.css and
+   the views refer to them by name - var(--bg-card) - and never write a colour
+   value of their own. ThemeTokenTests enforces that.
+
+   -- HOW THE LIGHT / DARK SWITCH WORKS ---------------------------------------
+   Three states, not two:
+
+     1. "system"  - no data-theme attribute. The OS decides, via the
+                    prefers-color-scheme media query. This is the default.
+     2. "dark"    - the visitor chose dark:  <html data-theme="dark">
+     3. "light"   - the visitor chose light: <html data-theme="light">
+
+   The visitor's choice must beat the system preference in BOTH directions,
+   which is why the media query is written as :root:not([data-theme="dark"])
+   rather than plain :root. wwwroot/js/theme.js sets the attribute.
+
+   -- WHY EVERYTHING IS WARM ---------------------------------------------------
+   Both palettes are warm neutrals rather than cool greys. Warm neutrals read as
+   paper, linen and unfinished wood; cool greys read as screens and hospitals.
+   For a tool someone uses while planning work in a building, the first is the
+   right feeling. Surfaces share one hue (~28deg) and lose saturation as they
+   get lighter, which is how real materials behave under light.
+
+   Dark mode follows established accessibility guidance: never pure black
+   (halation against light text, and you cannot see a shadow on black), never
+   pure white text for the same reason, and accents that are lighter and less
+   saturated than their light-mode versions, because a saturated colour vibrates
+   against a dark background.
+
+   -- THE CONTRAST BAND -------------------------------------------------------
+   --bg-band is the one token that INVERTS between themes: warm cream on dark,
+   warm near-black on light. It paints one section the opposite value to the
+   rest of the page, which is what stops a long page reading as flat. Because it
+   flips per theme, that rhythm survives the switch.
+
+   Anything drawn inside the band MUST use --band-ink / --band-muted /
+   --band-card, never --text-primary, or it will be invisible in one theme.
+   ============================================================================= */
+
+
+/* -- DARK: the default palette ----------------------------------------------
+   Dark is this project's identity, so it is the base. A visitor whose system
+   asks for light gets the light palette below; everyone else sees this. */
+:root {
+    /* SURFACES, furthest back to nearest front */
+    --bg-primary:         #0F1513;                                                    /* page background */
+    --bg-card:            #2B3632;                                                    /* cards and panels */
+    --bg-card-raised:     #35433E;                                                    /* a card sitting on top of another card */
+    --bg-input:           #313D38;                                                    /* form fields */
+    --bg-nav:             #090E0C;                                                    /* navigation bar */
+    --bg-subtle:          rgba(255, 255, 255, 0.045);                                 /* table headers, hover fills */
+
+    /* PRODUCT TILE - the same in BOTH themes, deliberately */
+    --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+    --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
+    /* THE CONTRAST BAND - inverts between themes, see the module docstring */
+    --bg-band:            #F3EEE7;                                                    /* the band surface */
+    --band-ink:           #1A1511;                                                    /* headings inside the band */
+    --band-muted:         #5E544B;                                                    /* secondary text inside the band */
+    --band-card:          #FFFFFF;                                                    /* a card sitting on the band */
+    --band-border:        #DED6CA;                                                    /* borders inside the band */
+
+    /* ACCENTS - each has exactly one job, see docs/DESIGN_GUIDE.md */
+    --accent-amber:       #F2764B;                                                    /* THE next action. Button fills. */
+    --accent-amber-ink:   #F79A76;                                                    /* the same accent used as TEXT rather than as a fill */
+    --accent-amber-hover: #FF8F63;
+    --on-accent:          #20100A;                                                    /* text placed ON an accent button */
+    --accent-blue:        #7FB6EE;                                                    /* information, links, technical badges */
+    --accent-green:       #62C79E;                                                    /* success, in stock, trust */
+    --accent-red:         #F08E80;                                                    /* errors and destructive actions only */
+    --accent-warning:     #F2C14E;                                                    /* low stock */
+
+    /* TEXT */
+    --text-strong:        #F2F5F4;                                                    /* headings and figures that must dominate */
+    --text-primary:       #D4DBD8;                                                    /* body text and prices */
+    --text-muted:         #A4B0AA;                                                    /* secondary text */
+
+    /* BORDERS */
+    --border-color:       #44534D;
+    --border-strong:      #576862;                                                    /* used when a border must actually be seen */
+
+    /* CIRCUIT TYPES in the BOM table */
+    --circuit-lighting:   #7FB6EE;
+    --circuit-socket:     #62C79E;
+    --circuit-stove:      #F08E80;
+    --circuit-rcd:        #BFA6F5;
+    --circuit-panel:      #F79A76;
+
+    /* TINTED FILLS behind badges and the trust strip */
+    --tint-amber:         rgba(242, 118, 75, 0.14);
+    --tint-blue:          rgba(127, 182, 238, 0.13);
+    --tint-green:         rgba(98, 199, 158, 0.12);
+    --tint-red:           rgba(240, 142, 128, 0.13);
+    --tint-warning:       rgba(233, 185, 106, 0.13);
+
+    /* SHADOWS */
+    --shadow-card:        0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 30px rgba(0,0,0,0.45);/* elevation */
+    --shadow-float:       0 20px 52px rgba(0,0,0,0.55);                               /* cards that overlap the hero photo */
+
+    color-scheme: dark;
+}
+
+/* -- LIGHT -------------------------------------------------------------------
+   Not an inversion of the above. Several colours are genuinely different
+   values, because a colour readable on near-black is often unreadable on
+   near-white. The orange accent stays #F2764B as a BUTTON FILL, where a dark
+   label sits on top, but darkens to #A8481D when used as TEXT.
+
+   Backgrounds are a warm bone rather than pure white: pure white glares in
+   daylight and reads as colder than the rest of the palette. */
+@media (prefers-color-scheme: light) {
+    /* :not([data-theme="dark"]) = "unless the visitor explicitly chose dark". */
+    :root:not([data-theme="dark"]) {
+        /* SURFACES, furthest back to nearest front */
+        --bg-primary:         #F2EEE8;                                                    /* page background */
+        --bg-card:            #FEFDFB;                                                    /* cards and panels */
+        --bg-card-raised:     #FFFFFF;                                                    /* a card sitting on top of another card */
+        --bg-input:           #FEFDFB;                                                    /* form fields */
+        --bg-nav:             #FEFDFB;                                                    /* navigation bar */
+        --bg-subtle:          rgba(26, 21, 17, 0.04);                                     /* table headers, hover fills */
+
+        /* PRODUCT TILE - the same in BOTH themes, deliberately */
+        --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+        --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
+        /* THE CONTRAST BAND - inverts between themes, see the module docstring */
+        --bg-band:            #1F1A16;                                                    /* the band surface */
+        --band-ink:           #F6F4F1;                                                    /* headings inside the band */
+        --band-muted:         #B3A99F;                                                    /* secondary text inside the band */
+        --band-card:          #2C2723;                                                    /* a card sitting on the band */
+        --band-border:        #3D352E;                                                    /* borders inside the band */
+
+        /* ACCENTS - each has exactly one job, see docs/DESIGN_GUIDE.md */
+        --accent-amber:       #F2764B;                                                    /* THE next action. Button fills. */
+        --accent-amber-ink:   #A8481D;                                                    /* the same accent used as TEXT rather than as a fill */
+        --accent-amber-hover: #DC6135;
+        --on-accent:          #20100A;                                                    /* text placed ON an accent button */
+        --accent-blue:        #1D5BB8;                                                    /* information, links, technical badges */
+        --accent-green:       #0A6B4D;                                                    /* success, in stock, trust */
+        --accent-red:         #A83226;                                                    /* errors and destructive actions only */
+        --accent-warning:     #7A5300;                                                    /* low stock */
+
+        /* TEXT */
+        --text-strong:        #1A1511;                                                    /* headings and figures that must dominate */
+        --text-primary:       #3F362F;                                                    /* body text and prices */
+        --text-muted:         #756A61;                                                    /* secondary text */
+
+        /* BORDERS */
+        --border-color:       #E7E1DA;
+        --border-strong:      #D2C9C1;                                                    /* used when a border must actually be seen */
+
+        /* CIRCUIT TYPES in the BOM table */
+        --circuit-lighting:   #1D5BB8;
+        --circuit-socket:     #0A6B4D;
+        --circuit-stove:      #A83226;
+        --circuit-rcd:        #6D3FC4;
+        --circuit-panel:      #A8481D;
+
+        /* TINTED FILLS behind badges and the trust strip */
+        --tint-amber:         rgba(242, 118, 75, 0.15);
+        --tint-blue:          rgba(29, 91, 184, 0.10);
+        --tint-green:         rgba(10, 107, 77, 0.10);
+        --tint-red:           rgba(168, 50, 38, 0.10);
+        --tint-warning:       rgba(133, 86, 12, 0.12);
+
+        /* SHADOWS */
+        --shadow-card:        0 1px 2px rgba(26,21,17,0.05), 0 8px 24px rgba(26,21,17,0.07);/* elevation */
+        --shadow-float:       0 20px 52px rgba(26,21,17,0.16);                            /* cards that overlap the hero photo */
+
+        color-scheme: light;
+    }
+}
+
+/* The visitor explicitly chose light. Same values as the media query
+   above, but applied regardless of what the operating system prefers. */
+:root[data-theme="light"] {
+    /* SURFACES, furthest back to nearest front */
+    --bg-primary:         #F2EEE8;                                                    /* page background */
+    --bg-card:            #FEFDFB;                                                    /* cards and panels */
+    --bg-card-raised:     #FFFFFF;                                                    /* a card sitting on top of another card */
+    --bg-input:           #FEFDFB;                                                    /* form fields */
+    --bg-nav:             #FEFDFB;                                                    /* navigation bar */
+    --bg-subtle:          rgba(26, 21, 17, 0.04);                                     /* table headers, hover fills */
+
+    /* PRODUCT TILE - the same in BOTH themes, deliberately */
+    --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+    --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
+    /* THE CONTRAST BAND - inverts between themes, see the module docstring */
+    --bg-band:            #1F1A16;                                                    /* the band surface */
+    --band-ink:           #F6F4F1;                                                    /* headings inside the band */
+    --band-muted:         #B3A99F;                                                    /* secondary text inside the band */
+    --band-card:          #2C2723;                                                    /* a card sitting on the band */
+    --band-border:        #3D352E;                                                    /* borders inside the band */
+
+    /* ACCENTS - each has exactly one job, see docs/DESIGN_GUIDE.md */
+    --accent-amber:       #F2764B;                                                    /* THE next action. Button fills. */
+    --accent-amber-ink:   #A8481D;                                                    /* the same accent used as TEXT rather than as a fill */
+    --accent-amber-hover: #DC6135;
+    --on-accent:          #20100A;                                                    /* text placed ON an accent button */
+    --accent-blue:        #1D5BB8;                                                    /* information, links, technical badges */
+    --accent-green:       #0A6B4D;                                                    /* success, in stock, trust */
+    --accent-red:         #A83226;                                                    /* errors and destructive actions only */
+    --accent-warning:     #7A5300;                                                    /* low stock */
+
+    /* TEXT */
+    --text-strong:        #1A1511;                                                    /* headings and figures that must dominate */
+    --text-primary:       #3F362F;                                                    /* body text and prices */
+    --text-muted:         #756A61;                                                    /* secondary text */
+
+    /* BORDERS */
+    --border-color:       #E7E1DA;
+    --border-strong:      #D2C9C1;                                                    /* used when a border must actually be seen */
+
+    /* CIRCUIT TYPES in the BOM table */
+    --circuit-lighting:   #1D5BB8;
+    --circuit-socket:     #0A6B4D;
+    --circuit-stove:      #A83226;
+    --circuit-rcd:        #6D3FC4;
+    --circuit-panel:      #A8481D;
+
+    /* TINTED FILLS behind badges and the trust strip */
+    --tint-amber:         rgba(242, 118, 75, 0.15);
+    --tint-blue:          rgba(29, 91, 184, 0.10);
+    --tint-green:         rgba(10, 107, 77, 0.10);
+    --tint-red:           rgba(168, 50, 38, 0.10);
+    --tint-warning:       rgba(133, 86, 12, 0.12);
+
+    /* SHADOWS */
+    --shadow-card:        0 1px 2px rgba(26,21,17,0.05), 0 8px 24px rgba(26,21,17,0.07);/* elevation */
+    --shadow-float:       0 20px 52px rgba(26,21,17,0.16);                            /* cards that overlap the hero photo */
+
+    color-scheme: light;
+}
+
+/* The visitor explicitly chose dark. Repeats the defaults so that
+   choosing dark on a light-preferring system works. */
+:root[data-theme="dark"] {
+    /* SURFACES, furthest back to nearest front */
+    --bg-primary:         #0F1513;                                                    /* page background */
+    --bg-card:            #2B3632;                                                    /* cards and panels */
+    --bg-card-raised:     #35433E;                                                    /* a card sitting on top of another card */
+    --bg-input:           #313D38;                                                    /* form fields */
+    --bg-nav:             #090E0C;                                                    /* navigation bar */
+    --bg-subtle:          rgba(255, 255, 255, 0.045);                                 /* table headers, hover fills */
+
+    /* PRODUCT TILE - the same in BOTH themes, deliberately */
+    --product-tile:       #FFFFFF;                                                    /* background behind a product photograph */
+    --product-tile-border:#E2E0DC;                                                    /* its edge, so a white tile still has a shape */
+
+    /* THE CONTRAST BAND - inverts between themes, see the module docstring */
+    --bg-band:            #F3EEE7;                                                    /* the band surface */
+    --band-ink:           #1A1511;                                                    /* headings inside the band */
+    --band-muted:         #5E544B;                                                    /* secondary text inside the band */
+    --band-card:          #FFFFFF;                                                    /* a card sitting on the band */
+    --band-border:        #DED6CA;                                                    /* borders inside the band */
+
+    /* ACCENTS - each has exactly one job, see docs/DESIGN_GUIDE.md */
+    --accent-amber:       #F2764B;                                                    /* THE next action. Button fills. */
+    --accent-amber-ink:   #F79A76;                                                    /* the same accent used as TEXT rather than as a fill */
+    --accent-amber-hover: #FF8F63;
+    --on-accent:          #20100A;                                                    /* text placed ON an accent button */
+    --accent-blue:        #7FB6EE;                                                    /* information, links, technical badges */
+    --accent-green:       #62C79E;                                                    /* success, in stock, trust */
+    --accent-red:         #F08E80;                                                    /* errors and destructive actions only */
+    --accent-warning:     #F2C14E;                                                    /* low stock */
+
+    /* TEXT */
+    --text-strong:        #F2F5F4;                                                    /* headings and figures that must dominate */
+    --text-primary:       #D4DBD8;                                                    /* body text and prices */
+    --text-muted:         #A4B0AA;                                                    /* secondary text */
+
+    /* BORDERS */
+    --border-color:       #44534D;
+    --border-strong:      #576862;                                                    /* used when a border must actually be seen */
+
+    /* CIRCUIT TYPES in the BOM table */
+    --circuit-lighting:   #7FB6EE;
+    --circuit-socket:     #62C79E;
+    --circuit-stove:      #F08E80;
+    --circuit-rcd:        #BFA6F5;
+    --circuit-panel:      #F79A76;
+
+    /* TINTED FILLS behind badges and the trust strip */
+    --tint-amber:         rgba(242, 118, 75, 0.14);
+    --tint-blue:          rgba(127, 182, 238, 0.13);
+    --tint-green:         rgba(98, 199, 158, 0.12);
+    --tint-red:           rgba(240, 142, 128, 0.13);
+    --tint-warning:       rgba(233, 185, 106, 0.13);
+
+    /* SHADOWS */
+    --shadow-card:        0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 30px rgba(0,0,0,0.45);/* elevation */
+    --shadow-float:       0 20px 52px rgba(0,0,0,0.55);                               /* cards that overlap the hero photo */
+
+    color-scheme: dark;
+}

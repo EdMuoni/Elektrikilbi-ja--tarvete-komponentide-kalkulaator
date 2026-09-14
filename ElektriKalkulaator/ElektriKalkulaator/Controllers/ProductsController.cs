@@ -1,5 +1,7 @@
+using ElektriKalkulaator.Core.Domain;
 using ElektriKalkulaator.Core.Dto;
 using ElektriKalkulaator.Core.ServiceInterface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -7,6 +9,15 @@ namespace ElektriKalkulaator.Controllers
 {
     // Full CRUD for products plus category management.
     // Routes: /Products, /Products/Details, /Products/Create, /Products/Edit, /Products/Delete, /Products/Categories
+    //
+    // [Authorize(Roles = Admin)] on the CLASS means every action here requires an administrator
+    // by default. The two pages the public genuinely needs - the catalogue listing and a product's
+    // details - opt back out with [AllowAnonymous] individually.
+    //
+    // Securing by default and opening up deliberately is safer than the reverse: forgetting to add
+    // [Authorize] to a new action would leave it open, whereas forgetting [AllowAnonymous] only
+    // makes a page stricter than intended, which is obvious immediately.
+    [Authorize(Roles = UserRoles.Admin)]
     public class ProductsController : Controller
     {
         private readonly IProductServices _productServices;
@@ -23,32 +34,44 @@ namespace ElektriKalkulaator.Controllers
             _env = env;
         }
 
-        // GET /Products — catalogue with optional category filter and name search
+        // GET /Products — catalogue with optional category, brand, text search and ordering
+        [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Index(Guid? categoryId, string? searchTerm)
+        public async Task<IActionResult> Index(
+            Guid? categoryId,
+            string? searchTerm,
+            string? brand = null,
+            ProductSortOrder sort = ProductSortOrder.CategoryThenName)
         {
             var categories = await _categoryServices.GetAll();
 
-            var products = categoryId.HasValue
-                ? await _productServices.GetByCategory(categoryId.Value)
-                : await _productServices.GetAll();
+            // One call does the category filter, the brand filter, the text search AND the
+            // ordering, all in the database rather than in memory here. See ProductServices.Search.
+            var products = await _productServices.Search(categoryId, searchTerm, brand, sort);
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                var term = searchTerm.ToLower();
-                products = products.Where(p =>
-                    p.Name.ToLower().Contains(term) ||
-                    p.Brand.ToLower().Contains(term));
-            }
+            // The brand list comes from the products themselves, so the filter can never offer a
+            // brand that would return an empty page. Trade catalogues are browsed by brand at
+            // least as often as by category — an electrician frequently knows they want Schneider
+            // before they know which category the part is filed under.
+            ViewBag.Brands           = await _productServices.GetBrands();
+
+            // Counts drive two things in the view: a number beside each category filter, the way
+            // trade catalogues show them, and leaving out categories that hold nothing. The seeded
+            // "Klemmid" category has no products, so its filter used to open an empty page.
+            ViewBag.CategoryCounts   = await _productServices.GetProductCountsByCategory();
+            ViewBag.SelectedBrand    = brand;
 
             ViewBag.Categories       = new SelectList(categories, "Id", "Name", categoryId);
+            ViewBag.AllCategories    = categories;
             ViewBag.SelectedCategory = categoryId;
             ViewBag.SearchTerm       = searchTerm;
+            ViewBag.Sort             = sort;
 
             return View(products);
         }
 
         // GET /Products/Details/{id}
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -70,6 +93,13 @@ namespace ElektriKalkulaator.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductDto dto, IFormFile? imageFile)
         {
+            // Check the uploaded file BEFORE anything else. If it's not acceptable we add the
+            // reason to ModelState, which makes ASP.NET treat it exactly like any other failed
+            // form validation: the page is redisplayed with the message next to the field.
+            var imageError = ValidateImageFile(imageFile);
+            if (imageError != null)
+                ModelState.AddModelError(nameof(imageFile), imageError);
+
             if (!ModelState.IsValid)
             {
                 await LoadCategoriesIntoViewBag();
@@ -117,27 +147,43 @@ namespace ElektriKalkulaator.Controllers
             if (!dto.Id.HasValue || id != dto.Id.Value)
                 return BadRequest();
 
+            // Same file check as Create — see the comment there.
+            var imageError = ValidateImageFile(imageFile);
+            if (imageError != null)
+                ModelState.AddModelError(nameof(imageFile), imageError);
+
             if (!ModelState.IsValid)
             {
                 await LoadCategoriesIntoViewBag(dto.CategoryId);
                 return View(dto);
             }
 
-            // A new file replaces the image; otherwise dto.ImagePath already holds the existing
-            // path, round-tripped through a hidden field in the Edit form. Keep the old file's
-            // path so we can delete it from disk once the new one is confirmed saved — otherwise
-            // every re-upload leaves an orphaned file behind.
-            var oldImagePath = dto.ImagePath;
+            // Read the image currently stored against this product FROM THE DATABASE, not from
+            // the submitted form. The form carries ImagePath in a hidden field, which means the
+            // browser could send any path at all — and this method deletes the file it names.
+            // Trusting it would let a stale or edited form delete a different product's image.
+            var existing = await _productServices.GetById(id);
+            if (existing == null)
+                return NotFound();
+
+            var oldImagePath = existing.ImagePath;
+
+            // Keep whatever the product already had unless a new file was actually uploaded.
+            dto.ImagePath = oldImagePath;
+
             var newImagePath = await SaveProductImage(imageFile);
             if (newImagePath != null)
-            {
                 dto.ImagePath = newImagePath;
-                DeleteProductImageFile(oldImagePath);
-            }
 
             var updated = await _productServices.Update(dto);
             if (updated == null)
                 return NotFound();
+
+            // Only now that the update has definitely succeeded is it safe to remove the old
+            // file. Deleting it earlier meant a failed update left the product pointing at an
+            // image that had already been erased, with no way to get it back.
+            if (newImagePath != null)
+                DeleteProductImageFile(oldImagePath);
 
             TempData["Success"] = $"Product '{dto.Name}' updated successfully!";
             return RedirectToAction(nameof(Index));
@@ -221,7 +267,7 @@ namespace ElektriKalkulaator.Controllers
         private const string UploadsWebPath = "/images/uploads/";
 
         // There is no login/authorization on this controller (by design, for the thesis scope —
-        // see PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
+        // see docs/PROJECT_ROADMAP.md), which means anyone who can reach /Products/Create or /Edit can
         // reach this upload path too. An extension allow-list and a size cap are the minimum
         // guardrails against someone using the form to drop arbitrary files on the server.
         private static readonly HashSet<string> AllowedImageExtensions =
@@ -229,22 +275,83 @@ namespace ElektriKalkulaator.Controllers
 
         private const long MaxImageSizeBytes = 5 * 1024 * 1024; // 5 MB
 
+        // Checks whether an uploaded file is one we're willing to store.
+        //
+        // Returns null when the file is fine (including when there is no file at all — the image
+        // is optional), or a message written for the person filling in the form when it isn't.
+        // The message is in Estonian because every label on that form is in Estonian.
+        //
+        // Validation lives in its own method, separate from saving, so the controller can report
+        // a problem on the form instead of the upload blowing up halfway through. Previously a
+        // wrong file type threw an exception and the user got a blank 500 error page with no idea
+        // what went wrong.
+        internal static string? ValidateImageFile(IFormFile? imageFile)
+        {
+            // No file chosen is perfectly valid — a product simply has no picture.
+            if (imageFile == null || imageFile.Length == 0)
+                return null;
+
+            var extension = Path.GetExtension(imageFile.FileName);
+            if (!AllowedImageExtensions.Contains(extension))
+                return $"Sobimatu failitüüp. Lubatud on: {string.Join(", ", AllowedImageExtensions)}.";
+
+            if (imageFile.Length > MaxImageSizeBytes)
+                return $"Pilt on liiga suur (suurim lubatud maht on {MaxImageSizeBytes / 1024 / 1024} MB).";
+
+            // A filename is just text the browser sent us — anyone can rename "virus.exe" to
+            // "photo.jpg". So we also look at the first few bytes of the file itself. Real image
+            // formats begin with a fixed signature (often called "magic bytes"), and a file that
+            // doesn't start with one is not the image it claims to be.
+            if (!HasValidImageSignature(imageFile))
+                return "Fail ei ole korrektne pildifail.";
+
+            return null;
+        }
+
+        // Reads the first bytes of the uploaded file and checks them against the known signatures
+        // of the formats we accept. Returns true only if one of them matches.
+        internal static bool HasValidImageSignature(IFormFile imageFile)
+        {
+            // 12 bytes is enough for every signature we check (WEBP needs bytes 8-11).
+            Span<byte> header = stackalloc byte[12];
+
+            using var stream = imageFile.OpenReadStream();
+            var bytesRead = stream.Read(header);
+            if (bytesRead < 12)
+                return false; // too short to be any real image
+
+            // JPEG: FF D8 FF
+            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+                return true;
+
+            // PNG: 89 50 4E 47 0D 0A 1A 0A
+            if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
+                header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A)
+                return true;
+
+            // GIF: the ASCII text "GIF87a" or "GIF89a"
+            if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+                return true;
+
+            // WEBP: "RIFF" at the start, then "WEBP" at position 8
+            if (header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
+                header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
+                return true;
+
+            return false;
+        }
+
         // Saves an uploaded image into wwwroot/images/uploads. Anything under wwwroot is served
         // by the default static-file middleware, so no extra configuration is needed.
         // Returns the web-relative path to store in Product.ImagePath, or null if no file was sent.
+        //
+        // Assumes ValidateImageFile has already approved the file — always call that first.
         private async Task<string?> SaveProductImage(IFormFile? imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
                 return null;
 
             var extension = Path.GetExtension(imageFile.FileName);
-            if (!AllowedImageExtensions.Contains(extension))
-                throw new InvalidOperationException(
-                    $"Unsupported image type '{extension}'. Allowed: {string.Join(", ", AllowedImageExtensions)}");
-
-            if (imageFile.Length > MaxImageSizeBytes)
-                throw new InvalidOperationException("Image is too large (max 5 MB).");
-
             var uploadsFolder = Path.Combine(_env.WebRootPath, "images", UploadsFolderName);
             Directory.CreateDirectory(uploadsFolder);
 

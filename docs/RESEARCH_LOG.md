@@ -13,6 +13,69 @@ change, sites redesign) while code changes don't.
 
 ---
 
+## 2026-08-14 — Six industry reference sites, supplied by Edgar
+
+**Sources** (screenshots reviewed 2026-08-14; the article was the route to the first one):
+- <https://nestasites.com/blog/11-best-electrician-websites/> — an agency's roundup, and their own
+  marketing site
+- <https://www.supplyhouse.com/Electrical-Supplies-20570000>
+- <https://www.electrical2go.co.uk/>
+- <https://www.automationdirect.com/>
+- Proelectro.ru — a Russian electrical-equipment marketplace
+
+### The finding that mattered
+
+These six do **not** share a design language. They fall into two opposite genres, and mixing them
+is what makes a site look wrong:
+
+| | Marketing | Catalogue |
+|---|---|---|
+| Sites | Nesta Sites | SupplyHouse, Electrical2Go, AutomationDirect, Proelectro |
+| Background | Dark | Light |
+| Density | 3–4 things per screen | Everything at once |
+| Images | One staged photo | Many small part photos |
+| Purpose | Convince | Help find |
+
+Note **who** each is for. Nesta sells *websites to electricians*, so it is a marketing site whose
+customer happens to be a tradesperson. The other four sell *parts to electricians*. Only the
+second group is a real functional comparison for `/Products` — worth making at the defence,
+because copying Nesta's look onto a catalogue would have been the obvious and wrong move.
+
+Written up as `DESIGN_GUIDE.md` Part 0 and applied the same day.
+
+### Specific techniques taken
+
+| From | Technique | Where used |
+|---|---|---|
+| Nesta | A single cream band breaking a long dark page | `--bg-band`, "Kuidas see töötab" |
+| Nesta | Huge headline + accent-coloured second line + short rule | Home hero |
+| Nesta | Small card overlapping the hero photo, showing real output | `.proof-card` |
+| Nesta | Thin accent border on feature cards instead of a filled block | `.feature-card` |
+| Nesta | Fully rounded primary buttons | `--radius-pill` |
+| Proelectro | A row of hard numbers under the hero | `.stat-strip` |
+| SupplyHouse, Electrical2Go | Photo-led product grid, price and stock per card | `.product-grid` |
+| All four trade sites | Compact filter bar directly above the grid | `.catalogue-toolbar` |
+
+### Deliberately not taken
+
+- **Nesta's testimonials and money-back guarantee** — this is a thesis project with no customers.
+  Inventing either would be a fabricated claim, which is the one thing this project must not do.
+- **AutomationDirect's left-hand category sidebar** — right for ~1,900 categories, absurd for 10
+  seeded products. Revisit only if the catalogue grows by two orders of magnitude.
+- **Electrical2Go's carousel** — carousels bury everything after slide 1, and these users are
+  looking something up rather than browsing.
+- **Proelectro's tender and supplier features** — a different business model. Relevant later if
+  the dropshipping plan in `SUPPLIER_SYNC_SPEC.md` proceeds.
+
+### Caveat
+
+This is a design reading from screenshots, not a usability study. No user testing was done, and
+"these successful sites do X" is weaker evidence than "X was tested and worked". Present it at the
+defence as **informed precedent, not proof**.
+
+
+---
+
 ## 2026-08-11 — Real Estonian market prices vs. the seeded prices
 
 **Why this was researched:** the calculator's entire selling point is producing a realistic cost

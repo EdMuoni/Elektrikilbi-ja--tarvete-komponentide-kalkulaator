@@ -1,27 +1,70 @@
 /* =====================================================================
-   site.css — ELEKTRIKILBIKALKULAATOR TUME TEEMA
+   site.css — ElektriKalkulaator dark theme
    =====================================================================
-   Värvide tähendused:
-     #0f0f1a = väga tume tumesinine (lehe taust)
-     #16213e = tume sinine (kaartide taust)
-     #1f2937 = veidi heledam (input väljad)
-     #F5A623 = merevaiku/oranž (esiletõstmine, nupud)
-     #3B82F6 = sinine (sekundaarne aktsent)
-     #e5e7eb = hele tekst
+   Design tokens and component styles. Every colour, spacing value and font
+   size should come from the tokens in :root below rather than being typed
+   in by hand — see docs/DESIGN_GUIDE.md for why, and for the rule that each
+   colour has exactly one job.
    ===================================================================== */
 
-/* ── GLOBAALSED STIILID ──────────────────────────────────────────── */
+/* ── GLOBAL STYLES  ──────────────────────────────────────────── */
 :root {
-    --bg-primary:    #0f0f1a;   /* Lehe põhitaust */
-    --bg-card:       #16213e;   /* Kaartide taust */
-    --bg-input:      #1f2937;   /* Sisendväljade taust */
-    --bg-nav:        #0d0d1a;   /* Navigatsiooni taust */
-    --accent-amber:  #F5A623;   /* Peamine oranž aktsent */
-    --accent-blue:   #3B82F6;   /* Sinine aktsent */
-    --accent-green:  #10B981;   /* Roheline (edukad teated) */
-    --text-primary:  #e5e7eb;   /* Peamine tekst */
-    --text-muted:    #9ca3af;   /* Hallim tekst */
-    --border-color:  #2d3748;   /* Äärte värv */
+    /* COLOURS LIVE IN theme.css — do not add any here.
+       Keeping them in one file is what makes the light/dark switch possible.
+       This block holds only the values that are the same in both themes. */
+
+    /* ── SPACING SCALE ────────────────────────────────────────────────────────
+       Every margin, padding and gap picks from this list. Six options is enough
+       for any layout; unlimited options is what produces a page where nothing
+       quite lines up. Based on 4px, which divides evenly at common screen sizes. */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 40px;
+    --space-6: 64px;
+
+    /* ── TYPE SCALE ───────────────────────────────────────────────────────────
+       Sizes step by roughly 1.25x. Anything outside this list is a decision that
+       has to be justified — which is the point of having a scale at all. */
+    --text-xs:   0.75rem;   /* badges and table captions ONLY, never body text */
+    --text-sm:   0.875rem;
+    --text-base: 1rem;      /* body. Never smaller for anything meant to be read. */
+    --text-lg:   1.125rem;
+    --text-xl:   1.5rem;
+    --text-2xl:  2rem;
+
+    /* Display sizes for the landing page. clamp(min, preferred, max) shrinks
+       them on a phone without needing a media query. */
+    --text-display: clamp(2.25rem, 5.5vw, 3.75rem);
+    --text-lede:    clamp(1.2rem, 2.4vw, 1.65rem);
+
+    /* ── SHAPE AND MOTION ─────────────────────────────────────────────────── */
+    --radius:     8px;
+    --radius-lg:  12px;
+    --radius-band: 28px;   /* the contrast band, which needs a softer corner */
+    --radius-pill: 999px;  /* primary buttons and step numbers */
+    --border:     1px solid var(--border-color);
+    --transition: 0.15s ease;
+}
+
+/* ── KEYBOARD FOCUS ───────────────────────────────────────────────────────────
+   Without a visible focus ring the site cannot be operated by keyboard at all —
+   a person tabbing through has no idea where they are. :focus-visible shows the
+   ring for keyboard users without putting an outline around every mouse click. */
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent-amber);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+}
+
+/* Respect a system setting of "reduce motion" — some people get motion sickness
+   from transitions, and the OS already knows their preference. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 html {
@@ -48,13 +91,13 @@ main {
 }
 
 .navbar-brand {
-    color: var(--accent-amber) !important;
+    color: var(--accent-amber-ink) !important;
     font-size: 1.2rem;
     letter-spacing: -0.5px;
 }
 
 .navbar-brand:hover {
-    color: #ffbe4f !important;
+    color: var(--accent-amber-hover) !important;
 }
 
 .nav-link {
@@ -65,11 +108,11 @@ main {
 
 .nav-link:hover {
     color: var(--text-primary) !important;
-    background-color: rgba(255,255,255,0.05);
+    background-color: var(--bg-subtle);
 }
 
 .cart-link {
-    color: var(--accent-amber) !important;
+    color: var(--accent-amber-ink) !important;
 }
 
 /* ── KAARDID ──────────────────────────────────────────────────────── */
@@ -81,20 +124,20 @@ main {
 }
 
 .card-header {
-    background-color: rgba(255,255,255,0.03);
+    background-color: var(--bg-subtle);
     border-bottom: 1px solid var(--border-color);
     font-weight: 600;
 }
 
 .card:hover {
-    border-color: rgba(245, 166, 35, 0.3);
+    border-color: var(--accent-amber-ink);
     transition: border-color 0.2s ease;
 }
 
 /* ── NUPUD ────────────────────────────────────────────────────────── */
 .btn-amber {
     background-color: var(--accent-amber);
-    color: #0f0f1a;
+    color: var(--on-accent);
     font-weight: 600;
     border: none;
     border-radius: 8px;
@@ -103,15 +146,15 @@ main {
 }
 
 .btn-amber:hover {
-    background-color: #ffbe4f;
-    color: #0f0f1a;
+    background-color: var(--accent-amber-hover);
+    color: var(--on-accent);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(245, 166, 35, 0.3);
+    box-shadow: 0 4px 16px var(--tint-amber);
 }
 
 .btn-outline-amber {
-    border: 1px solid var(--accent-amber);
-    color: var(--accent-amber);
+    border: 1px solid var(--accent-amber-ink);
+    color: var(--accent-amber-ink);
     background: transparent;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -119,21 +162,21 @@ main {
 
 .btn-outline-amber:hover {
     background-color: var(--accent-amber);
-    color: #0f0f1a;
+    color: var(--on-accent);
 }
 
 /* Bootstrap nuppude kohandamine tumedale taustale */
 .btn-primary {
     background-color: var(--accent-amber);
     border-color: var(--accent-amber);
-    color: #0f0f1a;
+    color: var(--on-accent);
     font-weight: 600;
 }
 
 .btn-primary:hover {
-    background-color: #ffbe4f;
-    border-color: #ffbe4f;
-    color: #0f0f1a;
+    background-color: var(--accent-amber-hover);
+    border-color: var(--accent-amber-hover);
+    color: var(--on-accent);
 }
 
 .btn-secondary {
@@ -143,8 +186,8 @@ main {
 }
 
 .btn-danger {
-    background-color: #ef4444;
-    border-color: #ef4444;
+    background-color: var(--accent-red);
+    border-color: var(--accent-red);
 }
 
 /* ── VORMID (INPUTS) ──────────────────────────────────────────────── */
@@ -161,7 +204,7 @@ main {
     background-color: var(--bg-input);
     border-color: var(--accent-amber);
     color: var(--text-primary);
-    box-shadow: 0 0 0 0.2rem rgba(245, 166, 35, 0.15);
+    box-shadow: 0 0 0 0.2rem var(--tint-amber);
 }
 
 /* Dropdown optionite taust (operatsioonisüsteemist sõltuv) */
@@ -189,12 +232,28 @@ main {
 
 /* ── TABELID ──────────────────────────────────────────────────────── */
 .table {
+    /* Bootstrap's .table sets --bs-table-bg to var(--bs-body-bg) - BOOTSTRAP's body
+       background, which is white and knows nothing about our theme. Bootstrap then
+       paints every cell with it, so the whole BOM table rendered as a white block on
+       top of our dark card. It looked correct in light mode purely by coincidence.
+
+       Making it transparent lets the card behind show through, so the table follows
+       whichever theme is active instead of carrying its own. Every other table
+       variable is pointed at our tokens for the same reason. */
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-primary);
+    --bs-table-border-color: var(--border-color);
+    --bs-table-hover-bg: var(--bg-subtle);
+    --bs-table-hover-color: var(--text-strong);
+    --bs-table-striped-bg: var(--bg-subtle);
+    --bs-table-striped-color: var(--text-primary);
+
     color: var(--text-primary);
     border-color: var(--border-color);
 }
 
 .table thead th {
-    background-color: rgba(255,255,255,0.04);
+    background-color: var(--bg-subtle);
     border-bottom: 2px solid var(--border-color);
     color: var(--text-muted);
     font-size: 0.8rem;
@@ -209,99 +268,13 @@ main {
 }
 
 .table tbody tr:hover {
-    background-color: rgba(255,255,255,0.03);
+    background-color: var(--bg-subtle);
 }
 
-.table-dark {
-    --bs-table-bg: var(--bg-card);
-}
-
-/* ── AVALEHT KANGELASESEKTSIOON ───────────────────────────────────── */
-.hero-section {
-    background: linear-gradient(135deg, #0f0f1a 0%, #16213e 50%, #0d1b3e 100%);
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    border-radius: 16px;
-    padding: 60px 40px;
-    border: 1px solid var(--border-color);
-    margin-bottom: 2rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-section::before {
-    /* Dekoratiivne gradient taust */
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 60%;
-    height: 200%;
-    background: radial-gradient(ellipse, rgba(245, 166, 35, 0.05) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-.hero-title {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 700;
-    color: white;
-    line-height: 1.2;
-}
-
-.hero-accent {
-    color: var(--accent-amber);
-}
-
-.hero-subtitle {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    margin-top: 1rem;
-    max-width: 600px;
-}
-
-/* ── TOOTEKAARDID ─────────────────────────────────────────────────── */
-.product-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.25rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.2s ease;
-}
-
-.product-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(245, 166, 35, 0.4);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-
-.product-card-image {
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: var(--bg-input);
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.product-card-img {
-    width: 100%;
-    height: 100%;
-    /* "contain", not "cover": the seeded product images are SVG illustrations whose rating
-       label sits at the bottom of the drawing. "cover" crops it off. Uploaded photos simply
-       letterbox against the matching dark background instead, which is acceptable. */
-    object-fit: contain;
-}
-
-.product-card-img-placeholder {
-    font-size: 2.5rem;
-    opacity: 0.3;
-}
-
+/* ── TOOTEKAARDID ─────────────────────────────────────────────────────────────
+   The card layout itself now lives in the CATALOGUE section of the redesign
+   layer at the bottom of this file. Only the technical badges remain here,
+   because nothing further down redefines them. */
 .product-badge {
     display: inline-block;
     padding: 2px 8px;
@@ -313,26 +286,78 @@ main {
 }
 
 .badge-ampere {
-    background-color: rgba(245, 166, 35, 0.15);
-    color: var(--accent-amber);
-    border: 1px solid rgba(245, 166, 35, 0.3);
+    background-color: var(--tint-amber);
+    color: var(--accent-amber-ink);
+    border: 1px solid var(--accent-amber-ink);
 }
 
 .badge-wire {
-    background-color: rgba(59, 130, 246, 0.15);
+    background-color: var(--tint-blue);
     color: var(--accent-blue);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    border: 1px solid var(--accent-blue);
 }
 
 /* ── BOM TABEL (KALKULAATORI TULEMUS) ─────────────────────────────── */
-.bom-circuit-lighting { color: #60a5fa; } /* sinine — valgustus */
-.bom-circuit-socket   { color: #34d399; } /* roheline — pistikud */
-.bom-circuit-stove    { color: #f87171; } /* punane — pliit */
-.bom-circuit-rcd      { color: #a78bfa; } /* lilla — rikkevoolukaitme */
-.bom-circuit-panel    { color: var(--accent-amber); } /* oranž — kilp */
+.bom-circuit-lighting { color: var(--circuit-lighting); } /* sinine — valgustus */
+.bom-circuit-socket   { color: var(--circuit-socket); } /* roheline — pistikud */
+.bom-circuit-stove    { color: var(--circuit-stove); } /* punane — pliit */
+.bom-circuit-rcd      { color: var(--circuit-rcd); } /* lilla — rikkevoolukaitme */
+.bom-circuit-panel    { color: var(--circuit-panel); }
 
-.bom-total-row {
-    background-color: rgba(245, 166, 35, 0.08);
+/* ── TRUST STRIP (kalkulaatori tulemuse all) ──────────────────────────────
+   Shown under the BOM. Three short, factually true statements about how the
+   result was produced. Uses a green accent rather than the amber used for
+   prices and buttons, so it reads as reassurance rather than another
+   call to action. */
+.trust-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.trust-item {
+    background-color: var(--tint-green);
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.trust-icon {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+.trust-item strong {
+    display: block;
+    color: var(--accent-green);
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+}
+
+.trust-item span:not(.trust-icon) {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+/* ── AVALEHE KANGELASPILT ─────────────────────────────────────────────────
+   A real photograph instead of a decorative emoji. The dark overlay keeps
+
+/* The highlight goes on the CELLS, not on the <tr>.
+   Bootstrap paints every table cell itself - background-color from --bs-table-bg
+   plus its own border-bottom - so anything set on the row is drawn over and lost.
+   The total row was silently rendering as a plain row: no tint, and its accent
+   top border replaced by Bootstrap's ordinary cell border. */
+.bom-total-row > td,
+.bom-total-row > th {
+    background-color: var(--tint-amber);
     font-weight: 700;
     font-size: 1.05rem;
     border-top: 2px solid var(--accent-amber);
@@ -340,84 +365,75 @@ main {
 
 /* ── MÄRGISED (BADGES) ───────────────────────────────────────────── */
 .badge-stock-ok {
-    background-color: rgba(16, 185, 129, 0.15);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background-color: var(--tint-green);
+    color: var(--accent-green);
+    border: 1px solid var(--accent-green);
     font-size: 0.7rem;
     padding: 2px 8px;
     border-radius: 4px;
 }
 
 .badge-stock-low {
-    background-color: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background-color: var(--tint-warning);
+    color: var(--accent-warning);
+    border: 1px solid var(--accent-warning);
     font-size: 0.7rem;
     padding: 2px 8px;
     border-radius: 4px;
 }
 
 .badge-stock-none {
-    background-color: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background-color: var(--tint-red);
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
     font-size: 0.7rem;
     padding: 2px 8px;
     border-radius: 4px;
 }
 
 /* ── HIND ─────────────────────────────────────────────────────────── */
+/* ── PRICES ───────────────────────────────────────────────────────────────────
+   Prices are INFORMATION, not an action, so they are not amber.
+   They used to be, which meant a price and an "Add to cart" button were the same
+   colour and the eye stopped telling them apart. Emphasis now comes from size and
+   weight instead — which is stronger anyway, and leaves amber to mean one thing.
+   Tabular figures keep the digits vertically aligned in the BOM table. */
 .price-tag {
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
     font-weight: 700;
-    color: var(--accent-amber);
+    color: var(--text-strong);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
 }
 
 .price-tag-small {
-    font-size: 0.95rem;
+    font-size: var(--text-base);
     font-weight: 600;
-    color: var(--accent-amber);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 /* ── JALUS ────────────────────────────────────────────────────────── */
-.footer {
-    background-color: var(--bg-nav);
-    border-top: 1px solid var(--border-color);
-    padding: 1.5rem 0;
-}
-
 /* ── TEADETERIBAD ─────────────────────────────────────────────────── */
 .alert-success {
-    background-color: rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.3);
-    color: #34d399;
+    background-color: var(--tint-green);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
 }
 
 .alert-danger {
-    background-color: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    background-color: var(--tint-red);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
 }
 
 .alert-info {
-    background-color: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
-    color: #60a5fa;
+    background-color: var(--tint-blue);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
 }
 
 /* ── LEHEPEALKIRI ─────────────────────────────────────────────────── */
-.page-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.25rem;
-}
-
-.page-subtitle {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-}
-
 /* Eraldaja pealkiri + sisu vahel */
 .section-divider {
     border: none;
@@ -425,9 +441,948 @@ main {
     margin: 1.5rem 0;
 }
 
-/* ── ABIVAHENDID ──────────────────────────────────────────────────── */
-.text-amber { color: var(--accent-amber) !important; }
+/* ── HELPER CLASSES ───────────────────────────────────────────────────────────
+   Each one is a name for a token, so views never write a colour value. */
+.text-amber { color: var(--accent-amber-ink) !important; }
 .text-muted-custom { color: var(--text-muted) !important; }
+
+/* Headings and figures that must dominate. This replaced Bootstrap's text-white
+   throughout the views.
+
+   Why it had to change: text-white hard-codes #fff. That is correct on a dark
+   background and invisible on a light one, so every heading using it vanished
+   the moment someone switched to the light theme. Following the token instead
+   means the colour is whichever theme is active — near-white on dark, near-black
+   on light. (Same bug the navbar had with navbar-dark.) */
+.text-strong-custom { color: var(--text-strong) !important; }
+
+/* Safety net: if text-white creeps back in — copied from a Bootstrap example, or
+   from an older view — it must not reintroduce the invisible-on-light bug. */
+.text-white { color: var(--text-strong) !important; }
 
 .bg-card { background-color: var(--bg-card) !important; }
 .border-custom { border-color: var(--border-color) !important; }
+
+/* ── SPECIFICATION TABLE (product details) ───────────────────────────────────
+   Two columns, label left and value right. Reads far faster top-to-bottom than
+   the grid of cards this replaced, and matches how components suppliers present
+   technical data. */
+.spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.spec-table th,
+.spec-table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--border);
+    text-align: left;
+    vertical-align: top;
+}
+
+.spec-table tr:last-child th,
+.spec-table tr:last-child td {
+    border-bottom: none;
+}
+
+.spec-table th {
+    color: var(--text-muted);
+    font-weight: 500;
+    width: 45%;
+    white-space: nowrap;
+}
+
+.spec-table td {
+    color: var(--text-primary);
+    font-weight: 600;
+    /* Keeps numbers aligned when comparing two products side by side. */
+    font-variant-numeric: tabular-nums;
+}
+
+/* The unit suffix after a price ("/m", "/tk"). Deliberately quieter than the
+   number itself so it clarifies without competing. */
+.price-unit {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-weight: 400;
+}
+
+/* Large muted glyph used in empty states. */
+/* Screen-reader-only text: present for assistive technology, invisible on screen.
+   Used for the specification table's caption. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   PRINT — turns a calculation result into a quote the client can be handed.
+   ═════════════════════════════════════════════════════════════════════════════
+   An electrician's real workflow is: calculate -> show the client -> order.
+   Without this, printing produced a dark page with navigation, buttons and a
+   giant hero, wasting ink and looking nothing like a quote.
+
+   The page is switched to black-on-white because a dark background prints as a
+   solid block of toner, and anything the reader cannot act on on paper (menus,
+   buttons, forms) is hidden. */
+@media print {
+
+    /* Paper is white. Force light colours regardless of the screen theme. */
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 11pt;
+    }
+
+    /* Hide everything that cannot be used on paper. */
+    header, nav, .navbar, footer, .footer,
+    form, .btn, button,
+    .hero, .stat-strip, .trust-strip,
+    .alert-dismissible .btn-close {
+        display: none !important;
+    }
+
+    /* Cards become plain bordered blocks rather than dark panels. */
+    .card, .product-card {
+        background: #fff !important;
+        border: 1px solid #999 !important;
+        box-shadow: none !important;
+        break-inside: avoid;          /* do not split a card across two pages */
+    }
+
+    .card h1, .card h2, .card h3, .card h4, .card h5,
+    .text-white, .page-title, .price-tag, .price-tag-small {
+        color: #000 !important;
+    }
+
+    .text-muted-custom, .text-muted {
+        color: #444 !important;
+    }
+
+    /* The BOM table is the reason someone prints this page at all. */
+    .table {
+        color: #000 !important;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .table th, .table td {
+        border: 1px solid #999 !important;
+        padding: 4pt 6pt;
+        background: #fff !important;
+    }
+
+    .table thead th {
+        background: #eee !important;
+        color: #000 !important;
+    }
+
+    /* Repeat the header row when the table runs onto a second page. */
+    .table thead { display: table-header-group; }
+    .table tr    { break-inside: avoid; }
+
+    .bom-total-row {
+        background: #eee !important;
+        font-weight: 700;
+        border-top: 2px solid #000 !important;
+    }
+
+    /* Circuit-type labels lose their colour coding on paper, so keep them legible. */
+    .bom-circuit-lighting, .bom-circuit-socket, .bom-circuit-stove,
+    .bom-circuit-rcd, .bom-circuit-panel {
+        color: #000 !important;
+    }
+
+    /* Give the printed sheet a heading and a footer, since the navigation bar
+       (which normally identifies the site) is hidden. content: comes from the
+       data-print-title attribute set on the results card. */
+    .print-header {
+        display: block !important;
+        border-bottom: 2px solid #000;
+        margin-bottom: 8pt;
+        padding-bottom: 4pt;
+    }
+
+    a[href]::after { content: ""; }   /* do not print raw URLs after every link */
+
+    @page {
+        margin: 15mm;
+    }
+}
+
+/* The printed heading is hidden on screen — it exists only for paper. */
+.print-header { display: none; }
+
+/* ── WORKED EXAMPLE (homepage) ───────────────────────────────────────────────
+   Shows a real calculator result rather than describing what the calculator
+   does. Two columns on desktop: the parts list on the left, the figure that
+   matters on the right. */
+.worked-example {
+    background-color: var(--bg-card);
+    border: var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.worked-example-head {
+    padding: var(--space-4) var(--space-4) 0;
+}
+
+.worked-example-label {
+    display: inline-block;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-green);
+    margin-bottom: var(--space-2);
+}
+
+.worked-example-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-strong);
+    margin: 0;
+}
+
+.worked-example-body {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    align-items: center;
+}
+
+.worked-example-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: var(--space-2) var(--space-4);
+}
+
+.worked-example-list li {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+}
+
+.worked-example-list span {
+    display: inline-block;
+    min-width: 3.5em;
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.worked-example-total {
+    text-align: right;
+    border-left: var(--border);
+    padding-left: var(--space-4);
+    min-width: 240px;
+}
+
+.worked-example-total-label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.worked-example-total-value {
+    display: block;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--text-strong);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    margin: var(--space-1) 0;
+}
+
+.worked-example-total-note {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+/* On a phone the two columns stack and the divider moves to the top. */
+@media (max-width: 767px) {
+    .worked-example-body { grid-template-columns: 1fr; }
+    .worked-example-total {
+        text-align: left;
+        border-left: none;
+        border-top: var(--border);
+        padding-left: 0;
+        padding-top: var(--space-3);
+    }
+}
+
+/* Large emoji used as a feature-card icon. Was an inline style on each card. */
+.feature-icon {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-3);
+}
+
+/* ── THEME TOGGLE ────────────────────────────────────────────────────────────
+   Deliberately understated: it is a preference, not an action anyone came here
+   to perform, so it must not compete with the primary button. */
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    line-height: 1;
+    padding: var(--space-2);
+    cursor: pointer;
+    transition: background-color var(--transition), border-color var(--transition);
+}
+
+.theme-toggle:hover {
+    background-color: var(--bg-subtle);
+    border-color: var(--accent-amber-ink);
+}
+
+/* The Bootstrap "navbar-dark" class was removed from the navigation because it
+   hard-codes light text, which is wrong once a light theme exists. These rules
+   replace what it provided, using tokens so both themes work. */
+.navbar-toggler {
+    border-color: var(--border-color);
+}
+
+.navbar-toggler-icon {
+    /* Bootstrap draws this icon with an inline SVG whose colour is baked in, so
+       it cannot use a CSS variable. A mask lets us paint it with currentColor
+       instead, which does follow the theme. */
+    background-image: none;
+    position: relative;
+    color: var(--text-primary);
+}
+
+.navbar-toggler-icon::before {
+    content: "☰";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+/* =============================================================================
+   REDESIGN LAYER (2026-08-14)
+   =============================================================================
+   Components added after studying how trade and marketing sites in this
+   industry are actually built. Two clearly different genres showed up, and the
+   difference matters more than any single colour choice:
+
+     MARKETING pages (Nesta Sites) sell one idea. Dark, enormous headline,
+     one accent, a lot of empty space, three or four things on the screen.
+
+     CATALOGUE pages (SupplyHouse, Electrical2Go, AutomationDirect, Proelectro)
+     help someone find a part. Light, dense, photo-led category grids,
+     everything scannable, very little empty space.
+
+   This project is both: the home page sells the calculator, the catalogue
+   serves someone who already knows what a B16 is. Copying one genre onto the
+   other is what makes a site feel wrong - a dense grid on a landing page looks
+   cluttered, and a huge airy hero on a parts list wastes the screen.
+
+   So: home page follows the marketing genre, catalogue follows the trade
+   genre, and they share the palette, the type scale and the buttons.
+
+   Everything here uses tokens from theme.css. No literal colours.
+   ============================================================================= */
+
+/* Vertical rhythm between the big blocks of a page. */
+.section { margin-bottom: var(--space-6); }
+
+/* -- HERO ---------------------------------------------------------------------
+   Two columns on a desktop, stacked on a phone. The headline is deliberately
+   much larger than anything else on the page: on a landing page the single
+   most common mistake is making the headline only slightly bigger than the
+   body, which leaves nothing for the eye to land on first. */
+.hero {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--space-6);
+    align-items: center;
+    padding: var(--space-5) 0 var(--space-6);
+}
+
+.hero-display {
+    font-size: var(--text-display);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    color: var(--text-strong);
+    margin: 0 0 var(--space-3);
+}
+
+/* The accent-coloured second line. It carries the promise, so it is large and
+   coloured, but it is NOT the same size as the headline - two competing
+   headlines read as no headline. */
+.hero-lede {
+    font-size: var(--text-lede);
+    line-height: 1.25;
+    font-weight: 600;
+    color: var(--accent-amber-ink);
+    margin: 0 0 var(--space-4);
+}
+
+/* A short rule under the lede. Purely a pause - it separates the promise from
+   the explanation without needing a blank gap big enough to break the group. */
+.hero-rule {
+    width: 72px;
+    height: 3px;
+    background: var(--accent-amber);
+    border: 0;
+    border-radius: var(--radius-pill);
+    opacity: 1;
+    margin: 0 0 var(--space-4);
+}
+
+.hero-body {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    color: var(--text-primary);
+    max-width: 52ch;   /* long lines are hard to track back from; 50-60 is the readable range */
+    margin: 0 0 var(--space-4);
+}
+
+.hero-media { position: relative; }
+
+.hero-figure {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    background-size: cover;
+    background-position: center;
+    box-shadow: var(--shadow-float);
+}
+
+/* -- STAT STRIP ---------------------------------------------------------------
+   Borrowed from the marketplace sites, which all put a row of hard numbers
+   directly under the hero. The 1px gap trick draws the dividers: the grid
+   background shows through between the cells, so there are no border
+   double-ups at the joins. */
+.stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1px;
+    background: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.stat { background: var(--bg-card); padding: var(--space-4) var(--space-3); text-align: center; }
+
+.stat-value {
+    display: block;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--text-strong);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+}
+
+/* -- FEATURE CARDS ------------------------------------------------------------
+   A neutral card with ONE accent edge along the top.
+
+   It was originally a full accent border on all four sides, copying the
+   reference site. Four outlined cards side by side put roughly four times the
+   accent colour on screen that the 60-30-10 guideline allows (~10% accent), and
+   the row read as loud rather than inviting - the cards competed with the
+   primary button, which is supposed to be the only thing shouting on the page.
+   A single top edge keeps the cards recognisably ours and lets the text work.
+
+   auto-fit means the row reflows on a phone with no media query - the columns
+   simply become fewer. */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-4);
+}
+
+.feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--accent-amber);   /* one accent edge, not four */
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-card-icon { font-size: 1.75rem; line-height: 1; margin-bottom: var(--space-3); }
+
+.feature-card h3 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--accent-amber-ink);
+    margin: 0 0 var(--space-2);
+}
+
+.feature-card p {
+    font-size: var(--text-base);
+    line-height: 1.55;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* -- THE CONTRAST BAND --------------------------------------------------------
+   One section painted the opposite value to the rest of the page. See the long
+   note in theme.css for why this matters so much.
+
+   It is a large rounded card rather than a full-bleed strip on purpose: a true
+   edge-to-edge band needs 100vw tricks that cause a horizontal scrollbar on
+   Windows, where the scrollbar takes real width. A rounded card inside the
+   container gets the same effect with none of that risk.
+
+   Everything inside MUST use the --band-* tokens. --text-primary in here is
+   invisible in one of the two themes. */
+.band {
+    background: var(--bg-band);
+    border-radius: var(--radius-band);
+    padding: clamp(2rem, 5vw, 3.75rem) clamp(1.25rem, 4vw, 3.25rem);
+}
+
+.band-title {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--band-ink);
+    text-align: center;
+    margin: 0 0 var(--space-2);
+}
+
+.band-sub {
+    text-align: center;
+    color: var(--band-muted);
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-5);
+}
+
+.step-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-5);
+}
+
+.step { text-align: center; }
+
+/* A numbered circle rather than an icon: the number says "this is step 2 of 3",
+   which an icon cannot. */
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent-amber);
+    color: var(--on-accent);
+    font-weight: 800;
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+}
+
+.step h3 { font-size: var(--text-lg); font-weight: 700; color: var(--band-ink); margin: 0 0 var(--space-2); }
+.step p  { font-size: var(--text-base); line-height: 1.55; color: var(--band-muted); margin: 0; }
+
+/* -- CATALOGUE CATEGORY GRID --------------------------------------------------
+   The trade-site pattern: a photo, a name, a count. Nothing else. The photo is
+   what people actually scan by - a list of category names in text takes far
+   longer to search than a grid of recognisable parts. */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: var(--space-4);
+}
+
+.category-card {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.category-card:hover,
+.category-card:focus-visible {
+    border-color: var(--accent-amber);
+    transform: translateY(-2px);
+}
+
+.category-card-figure {
+    aspect-ratio: 4 / 3;
+    background: var(--bg-subtle);
+    background-size: cover;
+    background-position: center;
+}
+
+.category-card-body { padding: var(--space-3); }
+.category-card-name { font-weight: 700; color: var(--text-strong); font-size: var(--text-base); }
+.category-card-count { display: block; margin-top: 2px; font-size: var(--text-sm); color: var(--text-muted); }
+
+/* -- BUTTONS: pill shape ------------------------------------------------------
+   Every reference site uses a fully rounded primary button. It reads as a
+   deliberate control rather than a default rectangle, and the extra horizontal
+   padding makes the label the widest thing on the row, which is what draws the
+   eye to it. */
+.btn-amber,
+.btn-outline-amber {
+    border-radius: var(--radius-pill);
+    padding: 0.8rem 1.85rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.btn-amber.btn-lg,
+.btn-outline-amber.btn-lg { padding: 1rem 2.35rem; font-size: var(--text-lg); }
+
+/* -- RESPONSIVE ---------------------------------------------------------------
+   One breakpoint. The grids above already reflow on their own via auto-fit, so
+   the only thing that genuinely needs a query is the hero, which must stop
+   being two columns before the headline gets squeezed. */
+@media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: var(--space-5); padding-top: var(--space-4); }
+
+    /* The photo comes second on a phone: the headline and the button should be
+       reachable without scrolling past a decorative image. */
+    .hero-media { order: 2; }
+
+}
+
+/* -- CATALOGUE (trade genre) --------------------------------------------------
+   Dense, photo-led and scannable. The opposite of the landing page on purpose -
+   see the note at the top of the redesign layer. */
+
+.catalogue-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+}
+
+/* One row on a desktop, wrapping to two on a tablet, stacked on a phone. The
+   search field grows because it is the control people reach for first; the
+   selects stay at their natural width so the row does not look ragged. */
+.catalogue-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: flex-end;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.catalogue-field { flex: 0 0 12rem; }
+.catalogue-field-grow { flex: 1 1 18rem; }
+.catalogue-field-action { flex: 0 0 8rem; }
+.catalogue-field .form-label { margin-bottom: var(--space-1); }
+
+.catalogue-count {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+}
+
+/* auto-fill rather than auto-fit: with auto-fit a single remaining result
+   stretches to the full page width, which looks broken. auto-fill keeps the
+   empty columns, so one result stays card-sized. */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--space-3);
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color var(--transition), transform var(--transition);
+}
+
+.product-card:hover { border-color: var(--accent-amber); transform: translateY(-2px); }
+
+/* The photograph is the largest thing on the card because it is what people
+   actually scan by. A wall of part numbers takes far longer to search. */
+/* A white tile in BOTH themes - see the note in scripts/generate-theme.py.
+   Product photography is shot on white, so on a dark surface each cut-out reads
+   as a glowing rectangle. Every trade catalogue puts the photo on a white tile
+   whatever the page does, because the tile belongs to the product. */
+.product-card-media {
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--product-tile);
+    border-bottom: 1px solid var(--product-tile-border);
+    padding: var(--space-3);
+}
+
+.product-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   /* contain, not cover: never crop a part photo */
+}
+
+.product-card-img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 2rem;
+    opacity: 0.35;
+}
+
+.product-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-top: 1px solid var(--border-color);
+    flex: 1;
+}
+
+.product-card-brand {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+}
+
+.product-card-name {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: var(--text-strong);
+    text-decoration: none;
+}
+.product-card-name:hover { color: var(--accent-amber-ink); }
+
+.product-card-specs { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+
+.badge-category {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.product-card-stock { font-size: var(--text-xs); }
+
+/* margin-top:auto pins the price row to the bottom, so prices line up across
+   the row even when names wrap to different numbers of lines. */
+.product-card-foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-color);
+}
+
+/* The catalogue button is small and appears once per card, so it keeps a modest
+   radius rather than the full pill used for page-level primary actions. */
+.product-card-foot .btn-amber { padding: 0.4rem 0.9rem; font-size: var(--text-xs); border-radius: var(--radius); }
+
+@media (max-width: 640px) {
+    .catalogue-field,
+    .catalogue-field-grow,
+    .catalogue-field-action { flex: 1 1 100%; }
+}
+
+/* -- NAVIGATION AND FOOTER ----------------------------------------------------
+   Both are on every page, so they set the tone before any content is read. */
+
+.navbar { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+
+.nav-link {
+    font-weight: 500;
+    font-size: var(--text-sm);
+}
+
+/* The signed-in name is not a link and must not pretend to be one. */
+.navbar .nav-link[style],
+.navbar span.nav-link { font-weight: 400; }
+
+/* The nav sign-up button keeps the pill shape but not the page-level padding -
+   a button the size of a hero CTA sitting in a navigation bar looks wrong. */
+.navbar .btn-amber,
+.navbar .btn-secondary {
+    padding: 0.4rem 1.1rem;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-pill);
+}
+
+.footer {
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-nav);
+    padding: var(--space-4) 0;
+}
+
+.footer-line {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+}
+
+/* Saying out loud that this is an estimate rather than a design. Admitting the
+   limit increases trust rather than reducing it, and it happens to be true.
+   max-width keeps it to a readable measure when centred on a wide screen. */
+.footer-note {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    max-width: 60ch;
+    margin-inline: auto;
+}
+
+/* -- SHARED PAGE HEADINGS -----------------------------------------------------
+   page-title was previously sized ad hoc per page. Pulling it onto the type
+   scale is what makes separate pages read as one site. */
+.page-title {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--text-strong);
+    margin-bottom: var(--space-1);
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    font-size: var(--text-lg);
+    margin-bottom: 0;
+}
+
+.empty-state-icon {
+    font-size: 3.5rem;
+    opacity: 0.28;
+    margin-bottom: var(--space-3);
+    line-height: 1;
+}
+
+/* -- BREADCRUMBS AND FILTER CHIPS ---------------------------------------------
+   Both borrowed from how real electrical wholesalers are navigated. The
+   catalogue previously hid its category filter inside a closed dropdown, which
+   shows neither what is available nor what is currently selected. */
+
+.breadcrumb-trail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+}
+
+.breadcrumb-trail a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb-trail a:hover { color: var(--accent-amber-ink); text-decoration: underline; }
+.breadcrumb-trail [aria-current="page"] { color: var(--text-strong); font-weight: 600; }
+
+.filter-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+.filter-row-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    min-width: 5.5rem;
+}
+
+/* A chip is a link, not a button: it navigates, it can be opened in a new tab,
+   and it works with JavaScript disabled. The selected one is filled rather than
+   merely outlined, because an outline alone is easy to miss in a row of them. */
+.chip {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.chip:hover { border-color: var(--accent-amber); color: var(--accent-amber-ink); }
+
+.chip-on {
+    background: var(--accent-amber);
+    border-color: var(--accent-amber);
+    color: var(--on-accent);
+    font-weight: 600;
+}
+.chip-on:hover { background: var(--accent-amber-hover); color: var(--on-accent); }
+
+@media (max-width: 640px) {
+    .filter-row-label { min-width: 100%; }
+}
+
+/* -- BOM COMPONENT CELL -------------------------------------------------------
+   Photograph beside the part name in the calculator results. The catalogue is
+   photo-led for the same reason: a part number is only meaningful to someone who
+   already knows the part. */
+.bom-component { display: flex; align-items: center; gap: var(--space-3); }
+
+.bom-thumb {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius);
+    border: 1px solid var(--product-tile-border);
+    background: var(--product-tile);   /* white in both themes, as above */
+    object-fit: contain;   /* contain, never cover: cropping a part photo hides the rating label */
+    padding: 2px;
+}
+
+.bom-thumb-empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    opacity: 0.35;
+}
+
+@media (max-width: 640px) {
+    /* On a phone the row is already tight; the name matters more than the picture. */
+    .bom-thumb { width: 36px; height: 36px; }
+}
+
+/* The count beside a filter name. Dimmer than the label so the row still scans as
+   a list of names, with the number available when wanted rather than competing. */
+.chip-count { opacity: 0.65; font-variant-numeric: tabular-nums; }
+.chip-on .chip-count { opacity: 0.8; }

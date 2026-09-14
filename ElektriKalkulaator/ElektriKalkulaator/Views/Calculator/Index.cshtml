@@ -12,9 +12,9 @@
 
 <!-- Pealkiri -->
 <div class="mb-4">
-    <h1 class="page-title">🔧 ElektrikilbiKalkulaator</h1>
+    <h1 class="page-title">Kalkulaator</h1>
     <p class="page-subtitle">
-        Täida hoone andmed — arvutame EVS-HD 60364 standardil põhineva komponentide nimekirja
+        Räägi meile hoonest — ülejäänu arvutame ise.
     </p>
 </div>
 
@@ -22,7 +22,7 @@
     <!-- VASAK: Sisendvorm -->
     <div class="col-lg-5">
         <div class="card p-4">
-            <h5 class="fw-bold text-white mb-4">📋 Hoone andmed</h5>
+            <h5 class="fw-bold text-strong-custom mb-4">📋 Hoone andmed</h5>
 
             @* POST /Calculator — triggers EVS-HD 60364 calculation *@
             <form asp-action="Index" asp-controller="Calculator" method="post">
@@ -83,7 +83,7 @@
                 <div class="mb-4">
                     <div class="form-check">
                         <input asp-for="HasElectricStove" type="checkbox" class="form-check-input" />
-                        <label asp-for="HasElectricStove" class="form-check-label text-white">
+                        <label asp-for="HasElectricStove" class="form-check-label text-strong-custom">
                             ♨️ Elektripliit (6 mm² / 32A eraldatud ahel)
                         </label>
                     </div>
@@ -91,7 +91,7 @@
 
                 <!-- Arvuta nupp -->
                 <button type="submit" class="btn btn-amber w-100 btn-lg">
-                    ⚡ Arvuta komponendid
+                    Näita, mida vaja läheb →
                 </button>
             </form>
         </div>
@@ -100,9 +100,9 @@
         <div class="card p-3 mt-3">
             <h6 class="text-amber fw-bold mb-2">ℹ️ Arvutamise reeglid</h6>
             <div class="small text-muted-custom">
-                <div class="mb-1">💡 <strong class="text-white">Valgustus:</strong> 1 ahel iga 8 lambi kohta · 1.5 mm² · 10A</div>
-                <div class="mb-1">🔌 <strong class="text-white">Pistikud:</strong> 1 ahel iga 6 pistiku kohta · 2.5 mm² · 16A</div>
-                <div class="mb-1">♨️ <strong class="text-white">Pliit:</strong> 1 eraldatud ahel · 6.0 mm² · 32A</div>
+                <div class="mb-1">💡 <strong class="text-strong-custom">Valgustus:</strong> 1 ahel iga 8 lambi kohta · 1.5 mm² · 10A</div>
+                <div class="mb-1">🔌 <strong class="text-strong-custom">Pistikud:</strong> 1 ahel iga 6 pistiku kohta · 2.5 mm² · 16A</div>
+                <div class="mb-1">♨️ <strong class="text-strong-custom">Pliit:</strong> 1 eraldatud ahel · 6.0 mm² · 32A</div>
             </div>
         </div>
     </div>
@@ -113,8 +113,16 @@
         {
             <!-- BOM tabel — materjalide nimekiri -->
             <div class="card p-4">
+                @if (ViewBag.StoveNotice != null)
+                {
+                    @* Says what the calculator did NOT do. See CalculatorController. *@
+                    <div class="alert alert-warning" role="alert">
+                        ⚠️ @ViewBag.StoveNotice
+                    </div>
+                }
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold text-white mb-0">📊 Komponentide nimekiri</h5>
+                    <h5 class="fw-bold text-strong-custom mb-0">Selle hoone jaoks läheb vaja:</h5>
                     <span class="badge bg-success">✅ Arvutus valmis</span>
                 </div>
 
@@ -135,7 +143,24 @@
                                 <!-- Iga BOM rida -->
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold text-white">@item.ProductName</div>
+                                        @* Photograph beside the name. "ABB S201-B32" means nothing
+                                           to someone who is not an electrician; a picture of a
+                                           breaker does, and it lets a professional confirm at a
+                                           glance that the right kind of part was chosen.
+                                           loading="lazy" stops a long BOM fetching every image
+                                           before the page can be read. *@
+                                        <div class="bom-component">
+                                            @if (!string.IsNullOrEmpty(item.ImagePath))
+                                            {
+                                                <img class="bom-thumb" src="@item.ImagePath" alt="" loading="lazy" />
+                                            }
+                                            else
+                                            {
+                                                @* Keeps the text column aligned when a product has no photo. *@
+                                                <span class="bom-thumb bom-thumb-empty" aria-hidden="true">📦</span>
+                                            }
+                                            <div>
+                                        <div class="fw-semibold text-strong-custom">@item.ProductName</div>
                                         <div class="small text-muted-custom">@item.Brand</div>
                                         @* Circuit type badge with colour coding *@
                                         @if (!string.IsNullOrEmpty(item.CircuitType))
@@ -156,9 +181,15 @@
                                         {
                                             <span class="badge-wire ms-1">@item.WireCrossSectionMm2 mm²</span>
                                         }
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="text-center fw-bold">@item.Quantity tk</td>
-                                    <td class="text-end price-tag-small">@item.UnitPrice.ToString("F2") €</td>
+                                    @* item.Unit is "tk" for countable items and "m" for cable, so a
+                                       40-metre cable run reads "40 m" instead of "40 tk". *@
+                                    <td class="text-center fw-bold">@item.Quantity @item.Unit</td>
+                                    <td class="text-end price-tag-small">
+                                        @item.UnitPrice.ToString("F2") €<span class="text-muted-custom small">/@item.Unit</span>
+                                    </td>
                                     <td class="text-end price-tag-small">@item.TotalPrice.ToString("F2") €</td>
                                     <td>
                                         @* Add to cart — POST form *@
@@ -187,14 +218,48 @@
                     </table>
                 </div>
 
+                @* ── TRUST STRIP ──────────────────────────────────────────────────
+                   Why this exists: the strongest thing about this calculator was invisible.
+                   A visitor saw a price list identical to any other shop's, with no indication
+                   that the quantities come from a published safety standard rather than a
+                   guess. Every claim below is literally true of this application, which is what
+                   separates it from marketing badges. *@
+                <div class="trust-strip mt-4">
+                    <div class="trust-item">
+                        <span class="trust-icon">📐</span>
+                        <div>
+                            <strong>EVS-HD 60364</strong>
+                            <span>Kogused arvutatud Eesti elektripaigaldise standardi järgi</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon">🔍</span>
+                        <div>
+                            <strong>Kontrollitav</strong>
+                            <span>Iga rida tuleb reeglist, mitte hinnangust — arvutuskäik on jälgitav</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon">📦</span>
+                        <div>
+                            <strong>Laoseisuga hinnad</strong>
+                            <span>Valitud on odavaim laos olev toode iga komponendi jaoks</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Lisa kõik ostukorvi -->
-                <div class="mt-3 pt-3 border-top border-secondary d-flex gap-2 flex-wrap">
+                <div class="mt-3 pt-3 border-top border-secondary d-flex gap-2 flex-wrap align-items-center">
                     <a asp-controller="Cart" asp-action="Index" class="btn btn-amber">
                         🛒 Vaata ostukorvi
                     </a>
                     <a asp-controller="Calculator" asp-action="History" class="btn btn-secondary">
                         📋 Arvutuste ajalugu
                     </a>
+                    @* The VAT basis is stated explicitly because a cost estimate that does not say
+                       whether tax is included is ambiguous by more than 20%. Estonian retailers
+                       always state it. The value comes from configuration — see appsettings.json. *@
+                    <span class="ms-auto small text-muted-custom">@VatNotice.Text(Configuration)</span>
                 </div>
             </div>
         }
@@ -202,11 +267,11 @@
         {
             <!-- Tühi olek — enne arvutust -->
             <div class="card p-5 text-center h-100 d-flex flex-column align-items-center justify-content-center">
-                <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1.5rem;">⚡</div>
-                <h5 class="text-white mb-2">Täida vorm ja vajuta "Arvuta"</h5>
-                <p class="text-muted-custom small">
-                    Sisesta hoone andmed vasakul — tulemused ilmuvad siia.<br>
-                    Arvutus põhineb EVS-HD 60364 Eesti elektristandardil.
+                <div class="empty-state-icon">⚡</div>
+                <h5 class="text-strong-custom mb-2">Tulemused ilmuvad siia</h5>
+                <p class="text-muted-custom small mb-0">
+                    Täida vasakul hoone andmed. Arvutame kaitselülitid, kaabli pikkuse,
+                    rikkevoolukaitse ja kilbi suuruse. Kaabli ja kaitse paar lähtub EVS-HD 60364 põhimõtetest.
                 </p>
             </div>
         }

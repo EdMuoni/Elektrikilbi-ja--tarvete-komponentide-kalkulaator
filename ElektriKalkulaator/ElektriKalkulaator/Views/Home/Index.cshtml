@@ -1,90 +1,204 @@
-@* Avaleht — kangelasesektsioon + omaduste kaardid *@
+@*
+    Avaleht (home page).
+
+    This page follows the MARKETING genre described at the top of the redesign
+    section in site.css: one big idea, one accent colour, a lot of space, and
+    only a few things competing for attention. The catalogue pages deliberately
+    do the opposite - see Views/Products/Index.cshtml.
+
+    Order of the page, and why:
+      1. hero          - what this is and one button
+      2. stat strip    - hard numbers, because claims without numbers read as marketing
+      3. feature cards - what you get
+      4. contrast band - how it works, on the opposite background so the page has rhythm
+      5. worked example- the actual output, which persuades better than describing it
+      6. standard      - the basis for the numbers
+
+    Copy follows docs/VOICE_AND_PERSONALITY.md: written as a good electrician
+    explaining something to a colleague, not as a company addressing a user.
+*@
 @{
     ViewData["Title"] = "Avaleht";
 }
 
-<!-- KANGELASESEKTSIOON -->
-<section class="hero-section mb-5">
-    <div class="row align-items-center w-100">
-        <div class="col-lg-7">
-            <h1 class="hero-title mb-3">
-                ⚡ <span class="hero-accent">ElektrikilbiKalkulaator</span>
-            </h1>
-            <p class="hero-subtitle mb-4">
-                Automaatne elektrikilbi komponentide kalkulaator
-                <strong class="text-amber">EVS-HD 60364</strong> standardil põhinev.<br>
-                Sisesta hoone andmed — saad täpse komponentide nimekirja koos hindadega.
-            </p>
-            <div class="d-flex flex-wrap gap-3">
-                <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber btn-lg">
-                    🔧 Kalkulaator
-                </a>
-                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-amber btn-lg">
-                    📦 Tooted
-                </a>
-            </div>
+<section class="hero">
+    <div class="hero-copy">
+        <h1 class="hero-display">
+            Elektrikilp, arvutatud standardi järgi.
+        </h1>
+
+        <p class="hero-lede">
+            Räägi meile hoonest — ülejäänu arvutame ise.
+        </p>
+
+        <hr class="hero-rule" />
+
+        <p class="hero-body">
+            Sisesta hoone tüüp, tubade ja pistikute arv. Saad tagasi komponentide nimekirja
+            koos hindadega — ja iga rea juurde selgituse, kust see number tuleb.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3">
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber btn-lg">
+                Näita, mida vaja läheb →
+            </a>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-amber btn-lg">
+                Sirvi tooteid
+            </a>
         </div>
-        <div class="col-lg-5 text-center d-none d-lg-block">
-            <div style="font-size: 8rem; opacity: 0.1;">⚡</div>
+    </div>
+
+    @* The photograph shows the work this tool is for.
+       Licence details are in docs/IMAGE_CREDITS.md. *@
+    <div class="hero-media">
+        <div class="hero-figure" style="background-image: url('/images/hero/panel.jpg');"
+             role="img" aria-label="Elektrikilp kaitselülitite ja juhtmetega"></div>
+    </div>
+</section>
+
+@* Numbers rather than adjectives. Every one of these is checkable against the
+   seeded database, which is the point - see docs/RESEARCH_LOG.md. *@
+<section class="section">
+    <div class="stat-strip">
+        <div class="stat">
+            <span class="stat-value">3</span>
+            <span class="stat-label">hoonetüüpi</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">10</span>
+            <span class="stat-label">toodet kataloogis</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">8</span>
+            <span class="stat-label">rida näidisarvutuses</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">0</span>
+            <span class="stat-label">registreerumist vaja</span>
         </div>
     </div>
 </section>
 
-<!-- OMADUSTE KAARDID -->
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="card h-100 p-4">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔧</div>
-            <h5 class="fw-bold text-white mb-2">Kalkulaator</h5>
-            <p class="text-muted-custom small mb-3">
-                Sisesta hoone tüüp, tubade ja pistikute arv —
-                saad täpse komponentide nimekirja koos hindadega EVS-HD 60364 standardil.
-            </p>
-            <a asp-controller="Calculator" asp-action="Index" class="btn btn-primary btn-sm mt-auto">
-                Ava kalkulaator →
-            </a>
+<section class="section">
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-card-icon">📐</div>
+            <h3>Arvutab standardi järgi</h3>
+            <p>Kaabli ja kaitselüliti valik lähtub EVS-HD 60364 põhimõtetest. Ahelate jaotus põhineb projekteerimistaval.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-card-icon">🧾</div>
+            <h3>Näitab arvutuskäiku</h3>
+            <p>Iga rea juures on kirjas, mitmest ahelast ja millisest jaotusest see tuleb.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-card-icon">📦</div>
+            <h3>Päris tooted, päris hinnad</h3>
+            <p>ABB ja Schneider kaitselülitid, Draka NYM kaablid ja kilbi korpused.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-card-icon">🕓</div>
+            <h3>Arvutused jäävad alles</h3>
+            <p>Varasemad arvutused saad hiljem uuesti lahti võtta ja üle vaadata.</p>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100 p-4">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📦</div>
-            <h5 class="fw-bold text-white mb-2">Toodete kataloog</h5>
-            <p class="text-muted-custom small mb-3">
-                ABB, Schneider ja Hager kaitselülitid, NYM juhtmed,
-                rikkevoolukaitsmeid ja kilbi korpused — kõik ühes kohas.
-            </p>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-sm mt-auto">
-                Vaata tooteid →
-            </a>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100 p-4">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📋</div>
-            <h5 class="fw-bold text-white mb-2">Arvutuste ajalugu</h5>
-            <p class="text-muted-custom small mb-3">
-                Vaata kõiki varasemaid arvutusi koos komponentide nimekirja
-                ja koguhinnadega.
-            </p>
-            <a asp-controller="Calculator" asp-action="History" class="btn btn-primary btn-sm mt-auto">
-                Vaata ajalugu →
-            </a>
-        </div>
-    </div>
-</div>
+</section>
 
-<!-- STANDARDI INFO -->
+@* THE CONTRAST BAND. Painted the opposite value to the rest of the page - cream
+   on the dark theme, near-black on the light one. Everything inside uses the
+   --band-* tokens; --text-primary in here would be invisible in one theme.
+   See the long note in theme.css for why the page needs this at all. *@
+<section class="section">
+    <div class="band">
+        <h2 class="band-title">Kuidas see töötab</h2>
+        <p class="band-sub">Kolm sammu, umbes minut aega.</p>
+
+        <div class="step-grid">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h3>Kirjelda hoonet</h3>
+                <p>Hoone tüüp, tubade arv, pistikute ja valgustite arv. Elektripliit eraldi.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h3>Vaata nimekirja</h3>
+                <p>Kaitselülitid, kaabli pikkus, rikkevoolukaitse ja kilp — koos hindadega.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h3>Võta kaasa</h3>
+                <p>Lisa ostukorvi või prindi nimekiri välja ja võta poodi kaasa.</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber btn-lg">
+                Alusta arvutamist →
+            </a>
+        </div>
+    </div>
+</section>
+
+@* ── WORKED EXAMPLE ───────────────────────────────────────────────────────────
+   Showing the actual output is more persuasive than describing the input. These
+   are the real figures the calculator produces, verified against the running app
+   on 2026-08-14 with these exact inputs:
+
+       BuildingType = korterelamu, RoomCount = 3, SocketCount = 10,
+       LightCount = 12, HasElectricStove = true
+
+   which returns 8 lines totalling 348.90 EUR, of which 120 m is cable
+   (2 lighting + 2 socket + 1 stove circuit, 24 m each).
+
+   These previously read 160 m and 504,10 EUR and matched nothing the calculator
+   produced. On a site whose whole claim is that its numbers are auditable, an
+   invented figure on the landing page is the worst possible place for one.
+
+   NOTE: if the seeded prices or the calculation rules change, re-run that exact
+   input and update BOTH this list and the proof card in the hero above. *@
+<section class="worked-example section">
+    <div class="worked-example-head">
+        <span class="worked-example-label">Näidisarvutus</span>
+        <h2 class="worked-example-title">3-toaline korter, elektripliidiga</h2>
+    </div>
+    <div class="worked-example-body">
+        <ul class="worked-example-list">
+            <li><span>2 ×</span> kaitselüliti B10 — valgustus</li>
+            <li><span>48 m</span> NYM-J 3×1,5 mm² — valgustus</li>
+            <li><span>2 ×</span> kaitselüliti B16 — pistikud</li>
+            <li><span>48 m</span> NYM-J 3×2,5 mm² — pistikud</li>
+            <li><span>1 ×</span> kaitselüliti B32 — pliit</li>
+            <li><span>24 m</span> NYM-J 3×6 mm² — pliit</li>
+            <li><span>1 ×</span> rikkevoolukaitse 40A / 30 mA</li>
+            <li><span>1 ×</span> jaotuskilp, 12 moodulit</li>
+        </ul>
+        <div class="worked-example-total">
+            <span class="worked-example-total-label">Hinnanguline maksumus</span>
+            <span class="worked-example-total-value">348,90 €</span>
+            <span class="worked-example-total-note">Hinnang · hinnad sisaldavad käibemaksu</span>
+            <a asp-controller="Calculator" asp-action="Index" class="btn btn-amber mt-3">
+                Arvuta oma hoonele
+            </a>
+        </div>
+    </div>
+</section>
+
 <div class="card p-4">
     <div class="row align-items-center">
-        <div class="col-md-8">
-            <h6 class="fw-bold text-white mb-1">🏛️ EVS-HD 60364 standard</h6>
+        <div class="col-12">
+            <h6 class="fw-bold text-strong-custom mb-1">🏛️ Arvutuse alused</h6>
+            @* The green "Standardi järgi" badge that used to sit here was removed along
+               with the claim beside it. Research recorded in docs/EVS_ALLIKAD.md found
+               that only PART of the calculation derives from EVS-HD 60364: the cable and
+               breaker pairings follow its overcurrent principle, but the circuit divisors
+               (8 lights, 6 sockets) are a design convention the standard does not set.
+               A badge asserting blanket compliance was therefore a claim the application
+               could not support. *@
             <p class="text-muted-custom small mb-0">
-                Kõik arvutused põhinevad Eesti elektripaigaldiste standardil EVS-HD 60364.
-                Valgustusahelad: 1.5 mm² / 10A · Pistikuahelad: 2.5 mm² / 16A · Elektripliit: 6.0 mm² / 32A
+                Kaabli ristlõike ja kaitselüliti valik lähtub EVS-HD 60364 põhimõtetest:
+                valgustusahelad 1.5 mm² / 10A · pistikuahelad 2.5 mm² / 16A ·
+                elektripliit 6.0 mm² / 32A. Ahelate jaotus põhineb projekteerimistaval.
             </p>
-        </div>
-        <div class="col-md-4 text-md-end mt-2 mt-md-0">
-            <span class="badge bg-success px-3 py-2">✅ Standardi järgi</span>
         </div>
     </div>
 </div>

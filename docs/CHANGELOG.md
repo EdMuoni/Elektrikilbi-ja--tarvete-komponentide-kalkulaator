@@ -44,6 +44,47 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-14 — README rewritten in Estonian, with an AI-use section
+
+**Type:** docs
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `README.md` — the whole file rewritten in Estonian.
+- School name changed from "Tallinna Tööstushariduskeskus" to "Tallinna Tehnoloogiakolledž (Techno TLN)".
+- New section "Autor ja tehisintellekti kasutamine" explaining why `claude` appears among the
+  GitHub contributors. Its wording follows thesis section 1.6.
+- New section "Teadaolevad piirangud", taken from the limitations the thesis itself states.
+- Corrected facts that had gone stale: "48 automated tests" → 218; the claim that the calculation
+  simply "follows" EVS-HD 60364 now says the clause references are still missing.
+- Documentation table: added `KOODI_SELGITUS.md`, `EVS_ALLIKAD.md`, `joonised/` and
+  `LOPUTOO_MUSTAND.md` (labelled as an old draft); `PROJECT_ROADMAP.md` is no longer "start here"
+  and shows its last-updated date.
+
+**Why**
+- The thesis reviewer (retsensent) asked for the repository link on 2026-09-14, so the README is
+  now the first thing an Estonian examiner reads. Edgar asked for it in Estonian.
+- Tallinna Tööstushariduskeskus merged into Tallinna Tehnoloogiakolledž (Techno TLN) on 01.07.2026.
+  The name was checked against the school's own email signature and news coverage of the merger.
+  Edgar had written "Tallinna Tehnikakolledž"; that is not the school's name.
+- The contributors list shows `claude` next to Edgar with no explanation. The thesis already
+  discloses AI use, so the README says the same thing in the place a reviewer sees the list.
+- A README that overstates standards compliance contradicts the thesis, which states the limitation.
+
+**How it was verified**
+- `dotnet test`: 218 passed, 0 failed (run today, before the edit).
+- Every file linked from the README exists in `docs/`; `appsettings.json` still defaults to
+  LocalDB and `launchSettings.json` still uses port 8080.
+
+**Follow-ups or known limitations**
+- `CLAUDE.md`, `HANDOFF.md` and `docs/PROJECT_ROADMAP.md` still name Tallinna Tööstushariduskeskus.
+- The thesis itself (Word file, outside the repo) is inconsistent: the unversioned copy edited on
+  2026-09-14 says "Tallinna Tehnikakolledž" on the title page and "Tallinna Tööstushariduskeskuse"
+  in the author declaration.
+- `docs/TESTING.md` still says 203 tests.
+
+---
+
 ## 2026-09-13 — Algorithm flowchart (Joonis 5) redrawn in portrait with larger text
 
 **Type:** docs

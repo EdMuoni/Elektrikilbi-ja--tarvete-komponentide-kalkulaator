@@ -1,96 +1,141 @@
 # ElektriKalkulaator
 
-**Elektrikilbi ja -tarvete komponentide kalkulaator** — an electrical panel and supplies component
-calculator.
+**Elektrikilbi ja -tarvete komponentide kalkulaator**
 
-A web application that turns a building's basic parameters into a **priced Bill of Materials** for
-its electrical installation: which circuit breakers, how much cable, an RCD and an enclosure. The
-calculation follows the Estonian electrical standard **EVS-HD 60364** and prices the result against
-a real product catalogue, replacing work normally done by a cost estimator (*eelarvestaja*).
+Veebirakendus, mis koostab hoone põhiandmete põhjal elektripaigaldise **hinnaga materjalide
+loendi**. Loendis on kaitselülitid, kaabli kogus, rikkevoolukaitse ja kilbi korpus. Arvutus lähtub
+Eesti standardist **EVS-HD 60364** ja tulemus hinnastatakse päris tootekataloogi järgi. Sama tööd
+teeb tavaliselt eelarvestaja.
 
-Diploma thesis (LÕPUTÖÖ) by **Edgar Muoni**, group TARge24, Tallinna Tööstushariduskeskus.
-Supervisor: **Kalle Olumets**.
+Kasutaja sisestab hoone tüübi, tubade, pistikute ja valgustite arvu ning selle, kas on elektripliit.
+Rakendus jagab tarbijad ahelateks, valib igale ahelale odavaima laos oleva sobiva kaitselüliti ja
+kaabli ning näitab iga materjali rea juures ahelatüüpi ja kaabli ristlõiget, nii et tulemust saab
+kontrollida.
+
+**Lõputöö:** Edgar Muoni, rühm TARge24, eriala noorem tarkvaraarendaja, Tallinna Tehnoloogiakolledž
+(Techno TLN)
+**Juhendaja:** Kalle Olumets
 
 ---
 
-## Running it
+## Autor ja tehisintellekti kasutamine
 
-Requires the .NET 9 SDK and SQL Server (LocalDB is fine — it ships with Visual Studio).
+Rakenduse autor on **Edgar Muoni** ja töö on tehtud üksinda.
+
+Arenduse ajal kasutasin abivahendina Anthropicu keelemudelit Claude, peamiselt agentkeskkonnas
+Claude Code. Peamiselt kasutasin seda vigade ja nende põhjuste otsimisel, koodi ülevaatamisel ning
+automaattestide kirjutamisel. Lisaks kasutasin seda dokumentatsiooni ja lõputöö teksti koostamisel.
+
+Seepärast on GitHubi kaastööliste (ingl *Contributors*) loendis ka `claude`. Sisestuse
+(ingl *commit*) lõpus olev rida `Co-Authored-By: Claude` tähistab muudatusi, mille juures kasutasin
+tehisintellekti abi. Muudatuste päevikus [docs/CHANGELOG.md](docs/CHANGELOG.md) on see märgitud iga
+kirje juures (väli *Author*).
+
+Nõuded, arhitektuuri valikud, andmemudel ja arvutusreeglid on minu otsused. Iga soovituse
+kontrollisin ise töötava rakenduse ja testidega. Tehisintellekti kasutamist kirjeldan täpsemalt
+lõputöö peatükis 1.6.
+
+Rakenduse enda sees tehisintellekti ei ole. Arvutus põhineb andmebaasis olevatel reeglitel ja annab
+sama sisendi korral alati sama tulemuse.
+
+---
+
+## Käivitamine
+
+Vaja on .NET 9 SDK-d ja SQL Serverit. Sobib ka LocalDB, mis tuleb koos Visual Studioga.
 
 ```bash
 cd ElektriKalkulaator
 dotnet run --project ElektriKalkulaator
 ```
 
-Then open <http://localhost:8080>. The database is created and seeded automatically on first run,
-with 10 demo products and the EVS-HD 60364 calculation rules.
+Seejärel ava brauseris <http://localhost:8080>. Esimesel käivitamisel luuakse andmebaas
+automaatselt ja sinna lisatakse 10 näidistoodet ning arvutusreeglid.
 
-### Optional configuration
+### Valikuline seadistus
 
-`appsettings.json` defaults to LocalDB so a fresh clone runs with no setup. To use a different
-SQL Server, or to create an administrator account, use User Secrets — **never edit the committed
-file**, and never put a password in it:
+`appsettings.json` kasutab vaikimisi LocalDB-d, nii et värskelt kloonitud projekt käivitub ilma
+seadistamata. Teise SQL Serveri kasutamiseks või administraatori konto loomiseks kasuta User
+Secrets hoidlat. **Ära muuda versioonihalduses olevat faili** ja ära kirjuta sinna kunagi parooli:
 
 ```bash
 cd ElektriKalkulaator/ElektriKalkulaator
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<your connection string>"
-dotnet user-secrets set "AdminUser:Email" "you@example.com"
-dotnet user-secrets set "AdminUser:Password" "<a strong password>"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<sinu ühendusstring>"
+dotnet user-secrets set "AdminUser:Email" "sina@example.com"
+dotnet user-secrets set "AdminUser:Password" "<tugev parool>"
 ```
 
-Without the admin settings the app still runs — it just creates no administrator, and logs a
-warning saying so.
+Ilma administraatori seadeteta töötab rakendus samuti. Administraatorit siis ei looda ja logisse
+kirjutatakse selle kohta hoiatus.
 
-## Testing
+## Testimine
 
 ```bash
 cd ElektriKalkulaator
 dotnet test ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj
 ```
 
-There is also a security check that runs against the live application. Start the app first, then:
+Rakendust katab 218 automaattesti. GitHub Actions käivitab need iga sisestuse järel automaatselt
+(vt vahekaart *Actions*).
+
+Lisaks on turvakontrolli skript, mis töötab käivitatud rakenduse vastu. Käivita kõigepealt rakendus
+ja seejärel:
 
 ```bash
 bash scripts/security-check.sh
 ```
 
-It re-runs every vulnerability found in the security review — authentication, antiforgery, open
-redirect, input validation — and exits non-zero if any regressed.
+Skript kordab kõiki turvaülevaatuses leitud rünnaku katseid: autentimine, CSRF-kaitse
+(ingl *antiforgery*), avatud ümbersuunamine ja sisendi kontroll. Kui mõni neist ei läbi, lõpetab
+skript veakoodiga.
 
-## Structure
+## Ülesehitus
 
 ```
-ElektriKalkulaator.Core     domain models, DTOs, service interfaces  (depends on nothing)
-ElektriKalkulaator.Data     DbContext, migrations, seed data          (depends on Core)
-...ApplicationServices      service implementations                   (Core + Data)
-ElektriKalkulaator          the web application                       (all of the above)
-ElektriKalkulaator.Tests    48 automated tests
+ElektriKalkulaator.Core     domeenimudelid, DTO-d, teenuste liidesed   (ei sõltu millestki)
+ElektriKalkulaator.Data     DbContext, migratsioonid, algandmed        (sõltub Core'ist)
+...ApplicationServices      teenuste realisatsioonid                   (Core + Data)
+ElektriKalkulaator          veebirakendus                              (kõik eelnevad)
+ElektriKalkulaator.Tests    automaattestid                             (kõik neli projekti)
 ```
 
-Built with ASP.NET Core 9 MVC, EF Core 9, SQL Server, Bootstrap 5 and ASP.NET Core Identity.
+Tehnoloogiad: ASP.NET Core 9 MVC, Entity Framework Core 9, SQL Server, *Bootstrap* 5 ja
+ASP.NET Core Identity.
 
-## Documentation
+## Teadaolevad piirangud
 
-Everything is in [`docs/`](docs/):
+- Arvutusreeglite juures ei ole veel EVS-HD 60364 punktiviiteid ja ahelate jaotus põhineb
+  projekteerimistaval, mitte standardi nõudel. Vt [docs/EVS_ALLIKAD.md](docs/EVS_ALLIKAD.md).
+- Kaabli pikkus on hinnanguline, mitte arvutatud.
+- Tellimust ei salvestata. Ostukorv on olemas, aga vormistamine on edasiarendus.
+- Rakendus töötab praegu ainult kohalikus arenduskeskkonnas.
 
-| Document | What it covers |
+## Dokumentatsioon
+
+Kõik dokumendid on kaustas [`docs/`](docs/). Enamik neist on inglise keeles.
+
+| Dokument | Sisu |
 |---|---|
-| [PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md) | Architecture, current status, design decisions and what is planned next. **Start here.** |
-| [CHANGELOG.md](docs/CHANGELOG.md) | Every code change and the reasoning behind it |
-| [RESEARCH_LOG.md](docs/RESEARCH_LOG.md) | Market prices, competitor analysis and UX research, with sources |
-| [IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md) | Licence and attribution for every image |
-| [DESIGN_GUIDE.md](docs/DESIGN_GUIDE.md) | Design system and page-by-page UI instructions |
-| [TESTING.md](docs/TESTING.md) | How the project is tested, and what to test |
-| [TEST_ACCOUNTS.md](docs/TEST_ACCOUNTS.md) | Demo admin and customer logins for trying the site |
-| [VOICE_AND_PERSONALITY.md](docs/VOICE_AND_PERSONALITY.md) | How the site should sound to a customer |
-| [SUPPLIER_SYNC_SPEC.md](docs/SUPPLIER_SYNC_SPEC.md) | Plan for the future supplier price-sync model (not built) |
-| [PROMPTS.md](docs/PROMPTS.md) | Prompts for working on this project with an AI assistant |
+| [KOODI_SELGITUS.md](docs/KOODI_SELGITUS.md) | Koodi tööpõhimõtte selgitus eesti keeles |
+| [EVS_ALLIKAD.md](docs/EVS_ALLIKAD.md) | Standardi allikad ja aus hinnang, kui palju rakendus seda järgib |
+| [CHANGELOG.md](docs/CHANGELOG.md) | Iga koodimuudatus ja selle põhjus |
+| [PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md) | Arhitektuur, otsused ja plaanid (viimati uuendatud 14.08.2026) |
+| [TESTING.md](docs/TESTING.md) | Testimise metoodika |
+| [DESIGN_GUIDE.md](docs/DESIGN_GUIDE.md) | Disainisüsteem ja lehtede kujunduse juhised |
+| [RESEARCH_LOG.md](docs/RESEARCH_LOG.md) | Väljast kogutud faktid: turuhinnad, konkurentide analüüs, kasutajaliidese uuring |
+| [IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md) | Iga pildi päritolu ja litsents |
+| [TEST_ACCOUNTS.md](docs/TEST_ACCOUNTS.md) | Näidiskontod (administraator ja klient) rakenduse proovimiseks |
+| [VOICE_AND_PERSONALITY.md](docs/VOICE_AND_PERSONALITY.md) | Kuidas veebileht kasutajaga räägib |
+| [SUPPLIER_SYNC_SPEC.md](docs/SUPPLIER_SYNC_SPEC.md) | Tulevase tarnijate hinnasünkrooni plaan (ei ole realiseeritud) |
+| [PROMPTS.md](docs/PROMPTS.md) | Juhised selle projekti kallal tehisintellektiga töötamiseks |
+| [joonised/](docs/joonised/) | Lõputöö arhitektuuri- ja vooskeemi joonise lähtefailid (SVG) |
+| [LOPUTOO_MUSTAND.md](docs/LOPUTOO_MUSTAND.md) | **Vana mustand, mitte lõputöö.** Lõplik töö on Wordi dokument |
 
-[`CLAUDE.md`](CLAUDE.md) sits at the repo root because AI assistants load it automatically from
-there; it points at the documents above.
+[`CLAUDE.md`](CLAUDE.md) asub repositooriumi juurkaustas, sest Claude Code loeb selle sealt
+automaatselt. See on juhend tehisintellektile ja viitab ülalolevatele dokumentidele.
 
-## Licence and attributions
+## Litsents ja pildiallikad
 
-Product photographs are freely licensed (Wikimedia Commons CC0 / CC BY-SA, Unsplash, Pexels) and
-individually credited in [docs/IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md). No manufacturer
-photography is used — see that file for why.
+Tootefotod on vaba litsentsiga (Wikimedia Commons CC0 / CC BY-SA, Unsplash, Pexels) ja iga pildi
+allikas on kirjas failis [docs/IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md). Tootjate fotosid ei kasutata;
+põhjus on samas failis.

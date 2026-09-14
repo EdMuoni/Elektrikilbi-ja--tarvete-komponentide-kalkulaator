@@ -4,7 +4,7 @@ namespace ElektriKalkulaator.Tests.Integration
 {
     // Who may open which page.
     //
-    // This is the automated version of the checks in scripts/security-check.sh. It exists because
+    // This is the automated version of the checks in docs/scripts/security-check.sh. It exists because
     // the most serious problem ever found in this project was that EVERY admin page was reachable
     // by anyone who knew the URL — Program.cs called UseAuthorization() without UseAuthentication(),
     // so the authorization middleware had nobody to check against and silently allowed everything.

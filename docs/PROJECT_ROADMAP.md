@@ -19,8 +19,8 @@ next, without guessing.
 | `CHANGELOG.md` | **What actually happened to the code, and why.** Append-only log, newest first. Never rewritten. |
 | `RESEARCH_LOG.md` | **Facts gathered from outside the project** — market prices, competitor design analysis, UX research, image sourcing. Separate from the changelog because external facts go stale on their own schedule. |
 | `IMAGE_CREDITS.md` | Attribution and licences for every shipped image. Legally required for the CC BY-SA one. |
-| `CLAUDE.md` | **Loaded automatically at the start of every AI session.** Rules, commands, and the things that look like bugs but are deliberate. |
-| `scripts/security-check.sh` | Re-runs every exploit from the security review against the running app. `bash scripts/security-check.sh` |
+| `docs/CLAUDE.md` | **Read at the start of every AI session** (a pointer file outside the repo loads it). Rules, commands, and the things that look like bugs but are deliberate. |
+| `docs/scripts/security-check.sh` | Re-runs every exploit from the security review against the running app. `bash docs/scripts/security-check.sh` |
 | `README.md` | Currently just the repo title. Low priority. |
 
 ### House rules for code

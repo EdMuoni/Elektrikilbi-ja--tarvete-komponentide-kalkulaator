@@ -11,7 +11,7 @@ cd ElektriKalkulaator
 dotnet test ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj
 ```
 
-There is also `scripts/security-check.sh`, which runs the same security checks against a *manually
+There is also `docs/scripts/security-check.sh`, which runs the same security checks against a *manually
 started* app. It is now **redundant** — everything it does is covered by the integration tests
 below — but it is kept because it can be pointed at a deployed server, which `dotnet test` cannot.
 
@@ -64,7 +64,7 @@ confidence that is not earned, and nobody looks at it again.
 
 **Two real examples from this project:**
 
-1. `scripts/security-check.sh` originally checked only that a redirect *"did not go to
+1. `docs/scripts/security-check.sh` originally checked only that a redirect *"did not go to
    evil.example.com"*. An **empty** response satisfies that. The check was green while verifying
    nothing. It now asserts the redirect goes to `/Cart`.
 2. An early test asserted a breaker's `WireCrossSectionMm2` was `null` to tell breakers from

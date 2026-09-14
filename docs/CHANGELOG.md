@@ -44,6 +44,49 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-14 — Scripts and CLAUDE.md moved into docs/; README language corrected
+
+**Type:** chore
+**Author:** Claude (Opus 5) + Edgar
+
+**What changed**
+- `scripts/` → `docs/scripts/`, `CLAUDE.md` → `docs/CLAUDE.md`. The repo root now holds only
+  `README.md`, `.gitignore`, `ElektriKalkulaator/` and `.github/`.
+- The four Python scripts locate files relative to their own folder, so each path gained one more
+  `".."` (`check-contrast.py`, `generate-theme.py`, `generate-code-figures.py`, `generate-erd.py`).
+  Their "Run:" comments now say `docs/scripts/…`.
+- `theme.css` regenerated: the only difference is its header comment, which quotes the generator's
+  new path.
+- References updated in three test-file comments, `docs/TESTING.md`, `docs/PROJECT_ROADMAP.md`,
+  `docs/CLAUDE.md` and `README.md`. Older changelog entries keep the old paths, as history.
+- A pointer `CLAUDE.md` was added in Edgar's `LÕPUTÖÖ` folder (outside the repo). It imports
+  `docs/CLAUDE.md`, because Claude Code only loads `CLAUDE.md` automatically from the working folder
+  or a parent folder, not from `docs/`.
+- `README.md`: grammar and wording corrected (case agreement in the security-check sentence,
+  "Väljastpoolt", a repeated "peamiselt", clearer table descriptions); the structure diagram now
+  shows `docs/` and `.github/workflows/`; the documentation table lists `CLAUDE.md` and `scripts/`.
+
+**Why**
+- Edgar wanted everything that is not the application in one folder instead of spread over the root.
+- `.github/workflows/` stays at the root: GitHub Actions only reads workflows from there, so moving
+  it would silently switch off CI, which the thesis describes in sections 2.2 and 2.4.
+- Nothing is removed. The thesis cites the docs in Tabel 14, the security script and the list of
+  deliberate design choices in `CLAUDE.md`; all are still in the repo, one folder deeper.
+
+**How it was verified**
+- Printed the resolved paths of all four Python scripts: each points at an existing file or folder.
+- Ran `check-contrast.py` (0 pairs below WCAG AA) and `generate-theme.py` (wrote the same 38 tokens
+  per palette) from the new location.
+- `dotnet build`: 0 warnings, 0 errors. `dotnet test`: 218 passed.
+- Started the app and ran `bash docs/scripts/security-check.sh` from the repo root: all checks passed.
+- Every `docs/` link in the README resolves to an existing path.
+
+**Follow-ups or known limitations**
+- `generate-erd.py` and `generate-code-figures.py` were not run, because they overwrite the thesis
+  figures in `LÕPUTÖÖ\Pictures\Diagrams`; their new paths were checked instead.
+
+---
+
 ## 2026-09-14 — Personal working notes moved out of the repository
 
 **Type:** chore

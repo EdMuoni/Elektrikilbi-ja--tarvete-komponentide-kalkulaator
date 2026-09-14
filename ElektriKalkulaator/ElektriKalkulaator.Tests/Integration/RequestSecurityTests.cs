@@ -4,7 +4,7 @@ namespace ElektriKalkulaator.Tests.Integration
 {
     // Protections that apply to requests themselves: antiforgery, redirect safety, input limits.
     //
-    // Automated versions of the remaining checks in scripts/security-check.sh. Each one had to be
+    // Automated versions of the remaining checks in docs/scripts/security-check.sh. Each one had to be
     // reproduced as a working exploit before it was fixed, and each test here is that exploit
     // turned into something that runs on every build.
     public class RequestSecurityTests : IClassFixture<TestWebAppFactory>

@@ -1,8 +1,9 @@
 # CLAUDE.md — instructions for AI assistants working on this project
 
-This file is loaded automatically at the start of every session. Read it, then read
-**`HANDOFF.md` in the `LÕPUTÖÖ` folder one level above this repository** (`../HANDOFF.md`) — that
-is the file which carries state between sessions, including the current thesis version and the
+This file lives in `docs/`. Claude Code does not load it from there on its own, so a short
+`CLAUDE.md` in the `LÕPUTÖÖ` folder that contains this repository (outside the repo) points here and
+is loaded automatically. Read this file, then read **`LÕPUTÖÖ\HANDOFF.md`** (also outside the repo) —
+that is the file which carries state between sessions, including the current thesis version and the
 supervisor's open review comments. It lives outside the repo on purpose: it holds personal working
 notes that do not belong in a public repository.
 `docs/PROJECT_ROADMAP.md` is a month stale (revision 7, 2026-08-14) and is being refreshed.
@@ -20,8 +21,9 @@ The calculator is the point. The shop exists to serve it.
 
 ## The documents
 
-All project documentation lives in `docs/`. Only this file and `README.md` sit at the repo root —
-this one because it is only loaded automatically from there.
+All project documentation, this file and the helper scripts (`docs/scripts/`) live in `docs/`.
+The repo root holds only `README.md`, `.gitignore`, the application folder and `.github/` — which
+must stay at the root, because GitHub Actions only reads workflows from `.github/workflows/`.
 
 | File | What it holds | When to update |
 |---|---|---|
@@ -66,8 +68,8 @@ dotnet build ElektriKalkulaator.slnx
 dotnet test ElektriKalkulaator.Tests/ElektriKalkulaator.Tests.csproj
 dotnet run --project ElektriKalkulaator            # http://localhost:8080
 
-# re-check the app is still locked down (app must be running)
-bash scripts/security-check.sh
+# re-check the app is still locked down (app must be running; from the repo root)
+bash docs/scripts/security-check.sh
 ```
 
 Local secrets already set on Edgar's machine (`dotnet user-secrets list` from the web project):

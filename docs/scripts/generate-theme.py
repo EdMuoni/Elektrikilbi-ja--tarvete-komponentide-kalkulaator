@@ -2,7 +2,7 @@
 """
 Generates ElektriKalkulaator/wwwroot/css/theme.css.
 
-    python scripts/generate-theme.py
+    python docs/scripts/generate-theme.py
 
 WHY A GENERATOR AND NOT A HAND-WRITTEN FILE
 -------------------------------------------
@@ -189,7 +189,7 @@ HEADER = '''/* =================================================================
    theme.css - ALL COLOURS FOR THE WHOLE SITE
    =============================================================================
    GENERATED FILE. Do not edit by hand - your changes will be overwritten.
-       python scripts/generate-theme.py
+       python docs/scripts/generate-theme.py
    The reasoning behind every value is in that script's docstring.
 
    Every colour used anywhere lives in this file and nowhere else. site.css and
@@ -277,7 +277,7 @@ def main():
     ])
 
     here = os.path.dirname(os.path.abspath(__file__))
-    target = os.path.join(here, "..", "ElektriKalkulaator", "ElektriKalkulaator",
+    target = os.path.join(here, "..", "..", "ElektriKalkulaator", "ElektriKalkulaator",
                           "wwwroot", "css", "theme.css")
     target = os.path.normpath(target)
     io.open(target, "w", encoding="utf-8").write(css)

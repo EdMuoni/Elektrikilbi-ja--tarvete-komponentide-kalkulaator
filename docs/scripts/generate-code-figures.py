@@ -11,7 +11,7 @@
 # font — the font size is what decides whether the figure is readable on paper,
 # so it is held constant and the line gives way instead.
 #
-# Run:  python scripts/generate-code-figures.py
+# Run:  python docs/scripts/generate-code-figures.py
 # Then render each .html with the msedge commands it prints.
 import io
 import os
@@ -155,7 +155,7 @@ def figure(name, path, start, end, label):
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..", "ElektriKalkulaator"))
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", "ElektriKalkulaator"))
 DEST = os.path.abspath(os.path.join(HERE, "..", "..", "Pictures", "Diagrams"))
 if not os.path.isdir(DEST):
     os.makedirs(DEST)

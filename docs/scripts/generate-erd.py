@@ -15,7 +15,7 @@
 # the types would push the boxes past the point where the text is legible on
 # paper. Names alone carry what that figure is there to show.
 #
-# Run:  python scripts/generate-erd.py
+# Run:  python docs/scripts/generate-erd.py
 # Then render each .html to .png with the msedge command printed at the end.
 import io
 import os
@@ -195,7 +195,7 @@ def write(name, width, height, title):
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEST = os.path.abspath(os.path.join(HERE, "..", "..", "Pictures", "Diagrams"))
+DEST = os.path.abspath(os.path.join(HERE, "..", "..", "..", "Pictures", "Diagrams"))
 if not os.path.isdir(DEST):
     os.makedirs(DEST)
 

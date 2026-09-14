@@ -2,7 +2,7 @@
 """
 Reports the WCAG contrast ratio of every text/background pairing the site uses.
 
-    python scripts/check-contrast.py
+    python docs/scripts/check-contrast.py
 
 Exits non-zero if any pairing falls below WCAG AA (4.5:1 for normal text), so it
 can be wired into CI later.
@@ -61,7 +61,7 @@ def ratio(a, b):
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     path = os.path.normpath(os.path.join(
-        here, "..", "ElektriKalkulaator", "ElektriKalkulaator", "wwwroot", "css", "theme.css"))
+        here, "..", "..", "ElektriKalkulaator", "ElektriKalkulaator", "wwwroot", "css", "theme.css"))
     css = io.open(path, encoding="utf-8-sig").read()
 
     dark = parse_block(css, r"\n:root \{(.*?)\n\}", "dark")

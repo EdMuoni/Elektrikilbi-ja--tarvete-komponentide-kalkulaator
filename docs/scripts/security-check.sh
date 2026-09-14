@@ -11,7 +11,7 @@
 #
 # HOW TO USE
 #   1. Start the app:   dotnet run --project ElektriKalkulaator
-#   2. In another shell: bash scripts/security-check.sh
+#   2. In another shell: bash docs/scripts/security-check.sh
 #
 # Every check prints PASS or FAIL. The script exits 1 if anything failed, so it can also be used
 # in a build pipeline later.

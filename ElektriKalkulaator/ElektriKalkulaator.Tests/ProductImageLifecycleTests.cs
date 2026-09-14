@@ -10,7 +10,7 @@ namespace ElektriKalkulaator.Tests
     // file to delete from a hidden form field the browser controls rather than from the database.
     //
     // The file-deletion itself lives in the controller and touches the filesystem, so it is
-    // covered by scripts/security-check.sh and manual testing. What IS testable here — and what
+    // covered by docs/scripts/security-check.sh and manual testing. What IS testable here — and what
     // the bug actually depended on — is that the stored path behaves correctly.
     public class ProductImageLifecycleTests : TestBase
     {

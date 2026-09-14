@@ -44,6 +44,55 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-08-11 — Fix: seeded product photos were excluded from git; separate uploads from shipped images
+
+**Type:** bugfix
+**Author:** Claude (Sonnet 5) + Edgar
+
+**What changed**
+- Uploaded images now save to **`wwwroot/images/uploads/`** instead of `wwwroot/images/products/`
+  (`ProductsController.SaveProductImage`). New constants `UploadsFolderName` / `UploadsWebPath`.
+- `DeleteProductImageFile` now deletes **only** files under the uploads folder, and resolves the
+  target by filename rather than by joining the raw database path.
+- `.gitignore`: ignores `wwwroot/images/uploads/*` instead of `wwwroot/images/products/*`.
+- The four seeded photos (`breaker.jpg`, `cable.jpg`, `rcd.jpg`, `enclosure.jpg`) are now **tracked
+  in git**. `.gitkeep` moved from `products/` to `uploads/`.
+
+**Why — two real bugs, both introduced by the previous two changes**
+
+1. **The shipped photos were never committed.** The `.gitignore` rule added with the upload
+   feature excluded everything in `wwwroot/images/products/`, with an exception for `*.svg`. When
+   the SVG illustrations were later replaced by `.jpg` photos, that exception stopped matching.
+   The result: `main` contained seed data pointing at `/images/products/breaker.jpg` while the
+   file itself was not in the repository — **a fresh clone would render ten broken images.**
+   Confirmed by inspecting the commit: it added the two hero images but none of the four product
+   photos.
+2. **Deleting one product could destroy another product's image.** All five breakers share
+   `breaker.jpg`. The old delete logic removed whatever file `Product.ImagePath` pointed at, so
+   deleting a single breaker would have deleted the image still displayed by the other four.
+   Splitting shipped assets from uploads fixes this by construction: shipped files are never
+   deleted at runtime.
+
+   The same change also removes a path-traversal foothold — the old code joined a database string
+   directly onto `WebRootPath`, so a malformed value such as `../../appsettings.json` would have
+   been deleted. Deletion is now confined to one known folder.
+
+**How it was verified**
+- `dotnet build` clean; `dotnet test` **16/16 passing**.
+- `git check-ignore` confirms all four seeded photos are now trackable and that a probe file in
+  `uploads/` is still ignored.
+- **Regression test against the running app:** deleted seeded product `…0001` (one of the five
+  breakers) and confirmed `breaker.jpg` still exists on disk afterwards, with the remaining four
+  breakers still rendering it. Under the previous code this deletion removed the shared file.
+- The seeded row deleted during that test was restored via SQL; the catalogue is back to 10
+  products.
+
+**Follow-ups or known limitations**
+- Uploaded images are still deleted immediately with no undo.
+- There is no cleanup for uploads orphaned by an error between saving the file and saving the row.
+
+---
+
 ## 2026-08-11 — Real product photography for the seeded catalogue
 
 **Type:** feature

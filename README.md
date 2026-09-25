@@ -15,29 +15,6 @@ tulemust saab kontrollida.
 **Lõputöö:** Edgar Muoni, rühm TARge24, eriala noorem tarkvaraarendaja, Tallinna Tehnoloogiakolledž
 (Techno TLN)
 **Juhendaja:** Kalle Olumets
-
----
-
-## Autor ja tehisintellekti kasutamine
-
-Rakenduse autor on **Edgar Muoni** ja töö on tehtud üksinda.
-
-Arenduse ajal kasutasin abivahendina Anthropicu keelemudelit Claude, peamiselt agentkeskkonnas
-Claude Code. Kasutasin seda eelkõige vigade ja nende põhjuste otsimisel, koodi ülevaatamisel ning
-automaattestide kirjutamisel. Lisaks kasutasin seda dokumentatsiooni ja lõputöö teksti koostamisel.
-
-Seepärast on GitHubi kaastööliste (ingl *Contributors*) loendis ka `claude`. Sisestuse
-(ingl *commit*) kirjelduse lõpus olev rida `Co-Authored-By: Claude` tähistab muudatusi, mille juures
-kasutasin tehisintellekti abi. Muudatuste päevikus [docs/CHANGELOG.md](docs/CHANGELOG.md) on see
-märgitud iga kirje juures (väli *Author*).
-
-Nõuded, arhitektuuri valikud, andmemudel ja arvutusreeglid on minu otsused. Iga soovituse
-kontrollisin ise töötava rakenduse ja testidega. Tehisintellekti kasutamist kirjeldan täpsemalt
-lõputöö peatükis 1.6.
-
-Rakenduses endas tehisintellekti ei kasutata. Arvutus põhineb andmebaasis olevatel reeglitel ja annab
-sama sisendi korral alati sama tulemuse.
-
 ---
 
 ## Käivitamine
@@ -135,7 +112,28 @@ Kõik dokumendid ja abiskriptid on kaustas [`docs/`](docs/). Enamik dokumente on
 | [joonised/](docs/joonised/) | Lõputöö arhitektuuriskeemi ja vooskeemi lähtefailid (SVG) |
 | [scripts/](docs/scripts/) | Turvakontrolli skript ning jooniste ja värviteema genereerimise skriptid |
 
-## Litsents ja pildiallikad
+---
+
+## Autor ja tehisintellekti kasutamine
+
+Rakenduse autor on **Edgar Muoni** ja töö on tehtud üksinda.
+
+Arenduse ajal kasutasin abivahendina Anthropicu keelemudelit Claude, peamiselt agentkeskkonnas
+Claude Code. Kasutasin seda eelkõige vigade ja nende põhjuste otsimisel, koodi ülevaatamisel ning
+automaattestide kirjutamisel. Lisaks kasutasin seda dokumentatsiooni ja lõputöö teksti koostamisel.
+
+Seepärast on GitHubi kaastööliste (ingl *Contributors*) loendis ka `claude`. Sisestuse
+(ingl *commit*) kirjelduse lõpus olev rida `Co-Authored-By: Claude` tähistab muudatusi, mille juures
+kasutasin tehisintellekti abi. Muudatuste päevikus [docs/CHANGELOG.md](docs/CHANGELOG.md) on see
+märgitud iga kirje juures (väli *Author*).
+
+Nõuded, arhitektuuri valikud, andmemudel ja arvutusreeglid on minu otsused. Iga soovituse
+kontrollisin ise töötava rakenduse ja testidega. Tehisintellekti kasutamist kirjeldan täpsemalt
+lõputöö peatükis 1.6.
+
+Rakenduses endas tehisintellekti ei kasutata. Arvutus põhineb andmebaasis olevatel reeglitel ja annab
+sama sisendi korral alati sama tulemuse.
+
 
 Tootefotod on vaba litsentsiga (Wikimedia Commons CC0 / CC BY-SA, Unsplash, Pexels) ja iga pildi
 allikas on kirjas failis [docs/IMAGE_CREDITS.md](docs/IMAGE_CREDITS.md). Tootjate fotosid ei

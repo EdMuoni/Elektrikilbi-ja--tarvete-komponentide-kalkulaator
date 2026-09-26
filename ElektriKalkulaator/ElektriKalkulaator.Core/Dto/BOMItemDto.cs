@@ -30,5 +30,13 @@ namespace ElektriKalkulaator.Core.Dto
 
         // Wire cross-section shown as a badge: 1.5 mm², 2.5 mm², 6.0 mm²
         public decimal? WireCrossSectionMm2 { get; set; }
+
+        // How many units of this product were in stock when the calculation ran.
+        //
+        // The calculator only picks products that have AT LEAST ONE unit in stock. It used to
+        // stop there, so 48 m of cable could be offered from a stock of 5 m without a word.
+        // Carrying the stock figure on the row lets the result page say "laos on ainult 5 m".
+        // Null means "not known" (for example a row built by an older caller or a test).
+        public int? StockQuantity { get; set; }
     }
 }

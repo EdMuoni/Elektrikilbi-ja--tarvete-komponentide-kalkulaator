@@ -113,11 +113,21 @@
         {
             <!-- BOM tabel — materjalide nimekiri -->
             <div class="card p-4">
-                @if (ViewBag.StoveNotice != null)
+                @{ var notes = ViewBag.Notes as List<string>; }
+                @if (notes != null && notes.Count > 0)
                 {
-                    @* Says what the calculator did NOT do. See CalculatorController. *@
+                    @* Says what the calculator did NOT do: a component with no suitable product in
+                       stock, less stock than the quantity needed, or a stove circuit that has no
+                       rule. Before this, a missing product simply vanished from the list and the
+                       total looked complete. See CalculatorServices.CalculateWithNotes. *@
                     <div class="alert alert-warning" role="alert">
-                        ⚠️ @ViewBag.StoveNotice
+                        <div class="fw-semibold mb-1">⚠️ Arvutust ei saanud täielikult teha:</div>
+                        <ul class="mb-0 ps-3">
+                            @foreach (var note in notes)
+                            {
+                                <li>@note</li>
+                            }
+                        </ul>
                     </div>
                 }
 
@@ -186,7 +196,15 @@
                                     </td>
                                     @* item.Unit is "tk" for countable items and "m" for cable, so a
                                        40-metre cable run reads "40 m" instead of "40 tk". *@
-                                    <td class="text-center fw-bold">@item.Quantity @item.Unit</td>
+                                    <td class="text-center fw-bold">
+                                        @item.Quantity @item.Unit
+                                        @* The product was chosen because at least one unit is in
+                                           stock, but that may be fewer than this row needs. *@
+                                        @if (item.StockQuantity.HasValue && item.StockQuantity.Value < item.Quantity)
+                                        {
+                                            <div class="small text-amber fw-normal">laos ainult @item.StockQuantity @item.Unit</div>
+                                        }
+                                    </td>
                                     <td class="text-end price-tag-small">
                                         @item.UnitPrice.ToString("F2") €<span class="text-muted-custom small">/@item.Unit</span>
                                     </td>
@@ -221,22 +239,25 @@
                 @* ── TRUST STRIP ──────────────────────────────────────────────────
                    Why this exists: the strongest thing about this calculator was invisible.
                    A visitor saw a price list identical to any other shop's, with no indication
-                   that the quantities come from a published safety standard rather than a
-                   guess. Every claim below is literally true of this application, which is what
-                   separates it from marketing badges. *@
+                   of where the quantities come from. Every claim below must be literally true.
+                   The first two used to say "Kogused arvutatud … standardi järgi" and "Iga rida
+                   tuleb reeglist, mitte hinnangust". Both overstated: only the cable/breaker pair
+                   follows the standard's principles, the circuit split is design practice and the
+                   cable length is an estimate. The thesis reviewer asked about exactly this
+                   ("Millel põhineb kasutajaliidese väide „standardi järgi“?"). *@
                 <div class="trust-strip mt-4">
                     <div class="trust-item">
                         <span class="trust-icon">📐</span>
                         <div>
                             <strong>EVS-HD 60364</strong>
-                            <span>Kogused arvutatud Eesti elektripaigaldise standardi järgi</span>
+                            <span>Kaabel ja kaitselüliti on valitud standardi põhimõtete järgi</span>
                         </div>
                     </div>
                     <div class="trust-item">
                         <span class="trust-icon">🔍</span>
                         <div>
                             <strong>Kontrollitav</strong>
-                            <span>Iga rida tuleb reeglist, mitte hinnangust — arvutuskäik on jälgitav</span>
+                            <span>Iga rea juures on näha ahel ja kaabli ristlõige</span>
                         </div>
                     </div>
                     <div class="trust-item">
@@ -246,6 +267,22 @@
                             <span>Valitud on odavaim laos olev toode iga komponendi jaoks</span>
                         </div>
                     </div>
+                </div>
+
+                @* ── ASSUMPTIONS ───────────────────────────────────────────────────
+                   The result is only as good as its assumptions, so they are stated next to the
+                   result instead of only in the thesis. The reviewer asked to "näidata kasutajale
+                   piiranguid". Each sentence matches thesis chapter 1.4 ("standardi põhimõtetest /
+                   projekteerimistava / hinnanguline eeldus"). *@
+                <div class="mt-3 small text-muted-custom">
+                    <div class="fw-semibold text-strong-custom mb-1">Arvutuse eeldused</div>
+                    <ul class="mb-0 ps-3">
+                        <li>Kaabli ristlõike ja kaitselüliti nimivoolu paar lähtub standardi EVS-HD 60364 põhimõtetest. Standardi punktiviiteid ei ole veel lisatud.</li>
+                        <li>Ahelate jaotus (8 valgustit või 6 pistikut ühe ahela kohta) on projekteerimistava, mitte standardi nõue.</li>
+                        <li>Kaabli pikkus on hinnang: 8 m ahela kohta iga toa kohta. Tegelik pikkus sõltub ruumide suurusest ja paigutusest.</li>
+                        <li>Hinnad on tootekataloogi ligikaudsed hinnad.</li>
+                        <li>Arvutus on hinnang, mitte elektriprojekt. Enne paigaldust peab selle üle vaatama pädev elektrik.</li>
+                    </ul>
                 </div>
 
                 <!-- Lisa kõik ostukorvi -->

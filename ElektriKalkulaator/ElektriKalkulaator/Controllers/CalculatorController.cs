@@ -33,27 +33,19 @@ namespace ElektriKalkulaator.Controllers
             if (!ModelState.IsValid)
                 return View(dto);
 
-            var bom = await _calculatorServices.Calculate(dto);
+            // CalculateWithNotes returns the rows AND a note for everything the calculator could
+            // not do: no suitable product in stock, less stock than needed, or a stove circuit for
+            // a building type without a stove rule. A calculator whose whole point is showing its
+            // reasoning must also show what it did NOT do. (The stove message used to be built
+            // here; it moved into the service so that all such notes come from one place, and so
+            // that a missing 32 A breaker is no longer reported as "no stove rule".)
+            var result = await _calculatorServices.CalculateWithNotes(dto);
+            var bom = result.Items;
             await _calculatorServices.SaveCalculation(dto, bom);
 
             ViewBag.BOM       = bom;
             ViewBag.TotalCost = bom.Sum(b => b.TotalPrice);
-
-            // The stove checkbox is shown for every building type, but only the
-            // residential types have a "stove" calculation rule seeded. Ticking it for
-            // ärihoone therefore produced no stove circuit AND no explanation - the form
-            // silently promised something it did not deliver, which is worse than not
-            // offering the option at all.
-            //
-            // Rather than hiding the checkbox (which would need the rule set in the view),
-            // the result says plainly that the request could not be honoured. A calculator
-            // whose whole point is showing its reasoning must also show what it did NOT do.
-            if (dto.HasElectricStove && !bom.Any(line => line.CircuitType == "stove"))
-            {
-                ViewBag.StoveNotice =
-                    "Elektripliidi ahelat ei lisatud: valitud hoonetüübi jaoks ei ole " +
-                    "pliidiahela arvutusreeglit määratud. Ülejäänud arvutus on tehtud.";
-            }
+            ViewBag.Notes     = result.Notes;
 
             return View(dto);
         }

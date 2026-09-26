@@ -44,6 +44,62 @@ already shows *what* changed; only a human/AI writing at the time knows *why*.
 
 ---
 
+## 2026-09-26 — Result page names its assumptions and warns about missing products and low stock
+
+**Type:** feature
+**Author:** Claude (Opus 5.5) + Edgar
+
+**What changed**
+- `Core/Dto/CalculationResultDto.cs` (new): the BOM rows plus a list of plain-language notes.
+- `Core/Dto/BOMItemDto.cs`: new `StockQuantity` — the stock of the chosen product at calculation time.
+- `ICalculatorServices` / `CalculatorServices`: new `CalculateWithNotes()` holds the calculation.
+  `Calculate()` now just returns its rows, so every existing caller and test behaves exactly as before.
+  A note is written when (a) no suitable breaker, cable, enclosure or RCD is in stock, (b) the quantity
+  needed is larger than the stock (rows are summed per product first), (c) a stove was ticked for a
+  building type that has no stove rule.
+- `CalculatorController`: uses `CalculateWithNotes()` and passes the notes to the view. The stove message
+  moved from here into the service.
+- `Views/Calculator/Index.cshtml`: the notes are listed in one warning box above the table (it replaces
+  the stove-only box); a row whose stock is too small shows "laos ainult … m"; the trust strip no longer
+  says "Kogused arvutatud … standardi järgi" and "Iga rida tuleb reeglist, mitte hinnangust"; a new
+  "Arvutuse eeldused" block states the standard/practice/estimate split, the 8 m per room per circuit
+  cable estimate, that prices are approximate, and that the result is an estimate, not a design.
+
+**Why**
+- The thesis reviewer (Markus Lehtla, 14.09.2026) asked how the solution behaves with a missing product
+  or insufficient stock (question 4), what the UI claim "standardi järgi" is based on, and to show the
+  user the limitations (question 3, criterion 2). Before this change a missing product simply vanished
+  from the list, so the total looked complete when it was not; 48 m of cable could be offered from a
+  stock of 5 m without a word; and the stove message said "no rule" even when the real cause could have
+  been an out-of-stock 32 A breaker.
+- The two trust-strip sentences overstated: only the cable/breaker pair follows the standard's principles,
+  the circuit split (8 lights, 6 sockets) is design practice and the cable length is an estimate
+  (thesis § 1.4).
+- `Calculate()` keeps its signature so that the 218 existing tests did not have to change.
+- This is a post-review change. The assessed version stays `8cfff90`; at the defence it must be presented
+  as "pärast retsensiooni parandasin …", never as part of the evaluated version.
+
+**How it was verified**
+- `dotnet build`: 0 warnings, 0 errors. `dotnet test`: 218/218 passed.
+- Running app (`dotnet run`, http://localhost:8080), real form posts with the antiforgery token:
+  - worked example (korterelamu, 3 rooms, 10 sockets, 12 lights, stove): 348,90 €, no notes, assumptions
+    block shown, old claim gone;
+  - 200 rooms, 500 sockets: note "NYM-J 3x2.5mm² kaabel (1m): vaja on 134400 m, laos on ainult 5000 m"
+    and the row hint "laos ainult 5000 m";
+  - ärihoone + stove: the stove note, text unchanged;
+  - enclosure stock set to 0 in the dev database: note "Kilbi korpust ei ole laos, seetõttu puudub see
+    rida loendist.", total 320,40 € (= 348,90 − 28,50). Stock restored to 30 afterwards.
+- `bash docs/scripts/security-check.sh`: all checks passed.
+- The four test calculations were deleted afterwards; the dev database is back to 10 products and 22
+  saved calculations.
+
+**Follow-ups or known limitations**
+- The cart still has no stock check; the calculator only warns.
+- The home page headline "Elektrikilp, arvutatud standardi järgi." is unchanged.
+- No new automated tests were added (Edgar's standing instruction: keep the 218, verify in the running app).
+
+---
+
 ## 2026-09-14 — Scripts and CLAUDE.md moved into docs/; README language corrected
 
 **Type:** chore

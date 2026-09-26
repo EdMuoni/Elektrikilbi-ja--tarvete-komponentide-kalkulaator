@@ -26,17 +26,33 @@ namespace ElektriKalkulaator.ApplicationServices.Services
         //   Lighting:  1 circuit per 8 lights  — 1.5mm² / 10A
         //   Sockets:   1 circuit per 6 sockets — 2.5mm² / 16A
         //   Stove:     1 dedicated circuit      — 6.0mm² / 32A
+        //
+        // Returns only the rows. The tests and SaveCalculation use this; the result page uses
+        // CalculateWithNotes, which also explains what could not be added.
         public async Task<List<BOMItemDto>> Calculate(CalculatorInputDto input)
         {
+            var result = await CalculateWithNotes(input);
+            return result.Items;
+        }
+
+        // The actual calculation. Besides the rows it writes a note for everything the calculator
+        // could not do: a component with no suitable product in stock, a product whose stock is
+        // smaller than the quantity needed, and a stove circuit for a building type with no stove rule.
+        public async Task<CalculationResultDto> CalculateWithNotes(CalculatorInputDto input)
+        {
+            var result = new CalculationResultDto();
+
             // Load rules for the selected building type from the database
             var rules = await _context.CalculationRules
                 .Where(r => r.BuildingType == input.BuildingType)
                 .ToListAsync();
 
             if (!rules.Any())
-                return new List<BOMItemDto>();
+                return result;
 
-            // How many circuits are needed per type
+            // How many circuits are needed per type.
+            // NOTE: the divisors 8 and 6 are constants here, not columns of CalculationRule.
+            // The thesis says so openly; moving them into the rule table is a planned change.
             int lightingCircuits = (int)Math.Ceiling(input.LightCount / 8.0);
             int socketCircuits   = (int)Math.Ceiling(input.SocketCount / 6.0);
             int stoveCircuits    = input.HasElectricStove ? 1 : 0;
@@ -44,7 +60,7 @@ namespace ElektriKalkulaator.ApplicationServices.Services
             // Rough wire estimate: 8 metres of cable per room per circuit
             int wireLengthPerCircuit = input.RoomCount * 8;
 
-            var bom = new List<BOMItemDto>();
+            var bom = result.Items;
 
             foreach (var rule in rules)
             {
@@ -81,8 +97,15 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                         TotalPrice          = breaker.Price * circuitCount,
                         CircuitType         = rule.CircuitType,
                         WireCrossSectionMm2 = rule.WireCrossSectionMm2,
-                        Unit                = UnitPieces
+                        Unit                = UnitPieces,
+                        StockQuantity       = breaker.StockQuantity
                     });
+                }
+                else
+                {
+                    // Used to be silent: the row simply vanished and the total looked complete.
+                    result.Notes.Add($"{CircuitName(rule.CircuitType)}: sobivat {rule.BreakerAmperes} A " +
+                                     "kaitselülitit ei ole laos, seetõttu puudub see rida loendist.");
                 }
 
                 // Find the cheapest in-stock cable matching the required cross-section
@@ -112,8 +135,14 @@ namespace ElektriKalkulaator.ApplicationServices.Services
                         CircuitType         = rule.CircuitType,
                         WireCrossSectionMm2 = rule.WireCrossSectionMm2,
                         // Cable is measured and priced per metre, not per piece.
-                        Unit                = UnitMetres
+                        Unit                = UnitMetres,
+                        StockQuantity       = wire.StockQuantity
                     });
+                }
+                else if (wire == null && wireMeters > 0)
+                {
+                    result.Notes.Add($"{CircuitName(rule.CircuitType)}: {rule.WireCrossSectionMm2:0.0} mm² " +
+                                     "kaablit ei ole laos, seetõttu puudub see rida loendist.");
                 }
             }
 
@@ -128,16 +157,21 @@ namespace ElektriKalkulaator.ApplicationServices.Services
             {
                 bom.Add(new BOMItemDto
                 {
-                    ProductId   = panelBox.Id,
-                    ProductName = panelBox.Name,
-                        ImagePath           = panelBox.ImagePath,
-                    Brand       = panelBox.Brand,
-                    Quantity    = 1,
-                    UnitPrice   = panelBox.Price,
-                    TotalPrice  = panelBox.Price,
-                    CircuitType = "panel",
-                    Unit        = UnitPieces
+                    ProductId     = panelBox.Id,
+                    ProductName   = panelBox.Name,
+                    ImagePath     = panelBox.ImagePath,
+                    Brand         = panelBox.Brand,
+                    Quantity      = 1,
+                    UnitPrice     = panelBox.Price,
+                    TotalPrice    = panelBox.Price,
+                    CircuitType   = "panel",
+                    Unit          = UnitPieces,
+                    StockQuantity = panelBox.StockQuantity
                 });
+            }
+            else
+            {
+                result.Notes.Add("Kilbi korpust ei ole laos, seetõttu puudub see rida loendist.");
             }
 
             // Add the RCD — required by EVS-HD 60364 for fault protection
@@ -151,20 +185,57 @@ namespace ElektriKalkulaator.ApplicationServices.Services
             {
                 bom.Add(new BOMItemDto
                 {
-                    ProductId   = rcd.Id,
-                    ProductName = rcd.Name,
-                        ImagePath           = rcd.ImagePath,
-                    Brand       = rcd.Brand,
-                    Quantity    = 1,
-                    UnitPrice   = rcd.Price,
-                    TotalPrice  = rcd.Price,
-                    CircuitType = "rcd",
-                    Unit        = UnitPieces
+                    ProductId     = rcd.Id,
+                    ProductName   = rcd.Name,
+                    ImagePath     = rcd.ImagePath,
+                    Brand         = rcd.Brand,
+                    Quantity      = 1,
+                    UnitPrice     = rcd.Price,
+                    TotalPrice    = rcd.Price,
+                    CircuitType   = "rcd",
+                    Unit          = UnitPieces,
+                    StockQuantity = rcd.StockQuantity
                 });
             }
+            else
+            {
+                result.Notes.Add("Rikkevoolukaitset ei ole laos, seetõttu puudub see rida loendist.");
+            }
 
-            return bom;
+            // Stock is checked above only as "at least one unit". Compare the quantity actually
+            // needed with what is in stock. The same product can appear on more than one row, so
+            // the rows are added up per product before comparing.
+            foreach (var product in bom.Where(b => b.StockQuantity.HasValue).GroupBy(b => b.ProductId))
+            {
+                int needed  = product.Sum(b => b.Quantity);
+                int inStock = product.First().StockQuantity!.Value;
+                if (needed > inStock)
+                {
+                    string unit = product.First().Unit;
+                    result.Notes.Add($"{product.First().ProductName}: vaja on {needed} {unit}, " +
+                                     $"laos on ainult {inStock} {unit}.");
+                }
+            }
+
+            // The stove checkbox is shown for every building type, but only the residential types
+            // have a stove rule. Ticking it for ärihoone used to add nothing and say nothing.
+            if (input.HasElectricStove && !rules.Any(r => r.CircuitType == "stove"))
+            {
+                result.Notes.Add("Elektripliidi ahelat ei lisatud: valitud hoonetüübi jaoks ei ole " +
+                                 "pliidiahela arvutusreeglit määratud. Ülejäänud arvutus on tehtud.");
+            }
+
+            return result;
         }
+
+        // Estonian name of a circuit type, for the notes above.
+        private static string CircuitName(string? circuitType) => circuitType switch
+        {
+            "lighting" => "Valgustus",
+            "socket"   => "Pistikud",
+            "stove"    => "Elektripliit",
+            _          => circuitType ?? "Ahel"
+        };
 
         // Persists the calculation to three tables:
         //   PowerboxCalculation  — session header (status, total cost)
